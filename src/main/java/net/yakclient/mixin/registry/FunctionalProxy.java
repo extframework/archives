@@ -17,7 +17,7 @@ public interface FunctionalProxy {
     }
 
     class ProxyResponseData {
-        private final boolean cancel;
+        public final boolean cancel;
 
         public ProxyResponseData(boolean cancel) {
             this.cancel = cancel;

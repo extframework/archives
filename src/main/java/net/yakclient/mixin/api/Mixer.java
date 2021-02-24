@@ -29,5 +29,5 @@ public @interface Mixer {
      *
      * @return returns the class that will be mixed into.
      */
-    Class<?> type();
+    Class<?> value();
 }

@@ -45,6 +45,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Injection {
+    String METHOD_SELF = "<SELF>";
+
     /**
      * The {@code Injection#to()} method defines the method that
      * will be injected into. If this value is not provided it will
@@ -52,7 +54,7 @@ public @interface Injection {
      *
      * @return the method that will be mixed into.
      */
-    String to() default "<SELF>";
+    String to() default METHOD_SELF;
 
     /**
      * The {@code Injection#type()} method specifies the type

@@ -1,7 +1,8 @@
 package net.yakclient.mixin.registry.proxy;
 
-import com.sun.istack.internal.NotNull;
 import net.yakclient.mixin.registry.FunctionalProxy;
+import net.yakclient.mixin.registry.PointerManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -19,16 +20,18 @@ public class MixinProxyManager {
     }
 
     public static FunctionalProxy.ProxyResponseData proxy(@NotNull UUID uuid) {
+//TODO Example        return new FunctionalProxy.ProxyResponseData(false);
         final MixinProxyManager manager = getInstance();
         if (!manager.proxys.containsKey(uuid)) throw new IllegalArgumentException("Invalid UUID, no proxy found");
         return manager.proxys.get(uuid).accept();
     }
 
-    public static UUID registerProxy(@NotNull ProxiedPointer proxy) {
+    public static ProxiedPointer registerProxy(@NotNull UUID uuid, FunctionalProxy proxy) {
         final MixinProxyManager manager = getInstance();
 
-        if (manager.proxys.containsKey(proxy.getUUID())) throw new IllegalArgumentException("Cannot override existing proxy's. Your UUID's have matched!");
+        if (manager.proxys.containsKey(uuid)) throw new IllegalArgumentException("Cannot override existing proxy's. Your UUID's have matched!");
+        if (!PointerManager.hasPointer(uuid)) throw new IllegalArgumentException("To register a proxy the pointer must first be registered");
 
-        return Objects.requireNonNull(manager.proxys.put(proxy.getUUID(), proxy)).getUUID();
+        return new ProxiedPointer(uuid, proxy);
     }
 }

@@ -1,29 +1,23 @@
 package net.yakclient.mixin.registry.pool;
 
-import net.yakclient.mixin.registry.Pointer;
+import net.yakclient.mixin.registry.PointerManager;
 import net.yakclient.mixin.registry.RegistryPointer;
 
 import java.net.URL;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
 
 public class ExternalLibRegistryPool extends RegistryPool<URL> {
     @Override
-    public CompletableFuture<Pointer> pool(URL type) {
+    public Location pool(URL type) {
         final ExternalLibLocation key = new ExternalLibLocation(type);
-        if (!this.pool.containsKey(key)) this.pool.put(key, new PriorityQueue<>());
+        if (!this.pool.containsKey(key)) this.pool.put(key, new PoolQueue<>(new SuppliedFuture<>(() -> new RegistryPointer(PointerManager.register(this.register(key))))));
 
         this.pool.get(key).add(type);
 
-        return new SuppliedFuture<>(() -> {
-            this.register(this.pool.get(key);
-            return new RegistryPointer()
-        }));
+        return key;
     }
 
     @Override
-    public void register(Queue<URL> queue) {
-
+    public ClassLoader register(Location location) {
+        return null;
     }
 }
