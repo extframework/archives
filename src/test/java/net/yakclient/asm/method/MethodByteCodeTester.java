@@ -1,11 +1,10 @@
 package net.yakclient.asm.method;
 
 import net.yakclient.asm.classloader.CustomClassLoader;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

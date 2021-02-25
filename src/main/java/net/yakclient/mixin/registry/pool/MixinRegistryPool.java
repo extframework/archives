@@ -1,13 +1,26 @@
 package net.yakclient.mixin.registry.pool;
 
+import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
 import net.yakclient.mixin.registry.FunctionalProxy;
 import net.yakclient.mixin.registry.MixinMetaData;
 import net.yakclient.mixin.registry.PointerManager;
 import net.yakclient.mixin.registry.RegistryPointer;
 import net.yakclient.mixin.registry.proxy.MixinProxyManager;
 import net.yakclient.mixin.registry.proxy.ProxiedPointer;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
+    private final BytecodeMethodModifier methodModifier;
+
+    public MixinRegistryPool() {
+        this.methodModifier = new BytecodeMethodModifier();
+    }
+
+
     @Override
     public Location pool(MixinMetaData type) {
         final QualifiedMethodLocation key = QualifiedMethodLocation.fromDataDest(type);
@@ -43,7 +56,28 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
         It wont take a collection because in the end that doest make sense and makes it way more complicated
      */
     @Override
+    @Nullable
     public ClassLoader register(Location location) {
+        try {
+            final PoolQueue<MixinMetaData> pools = this.pool.get(location);
+            for (MixinMetaData data : pools.queue.stream().sorted(new MixinSorter()).collect(Collectors.toList())) {
+                if (location instanceof ProxiedMethodLocation) {
+                    ProxiedMethodLocation proxy = (ProxiedMethodLocation) location;
+                    return this.methodModifier.combine(QualifiedMethodLocation.fromDataOrigin(data), MethodLocation.fromDataDest(data), proxy.getProxy());
+                }
+                return this.methodModifier.combine(QualifiedMethodLocation.fromDataOrigin(data), MethodLocation.fromDataDest(data));
+
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Given class has failed ASM reading. E: " + e.getMessage());
+        }
         return null;
+    }
+
+    private static class MixinSorter implements Comparator<MixinMetaData> {
+        @Override
+        public int compare(MixinMetaData o1, MixinMetaData o2) {
+            return o1.getPriority() - o2.getPriority();
+        }
     }
 }

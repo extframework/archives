@@ -1,4 +1,5 @@
 package net.yakclient.mixin.internal.loader;
 
-public class MixinClassLoader {
+public class MixinClassLoader extends ProxyClassLoader {
+
 }

@@ -1,7 +1,7 @@
 package net.yakclient.asm;
 
 import net.yakclient.asm.classloader.CustomClassLoader;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -69,6 +69,5 @@ public class BasicASMTests {
 
         loader.loadSomeClass(writer2.toByteArray(), "net.yakclient.asm.ASMTestCase");
     }
-
 
 }

@@ -1,6 +1,5 @@
 package net.yakclient.mixin.registry.pool;
 
-import net.yakclient.mixin.registry.FunctionalProxy;
 import net.yakclient.mixin.registry.Pointer;
 import org.jetbrains.annotations.NotNull;
 

@@ -10,10 +10,10 @@ import org.objectweb.asm.Opcodes;
 import java.util.UUID;
 
 public class ProxyMethodForwarder extends MethodInstructionForwarder {
-    private final ProxiedPointer pointer;
+    private final UUID pointer;
     private int ln = 0;
 
-    public ProxyMethodForwarder(MethodVisitor visitor, ProxiedPointer pointer) {
+    public ProxyMethodForwarder(MethodVisitor visitor, UUID pointer) {
         super(visitor);
         this.pointer = pointer;
     }
@@ -105,8 +105,8 @@ L0
         builder.addInstruction(mv -> mv.visitInsn(Opcodes.DUP));
 
 //        builder.addInstruction(mv -> mv.visitVarInsn(Opcodes.ALOAD, 0));
-        builder.addInstruction(mv -> mv.visitLdcInsn(this.pointer.getUUID().getMostSignificantBits()));
-        builder.addInstruction(mv -> mv.visitLdcInsn(this.pointer.getUUID().getLeastSignificantBits()));
+        builder.addInstruction(mv -> mv.visitLdcInsn(this.pointer.getMostSignificantBits()));
+        builder.addInstruction(mv -> mv.visitLdcInsn(this.pointer.getLeastSignificantBits()));
 
         builder.addInstruction(mv -> mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/UUID", "<init>", "(JJ)V", false));
         builder.addInstruction(mv -> mv.visitVarInsn(Opcodes.ASTORE, 1));
