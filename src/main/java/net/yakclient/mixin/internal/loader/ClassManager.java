@@ -5,12 +5,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+//TODO pretty sure i dont need this
 public class ClassManager {
     private final Map<String, ClassLoader> overloads;
+    private final ClassLoader parent;
+
     private static ClassManager instance;
 
     private ClassManager() {
         this.overloads = new HashMap<>();
+        this.parent = getClass().getClassLoader();
     }
 
     @Nullable
@@ -37,6 +41,10 @@ public class ClassManager {
 
     public static boolean hasOverload(String cls) {
         return getInstance().overloads.containsKey(cls);
+    }
+
+    public static ClassLoader parentLoader() {
+        return getInstance().parent;
     }
 
     private static synchronized ClassManager getInstance() {

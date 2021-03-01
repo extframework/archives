@@ -1,7 +1,7 @@
 package net.yakclient.asm.method;
 
 import net.yakclient.asm.classloader.CustomClassLoader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
