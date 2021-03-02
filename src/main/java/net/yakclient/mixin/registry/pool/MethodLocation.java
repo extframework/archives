@@ -4,7 +4,7 @@ import net.yakclient.mixin.registry.MixinMetaData;
 
 import java.util.Objects;
 
-public class MethodLocation implements Location {
+public class MethodLocation implements Location{
     private final Class<?> cls;
     private final String method;
 

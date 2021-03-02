@@ -1,5 +1,6 @@
 package net.yakclient.mixin.registry.pool;
 
+import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.PointerManager;
 import net.yakclient.mixin.registry.RegistryPointer;
 
@@ -17,7 +18,7 @@ public class ExternalLibRegistryPool extends RegistryPool<URL> {
     }
 
     @Override
-    public ClassLoader register(Location location) {
+    public PackageTarget register(Location location) {
         return null;
     }
 }

@@ -1,7 +1,13 @@
 package net.yakclient.mixin.registry;
 
+import net.yakclient.mixin.internal.loader.PackageTarget;
+import net.yakclient.mixin.registry.pool.SuppliedFuture;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class RegistryConfigurator {
     private final Configuration configuration;
@@ -32,15 +38,28 @@ public class RegistryConfigurator {
         return this;
     }
 
-    public static class Configuration {
-        private final List<String> packageBlockList;
+    public SuppliedFuture<Pointer> addTarget(PackageTarget target) {
+        final SuppliedFuture<Pointer> e = new SuppliedFuture<>(()->
+            new RegistryPointer(PointerManager.register(target))
+        );
+        this.configuration.targets.add(e);
+        return e;
+    }
 
-        private final List<String> packageSafeList;
+    public static class Configuration {
+        final List<String> packageBlockList;
+
+        final List<String> packageSafeList;
+
+        final Set<SuppliedFuture<Pointer>> targets;
 
         private Configuration() {
             this.packageBlockList = DefaultConfiguration.BLOCK_LIST.instantiate();
             this.packageSafeList = DefaultConfiguration.SAFE_LIST.instantiate();
+            this.targets = DefaultConfiguration.TARGETS.instantiate();
         }
+
+
     }
 
     @FunctionalInterface
@@ -51,5 +70,6 @@ public class RegistryConfigurator {
     private static class DefaultConfiguration {
         public static final FunctionalConfiguration<List<String>> BLOCK_LIST = ArrayList::new;
         public static final FunctionalConfiguration<List<String>> SAFE_LIST = ArrayList::new;
+        public static final FunctionalConfiguration<Set<SuppliedFuture<Pointer>>> TARGETS = HashSet::new;
     }
 }

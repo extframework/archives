@@ -1,8 +1,5 @@
 package net.yakclient.mixin.internal.instruction;
 
-import net.yakclient.mixin.registry.FunctionalProxy;
-import net.yakclient.mixin.registry.proxy.MixinProxyManager;
-import net.yakclient.mixin.registry.proxy.ProxiedPointer;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -13,8 +10,8 @@ public class ProxyMethodForwarder extends MethodInstructionForwarder {
     private final UUID pointer;
     private int ln = 0;
 
-    public ProxyMethodForwarder(MethodVisitor visitor, UUID pointer) {
-        super(visitor);
+    public ProxyMethodForwarder(MethodVisitor visitor, UUID pointer, boolean shouldReturn) {
+        super(visitor, shouldReturn);
         this.pointer = pointer;
     }
 

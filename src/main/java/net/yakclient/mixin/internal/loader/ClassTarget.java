@@ -10,22 +10,33 @@ public class ClassTarget extends PackageTarget {
         this.cls = cls;
     }
 
-   public static ClassTarget create(String path) {
-       try {
-           if (ClassTarget.class.getClassLoader().loadClass(path) != null) {
-               final String[] fromPath = PackageTarget.fromPath(path);
+    public static ClassTarget create(String path) {
+        try {
+            if (ClassTarget.class.getClassLoader().loadClass(path) != null) {
+                final String[] fromPath = PackageTarget.fromPath(path);
 
-               final int i = fromPath.length - 1;
-               final String[] split = new String[i];
+                final int i = fromPath.length - 1;
+                final String[] split = new String[i];
 
-               System.arraycopy(fromPath, 0, split, 0, i);
+                System.arraycopy(fromPath, 0, split, 0, i);
 
-               return new ClassTarget(split, fromPath[i]);
-           } else throw new ClassNotFoundException("Failed to find specified class");
-       } catch (ClassNotFoundException e) {
-           throw new IllegalArgumentException("Invalid class path");
-       }
-   }
+                return new ClassTarget(split, fromPath[i]);
+            } else throw new ClassNotFoundException("Failed to find specified class");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Invalid class path");
+        }
+    }
+
+    public static ClassTarget create(Class<?> path) {
+        final String[] fromPath = PackageTarget.fromPath(path.getName());
+
+        final int i = fromPath.length - 1;
+        final String[] split = new String[i];
+
+        System.arraycopy(fromPath, 0, split, 0, i);
+
+        return new ClassTarget(split, fromPath[i]);
+    }
 
     @Override
     public boolean equals(Object o) {

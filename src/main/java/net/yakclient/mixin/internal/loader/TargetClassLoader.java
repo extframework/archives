@@ -5,18 +5,18 @@ import java.io.InputStream;
 
 public class TargetClassLoader extends ProxyClassLoader {
     private final PackageTarget target;
-    private final ProxyClassLoader lazyParent;
+//    private final ProxyClassLoader lazyParent;
 
-    public TargetClassLoader(ProxyClassLoader parent, PackageTarget target) {
-        super(null);
-        this.lazyParent = parent;
+    public TargetClassLoader(ClassLoader parent, PackageTarget target) {
+        super(parent);
+//        this.lazyParent = parent;
         this.target = target;
     }
 
     @Override
     protected final Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         final ClassTarget target = ClassTarget.create(name);
-        if (!this.target.isTargetOf(target)) return this.lazyParent.loadClass(name, resolve);
+        if (!this.target.isTargetOf(target)) return super.loadClass(name, resolve);
         try {
             Class<?> c = this.findLoadedClass(name);
 

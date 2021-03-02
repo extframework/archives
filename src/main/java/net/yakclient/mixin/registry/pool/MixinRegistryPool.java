@@ -1,13 +1,16 @@
 package net.yakclient.mixin.registry.pool;
 
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
+import net.yakclient.mixin.internal.loader.ClassTarget;
+import net.yakclient.mixin.internal.loader.ContextPoolManager;
+import net.yakclient.mixin.internal.loader.PackageTarget;
+import net.yakclient.mixin.internal.loader.ProxyClassLoader;
 import net.yakclient.mixin.registry.FunctionalProxy;
 import net.yakclient.mixin.registry.MixinMetaData;
 import net.yakclient.mixin.registry.PointerManager;
 import net.yakclient.mixin.registry.RegistryPointer;
 import net.yakclient.mixin.registry.proxy.MixinProxyManager;
 import net.yakclient.mixin.registry.proxy.ProxiedPointer;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -56,22 +59,32 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
         It wont take a collection because in the end that doest make sense and makes it way more complicated
      */
     @Override
-    @Nullable
-    public ClassLoader register(Location location) {
+    public PackageTarget register(Location location) {
         try {
             final PoolQueue<MixinMetaData> pools = this.pool.get(location);
+            if (!(location instanceof MethodLocation)) throw new IllegalArgumentException("Provided location must be a MethodLocation!");
+
+            final ClassTarget sysTarget = ClassTarget.create(((MethodLocation) location).getCls());
+            final ProxyClassLoader loader = ContextPoolManager.createLoader(sysTarget);
+            ContextPoolManager.applyTarget(sysTarget, loader);
+
             for (MixinMetaData data : pools.queue.stream().sorted(new MixinSorter()).collect(Collectors.toList())) {
+                byte[] b;
+
+                final QualifiedMethodLocation source = QualifiedMethodLocation.fromDataOrigin(data);
+                final MethodLocation dest = MethodLocation.fromDataDest(data);
+
                 if (location instanceof ProxiedMethodLocation) {
                     ProxiedMethodLocation proxy = (ProxiedMethodLocation) location;
-                    return this.methodModifier.combine(QualifiedMethodLocation.fromDataOrigin(data), MethodLocation.fromDataDest(data), proxy.getProxy());
-                }
-                return this.methodModifier.combine(QualifiedMethodLocation.fromDataOrigin(data), MethodLocation.fromDataDest(data));
+                    b = this.methodModifier.combine(source, dest, proxy.getProxy());
+                } else b = this.methodModifier.combine(source, dest);
 
+                loader.defineClass(dest.getCls().getName(), b);
             }
+            return sysTarget;
         } catch (IOException e) {
             throw new IllegalArgumentException("Given class has failed ASM reading. E: " + e.getMessage());
         }
-        return null;
     }
 
     private static class MixinSorter implements Comparator<MixinMetaData> {

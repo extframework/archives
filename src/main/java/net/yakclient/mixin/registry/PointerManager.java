@@ -1,5 +1,6 @@
 package net.yakclient.mixin.registry;
 
+import net.yakclient.mixin.internal.loader.PackageTarget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PointerManager {
-    private final Map<UUID, ClassLoader> loaders;
+    private final Map<UUID, PackageTarget> loaders;
     private static PointerManager instance;
 
     private PointerManager() {
@@ -20,9 +21,9 @@ public class PointerManager {
         return instance;
     }
 
-    public static @NotNull UUID register(ClassLoader csl) {
+    public static @NotNull UUID register(PackageTarget target) {
         final UUID key = UUID.randomUUID();
-        getInstance().loaders.put(key, csl);
+        getInstance().loaders.put(key, target);
         return key;
     }
 
@@ -32,13 +33,13 @@ public class PointerManager {
         return key;
     }
 
-    public static UUID overload(UUID uuid, ClassLoader csl) {
-        getInstance().loaders.put(uuid, csl);
+    public static UUID overload(UUID uuid, PackageTarget target) {
+        getInstance().loaders.put(uuid, target);
         return uuid;
     }
 
     @Nullable
-    public static ClassLoader retrieve(UUID uuid) {
+    public static PackageTarget retrieve(UUID uuid) {
         return getInstance().loaders.get(uuid);
     }
 

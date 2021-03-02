@@ -8,6 +8,6 @@ public class MixinSourceClassTest {
     }
 
     public void printTheString() {
-        System.out.println(this.testString);
+        System.out.println("I love combining bytecode");
     }
 }

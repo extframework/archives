@@ -1,12 +1,15 @@
 package net.yakclient.mixin.internal.instruction;
 
+import net.yakclient.mixin.internal.methodadapter.MethodInjectionPatternMatcher;
 import org.objectweb.asm.*;
 
 public class MethodInstructionForwarder extends MethodVisitor {
     protected final Instruction.InstructionBuilder builder;
+    private final boolean shouldReturn;
 
-    public MethodInstructionForwarder(MethodVisitor visitor) {
+    public MethodInstructionForwarder(MethodVisitor visitor, boolean shouldReturn) {
         super(Opcodes.ASM6, visitor);
+        this.shouldReturn = shouldReturn;
         this.builder = new Instruction.InstructionBuilder();
     }
 
@@ -22,7 +25,8 @@ public class MethodInstructionForwarder extends MethodVisitor {
 
     @Override
     public void visitInsn(int opcode) {
-        this.builder.addInstruction(v -> v.visitInsn(opcode));
+        if (!(!this.shouldReturn && MethodInjectionPatternMatcher.isReturn(opcode)))
+            this.builder.addInstruction(v -> v.visitInsn(opcode));
         super.visitInsn(opcode);
     }
 

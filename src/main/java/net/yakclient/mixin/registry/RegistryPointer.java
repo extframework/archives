@@ -1,5 +1,7 @@
 package net.yakclient.mixin.registry;
 
+import net.yakclient.mixin.internal.loader.ContextPoolManager;
+import net.yakclient.mixin.internal.loader.DynamicContextPool;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Objects;
@@ -12,14 +14,15 @@ public class RegistryPointer implements Pointer {
         this.uuid = uuid;
     }
 
-    public UUID getUUID() {
+    @Override
+    public UUID getIdentifier() {
         return uuid;
     }
 
     @Override
     public Class<?> retrieveClass(String cls) throws ClassNotFoundException {
         if (!PointerManager.hasPointer(this.uuid)) throw new IllegalStateException("Pointers must be registered");
-        return PointerManager.retrieve(this.uuid).loadClass(cls);
+        return ContextPoolManager.loadClass(cls);   // PointerManager.retrieve(this.uuid)
     }
 
     @Override
@@ -33,11 +36,12 @@ public class RegistryPointer implements Pointer {
         }
     }
 
-    @Override
-    public ClassLoader classLoader() {
-        if (!PointerManager.hasPointer(this.uuid)) throw new IllegalStateException("Pointers must be registered");
-        return PointerManager.retrieve(this.uuid);
-    }
+    //TODO
+//    @Override
+//    public ClassLoader classLoader() {
+//        if (!PointerManager.hasPointer(this.uuid)) throw new IllegalStateException("Pointers must be registered");
+//        return PointerManager.retrieve(this.uuid);
+//    }
 
     @Override
     public boolean equals(Object o) {

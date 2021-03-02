@@ -2,10 +2,9 @@ package net.yakclient.mixin.registry;
 
 import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.Mixer;
-import net.yakclient.mixin.registry.pool.ExternalLibRegistryPool;
-import net.yakclient.mixin.registry.pool.Location;
-import net.yakclient.mixin.registry.pool.MixinRegistryPool;
-import net.yakclient.mixin.registry.pool.RegistryPool;
+import net.yakclient.mixin.internal.loader.ContextPoolManager;
+import net.yakclient.mixin.internal.loader.PackageTarget;
+import net.yakclient.mixin.registry.pool.*;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -22,17 +21,19 @@ public class MixinRegistry {
         this.configuration = configuration;
         this.libRegistry = new ExternalLibRegistryPool();
         this.mixinRegistry = new MixinRegistryPool();
+
+        for (SuppliedFuture<Pointer> target : this.configuration.targets)
+            ContextPoolManager.applyTarget(PointerManager.retrieve(target.get().getIdentifier()));
     }
 
     //TODO there needs to be a better way to have the mixin pool get dumped. Currently nothing will happen if one of our calls is not invoked. A solution could be spawning off another thread and then having a callback? For external libs its very simple and will just go when its needed.
 
     /**
      * Registers a Mixin from the given class.
-     *
+     * <p>
      * Right now it doest make sense to return a pointer after adding the mixin.
      * there would be virtually nothing you would need to do with it and accessing
      * the class would already be provided by calling the default classloader etc.
-     *
      *
      * @param cls The class to take mixins from
      * @return MixinRegistry for easy access.

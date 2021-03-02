@@ -72,7 +72,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
      */
     public abstract void visitInsn();
 
-    boolean isReturn(int opcode) {
+    public static boolean isReturn(int opcode) {
         switch (opcode) {
             case Opcodes.IRETURN:
             case Opcodes.LRETURN:

@@ -2,6 +2,8 @@ package net.yakclient.mixin.internal.loader;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.PreDestroy;
+
 public class ContextPoolManager {
     private static ContextPoolManager instance;
     private final ContextPool pool;
@@ -36,9 +38,9 @@ public class ContextPoolManager {
      * @see Context
      * @see ContextPool
      */
-    public static Context applyTarget(String target) {
+    public static Context applyTarget(PackageTarget target) {
         final ContextPoolManager instance = getInstance();
-        return instance.pool.addTarget(target, null);
+        return instance.pool.addTarget(target);
     }
 
     /**
@@ -51,9 +53,10 @@ public class ContextPoolManager {
      * @see Context
      * @see ContextPool
      */
-    public static Context applyTarget(String target, @NotNull ClassLoader loader) {
+    public static PackageTarget applyTarget(PackageTarget target, @NotNull ClassLoader loader) {
         final ContextPoolManager instance = getInstance();
-        return instance.pool.addTarget(target, loader);
+        instance.pool.addTarget(target, loader);
+        return target;
     }
 
     /**
@@ -65,7 +68,7 @@ public class ContextPoolManager {
      * @return The loaded class.
      * @throws ClassNotFoundException If this class isn't found.
      */
-    static Class<?> loadClass(String name) throws ClassNotFoundException {
+   public static Class<?> loadClass(String name) throws ClassNotFoundException {
         final ContextPoolManager manager = getInstance();
 
         if (!isTargeted(name)) manager.loader.loadClass(name);
@@ -76,7 +79,23 @@ public class ContextPoolManager {
         return aClass;
     }
 
+    /**
+     * Creates a new TargetClassLoader targeted with the location given. For any
+     * operation with MixinUtils the ProxyClassLoader must be the default but an
+     * exception can be throw here if that is not the case.
+     *
+     * A side note; The return of this method SHOULD NOT BE STORED! This could
+     * very well cause massive leaks in class reloading through memory.
+     *
+     * @param target The String to target for.
+     * @return The classloader produced.
+     */
+    public static TargetClassLoader createLoader(PackageTarget target) {
+        final ContextPoolManager instance = getInstance();
 
+        if (!(instance.loader instanceof ProxyClassLoader)) throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
+        return new TargetClassLoader((ProxyClassLoader) instance.loader, target);
+    }
 
     public static ContextPoolManager getInstance() {
         if (instance == null) return (instance = new ContextPoolManager());

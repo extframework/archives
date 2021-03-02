@@ -1,5 +1,6 @@
 package net.yakclient.mixin.registry.pool;
 
+import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.Pointer;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ public abstract class RegistryPool<T> {
 
 
 
-    public abstract ClassLoader register(Location location);
+    public abstract PackageTarget register(Location location);
 
     public void empty(Location location) {
 

@@ -12,7 +12,7 @@ public class MixinClassVisitor extends ClassVisitor {
     private final String targetMethod;
 
     public MixinClassVisitor(ClassVisitor visitor, Instruction instruction, MethodInjectionPatternMatcher.MatcherPattern pattern, String targetMethod) {
-        super(Opcodes.ASM6,visitor);
+        super(Opcodes.ASM6, visitor);
         this.instruction = instruction;
         this.pattern = pattern;
         this.targetMethod = targetMethod;

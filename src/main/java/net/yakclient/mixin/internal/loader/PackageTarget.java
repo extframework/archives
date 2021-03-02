@@ -17,7 +17,12 @@ public class PackageTarget {
         return new PackageTarget(fromPath(path));
     }
 
-   protected static String[] fromPath(String path) {
+    public static PackageTarget create(Class<?> cls) {
+        return new PackageTarget(fromPath(cls.getPackage().getName()));
+    }
+
+
+    protected static String[] fromPath(String path) {
         return path.split("\\.");
     }
 
@@ -32,7 +37,9 @@ public class PackageTarget {
         if (this.equals(target)) return true;
 
         boolean isTarget = false;
-        for (int i = 0; i < this.path.length; i++) isTarget = this.path[i].equals(target.path[i]);
+        for (int i = 0; i < this.path.length; i++) {
+             isTarget = target.path.length > i && this.path[i].equals(target.path[i]);
+        }
 
         return isTarget;
     }

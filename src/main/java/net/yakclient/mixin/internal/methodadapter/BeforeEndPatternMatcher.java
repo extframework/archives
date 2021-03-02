@@ -32,17 +32,20 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
 
     @Override
     public void visitEnd() {
-        if (this.state == FOUND_RETURN) {
+        //Pointless but is nice for cleanup
+        if (this.state == FOUND_RETURN)
             this.state = FOUND_LAST_RETURN;
-            this.executeInsn();
-            super.visitInsn(this.returnType);
-        }
+
+        this.executeInsn();
+        super.visitInsn(this.returnType);
         super.visitEnd();
     }
 
     @Override
     public void visitInsn() {
-        if (state == FOUND_RETURN) state = NOT_MATCHED;
-
+        if (state == FOUND_RETURN) {
+            state = NOT_MATCHED;
+            this.visitInsn(this.returnType);
+        }
     }
 }

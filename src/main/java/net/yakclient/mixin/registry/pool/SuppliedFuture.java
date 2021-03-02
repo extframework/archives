@@ -12,8 +12,8 @@ public class SuppliedFuture<T> extends CompletableFuture<T> {
     }
 
     @Override
-    public T get() throws InterruptedException, ExecutionException {
+    public T get() {
         if (!this.isDone()) this.complete(this.supplier.get());
-        return super.get();
+        return this.supplier.get();
     }
 }
