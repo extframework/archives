@@ -1,17 +1,24 @@
 package net.yakclient.mixin.internal.instruction;
 
 import net.yakclient.mixin.internal.methodadapter.MethodInjectionPatternMatcher;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.*;
 
 public class MethodInstructionForwarder extends MethodVisitor {
     protected final Instruction.InstructionBuilder builder;
     private final boolean shouldReturn;
+    @NotNull private final String ownerSource;
+    @NotNull private final String ownerDest;
 
-    public MethodInstructionForwarder(MethodVisitor visitor, boolean shouldReturn) {
-        super(Opcodes.ASM6, visitor);
-        this.shouldReturn = shouldReturn;
+    public MethodInstructionForwarder(MethodVisitor mv, boolean shouldReturn, @NotNull String ownerSource,  @NotNull String ownerDest) {
+        super(Opcodes.ASM6, mv);
         this.builder = new Instruction.InstructionBuilder();
+        this.shouldReturn = shouldReturn;
+        this.ownerSource = ownerSource.replace('.', '/');
+        this.ownerDest = ownerDest.replace('.', '/');
     }
+
+
 
     public Instruction toInstructions() {
         return this.builder.build();
@@ -56,13 +63,15 @@ public class MethodInstructionForwarder extends MethodVisitor {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-        this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc));
+        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC) this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc));
+        else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc));
         super.visitMethodInsn(opcode, owner, name, desc);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-        this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
+        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC) this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc, itf));
+       else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 

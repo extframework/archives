@@ -14,7 +14,7 @@ public class BytecodeMethodModifier {
     public byte[] combine(QualifiedMethodLocation source, MethodLocation dest) throws IOException {
 
         ClassReader sourceReader = new ClassReader(source.getCls().getName());
-        InstructionClassVisitor instructionVisitor = new InstructionClassVisitor(new ClassWriter(0), source.getMethod());
+        InstructionClassVisitor instructionVisitor = new InstructionClassVisitor(new ClassWriter(0), source.getMethod(), source.getCls(), dest.getCls());
         sourceReader.accept(instructionVisitor, 0);
 
         return this.apply(source, dest, instructionVisitor);
@@ -22,7 +22,7 @@ public class BytecodeMethodModifier {
 
     public byte[] combine(QualifiedMethodLocation source, MethodLocation dest, UUID pointer) throws IOException {
         ClassReader sourceReader = new ClassReader(source.getCls().getName());
-        InstructionClassVisitor instructionVisitor = new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), pointer, source.getMethod());
+        InstructionClassVisitor instructionVisitor = new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), source.getMethod(), source.getCls(), dest.getCls(), pointer);
         sourceReader.accept(instructionVisitor, 0);
 
         return this.apply(source, dest, instructionVisitor);

@@ -1,5 +1,7 @@
 package net.yakclient.apitests;
 
+import org.junit.jupiter.api.Test;
+
 public class MixinSourceClassTest {
     private final String testString;
 
@@ -7,7 +9,13 @@ public class MixinSourceClassTest {
         this.testString = testString;
     }
 
-    public void printTheString() {
-        System.out.println("I love combining bytecode");
+    public void shadowMethod() {
+        System.out.println("A shadow method has been called!");
     }
+
+    public void printTheString() {
+        System.out.println(this.testString);
+    }
+
+
 }

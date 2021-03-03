@@ -17,12 +17,16 @@ public class InstructionClassVisitor extends ClassVisitor {
     private final String targetMethod;
     private boolean found = false;
     private MethodInstructionForwarder forwarder;
+    protected final Class<?> source;
+    protected final Class<?> dest;
 
     private static final String VOID_RETURN_PATTERN = "(.*)V";
 
-    public InstructionClassVisitor(ClassVisitor visitor, String targetMethod) {
-    super(Opcodes.ASM6,visitor);
+    public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, Class<?> source, Class<?> dest) {
+        super(Opcodes.ASM6, visitor);
         this.targetMethod = targetMethod;
+        this.source = source;
+        this.dest = dest;
     }
 
     public boolean found() {
@@ -38,7 +42,7 @@ public class InstructionClassVisitor extends ClassVisitor {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
         if (visitor != null && targetMethod != null && targetMethod.equals(name) && !found) {
             this.found = true;
-            return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc));
+            return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source.getName(), this.dest.getName());
         }
         return visitor;
     }
@@ -52,15 +56,16 @@ public class InstructionClassVisitor extends ClassVisitor {
     public static class InstructionProxyVisitor extends InstructionClassVisitor {
         private final UUID pointer;
 
-        public InstructionProxyVisitor(ClassWriter writer, UUID pointer, String targetMethod) {
-            super(writer, targetMethod);
+        public InstructionProxyVisitor(ClassVisitor visitor, String targetMethod, Class<?> source, Class<?> dest, UUID pointer) {
+            super(visitor, targetMethod, source, dest);
             this.pointer = pointer;
         }
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
             final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
-            if (visitor != null) return new ProxyMethodForwarder(visitor, this.pointer, this.shouldReturn(signature));
+            if (visitor != null)
+                return new ProxyMethodForwarder(visitor, this.shouldReturn(signature), this.source.getName(), this.dest.getName(), this.pointer);
             return null;
         }
     }

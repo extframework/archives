@@ -7,6 +7,7 @@ import net.yakclient.mixin.internal.loader.ClassTarget;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.internal.loader.ProxyClassLoader;
 import net.yakclient.mixin.internal.loader.TargetClassLoader;
+import net.yakclient.mixin.registry.MixinRegistry;
 import net.yakclient.mixin.registry.Pointer;
 import net.yakclient.mixin.registry.RegistryConfigurator;
 import net.yakclient.mixin.registry.pool.MethodLocation;
@@ -30,18 +31,13 @@ public class RegistryTest {
     //for testing
 
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        System.out.println("GOt here");
-        final Class<RegistryConfigurator> registryConfiguratorClass = RegistryConfigurator.class;
         final RegistryConfigurator configure = RegistryConfigurator.configure();
-        final SuppliedFuture<Pointer> pointerCompletableFuture = configure.addTarget(PackageTarget.create("net.yakclient"));
-        configure.create().registerMixin(MixinTestCase.class).dumpAll();
-//        Thread.currentThread().getContextClassLoader().loadClass(MixinTestCase.class.getName());
-        Class<?> cls = MixinSourceClassTest.class;
-        MixinSourceClassTest test = new MixinSourceClassTest("Ayay, whats this:?");
-//        final Object obj = cls3.getConstructor(String.class).newInstance("YAYA");
-//        cls3.getMethod("printTheString").invoke(obj);
+        final SuppliedFuture<Pointer> target = configure.addTarget(PackageTarget.create("net.yakclient"));
+        final MixinRegistry mixinRegistry = configure.create();
 
-        final Class<?> aClass = pointerCompletableFuture.get().retrieveClass(MixinSourceClassTest.class.getName());
+        mixinRegistry.registerMixin(MixinTestCase.class).dumpAll();
+
+        final Class<?> aClass = target.get().retrieveClass(MixinSourceClassTest.class.getName());
         final Object obj = aClass.getConstructor(String.class).newInstance("YAYA");
         aClass.getMethod("printTheString").invoke(obj);
     }

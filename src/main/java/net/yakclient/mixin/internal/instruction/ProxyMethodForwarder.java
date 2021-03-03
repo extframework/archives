@@ -10,8 +10,8 @@ public class ProxyMethodForwarder extends MethodInstructionForwarder {
     private final UUID pointer;
     private int ln = 0;
 
-    public ProxyMethodForwarder(MethodVisitor visitor, UUID pointer, boolean shouldReturn) {
-        super(visitor, shouldReturn);
+    public ProxyMethodForwarder(MethodVisitor mv, boolean shouldReturn, String ownerSource, String ownerDest, UUID pointer) {
+        super(mv, shouldReturn, ownerSource, ownerDest);
         this.pointer = pointer;
     }
 
