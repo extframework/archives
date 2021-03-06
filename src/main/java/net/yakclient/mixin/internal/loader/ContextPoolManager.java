@@ -2,8 +2,6 @@ package net.yakclient.mixin.internal.loader;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.PreDestroy;
-
 public class ContextPoolManager {
     private static ContextPoolManager instance;
     private final ContextPool pool;
@@ -94,7 +92,7 @@ public class ContextPoolManager {
         final ContextPoolManager instance = getInstance();
 
         if (!(instance.loader instanceof ProxyClassLoader)) throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
-        return new TargetClassLoader((ProxyClassLoader) instance.loader, target);
+        return new TargetClassLoader(instance.loader, target);
     }
 
     public static ContextPoolManager getInstance() {

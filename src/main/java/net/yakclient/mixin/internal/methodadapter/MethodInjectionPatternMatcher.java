@@ -5,10 +5,12 @@ import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.util.Queue;
+
 public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     @FunctionalInterface
     private interface MatcherInitializer {
-        MethodInjectionPatternMatcher apply(MethodVisitor v, Instruction insn);
+        MethodInjectionPatternMatcher apply(MethodVisitor v, Queue<Instruction> insn);
     }
 
     public enum MatcherPattern {
@@ -23,7 +25,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
             this.matcher = matcher;
         }
 
-        public MethodInjectionPatternMatcher match(MethodVisitor v, Instruction insn) {
+        public MethodInjectionPatternMatcher match(MethodVisitor v, Queue<Instruction> insn) {
             return this.matcher.apply(v, insn);
         }
 
@@ -41,18 +43,25 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
         }
     }
 
-    private final Instruction instruction;
+    private final Queue<Instruction> instructions;
     static final int NOT_MATCHED = 0;
 
     int state = NOT_MATCHED;
 
-    public MethodInjectionPatternMatcher(MethodVisitor visitor, Instruction instruction) {
+    public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<Instruction> instructions) {
         super(Opcodes.ASM6, visitor);
-        this.instruction = instruction;
+        this.instructions = instructions;
     }
 
     void executeInsn() {
-        this.instruction.execute(this.mv);
+        for (Instruction insn : this.instructions) {
+            insn.execute(this.mv);
+        }
+    }
+
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        super.visitMaxs(maxStack, maxLocals);
     }
 
     @Override

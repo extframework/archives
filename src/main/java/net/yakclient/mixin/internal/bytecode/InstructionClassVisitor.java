@@ -14,15 +14,15 @@ import java.util.regex.Pattern;
 
 public class InstructionClassVisitor extends ClassVisitor {
     //    private final Set<String> toFind;
-    private final String targetMethod;
-    private boolean found = false;
-    private MethodInstructionForwarder forwarder;
-    protected final Class<?> source;
-    protected final Class<?> dest;
+    protected final String targetMethod;
+    protected boolean found = false;
+    protected MethodInstructionForwarder forwarder;
+    protected final String source;
+    protected final String dest;
 
     private static final String VOID_RETURN_PATTERN = "(.*)V";
 
-    public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, Class<?> source, Class<?> dest) {
+    public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, String source, String dest) {
         super(Opcodes.ASM6, visitor);
         this.targetMethod = targetMethod;
         this.source = source;
@@ -37,12 +37,16 @@ public class InstructionClassVisitor extends ClassVisitor {
         return this.forwarder.toInstructions();
     }
 
+    protected final MethodVisitor visitSuperMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        return super.visitMethod(access, name, desc, signature, exceptions);
+    }
+
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
+        final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
         if (visitor != null && targetMethod != null && targetMethod.equals(name) && !found) {
             this.found = true;
-            return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source.getName(), this.dest.getName());
+            return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source, this.dest);
         }
         return visitor;
     }
@@ -56,17 +60,19 @@ public class InstructionClassVisitor extends ClassVisitor {
     public static class InstructionProxyVisitor extends InstructionClassVisitor {
         private final UUID pointer;
 
-        public InstructionProxyVisitor(ClassVisitor visitor, String targetMethod, Class<?> source, Class<?> dest, UUID pointer) {
+        public InstructionProxyVisitor(ClassVisitor visitor, String targetMethod, String source, String dest, UUID pointer) {
             super(visitor, targetMethod, source, dest);
             this.pointer = pointer;
         }
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-            final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
-            if (visitor != null)
-                return new ProxyMethodForwarder(visitor, this.shouldReturn(signature), this.source.getName(), this.dest.getName(), this.pointer);
-            return null;
+            final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
+            if (visitor != null && targetMethod != null && targetMethod.equals(name) && !found) {
+                this.found = true;
+                return this.forwarder = new ProxyMethodForwarder(visitor, this.shouldReturn(desc), this.source, this.dest, this.pointer);
+            }
+            return visitor;
         }
     }
 }

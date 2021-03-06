@@ -18,8 +18,6 @@ public class MethodInstructionForwarder extends MethodVisitor {
         this.ownerDest = ownerDest.replace('.', '/');
     }
 
-
-
     public Instruction toInstructions() {
         return this.builder.build();
     }

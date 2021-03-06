@@ -4,15 +4,18 @@ import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.util.Queue;
+
 public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
     private static final int FOUND_RETURN = 1;
     private static final int FOUND_LAST_RETURN = 2;
 
     private int returnType = Opcodes.RETURN;
 
-    public BeforeEndPatternMatcher(MethodVisitor visitor, Instruction instruction) {
-        super(visitor, instruction);
+    public BeforeEndPatternMatcher(MethodVisitor visitor, Queue<Instruction> instructions) {
+        super(visitor, instructions);
     }
+
 
     // int IRETURN = 172; // visitInsn
     //    int LRETURN = 173; // -

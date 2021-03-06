@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class RegistryConfigurator {
     private final Configuration configuration;
@@ -25,9 +24,13 @@ public class RegistryConfigurator {
     }
 
     public MixinRegistry create() {
-        return new MixinRegistry(this.configuration);
+        return MixinRegistry.create(this.configuration);
     }
 
+
+    /*
+        Public actions
+     */
     public RegistryConfigurator addSafePackage(String location) {
         this.configuration.packageSafeList.add(location);
         return this;
@@ -38,12 +41,14 @@ public class RegistryConfigurator {
         return this;
     }
 
-    public SuppliedFuture<Pointer> addTarget(PackageTarget target) {
-        final SuppliedFuture<Pointer> e = new SuppliedFuture<>(()->
-            new RegistryPointer(PointerManager.register(target))
-        );
-        this.configuration.targets.add(e);
-        return e;
+    public PackageTarget addTarget(PackageTarget target) {
+//        final SuppliedFuture<Pointer> e = new SuppliedFuture<>(()->
+//            new RegistryPointer(PointerManager.register(target))
+//        );
+        this.configuration.targets.add(target);
+        return target;
+//        this.configuration.targets.add(e);
+//        return e;
     }
 
     public static class Configuration {
@@ -51,15 +56,13 @@ public class RegistryConfigurator {
 
         final List<String> packageSafeList;
 
-        final Set<SuppliedFuture<Pointer>> targets;
+        final Set<PackageTarget> targets;
 
         private Configuration() {
             this.packageBlockList = DefaultConfiguration.BLOCK_LIST.instantiate();
             this.packageSafeList = DefaultConfiguration.SAFE_LIST.instantiate();
             this.targets = DefaultConfiguration.TARGETS.instantiate();
         }
-
-
     }
 
     @FunctionalInterface
@@ -70,6 +73,6 @@ public class RegistryConfigurator {
     private static class DefaultConfiguration {
         public static final FunctionalConfiguration<List<String>> BLOCK_LIST = ArrayList::new;
         public static final FunctionalConfiguration<List<String>> SAFE_LIST = ArrayList::new;
-        public static final FunctionalConfiguration<Set<SuppliedFuture<Pointer>>> TARGETS = HashSet::new;
+        public static final FunctionalConfiguration<Set<PackageTarget>> TARGETS = HashSet::new;
     }
 }

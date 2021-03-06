@@ -1,11 +1,9 @@
 package net.yakclient.mixin.registry.pool;
 
 import net.yakclient.mixin.internal.loader.PackageTarget;
-import net.yakclient.mixin.registry.Pointer;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public abstract class RegistryPool<T> {
     protected final Map<Location, PoolQueue<T>> pool;
@@ -31,53 +29,93 @@ public abstract class RegistryPool<T> {
         }
     }
 
-    public CompletableFuture<Pointer> retrieve(@NotNull Location location) {
-       return this.pool.get(location).future;
-    }
+//    public CompletableFuture<Pointer> retrieve(@NotNull Location location) {
+//       return this.pool.get(location).future;
+//    }
 
-    static class PoolQueue<T> implements Iterable<T> {
-        protected final Queue<T> queue;
-        private final CompletableFuture<Pointer> future;
+    static class PoolQueue<T> /* implements Iterable<T> */ {
+        protected final Queue<PoolNode<T>> queue;
+//        private final Runnable register;
 
-        public PoolQueue(CompletableFuture<Pointer> future) {
-            this.queue = new PriorityQueue<>();
-            this.future = future;
+        public PoolQueue() {
+//            this.register = register;
+//            this.queue = new LinkedList<>();
+            this.queue = new LinkedList<>();
         }
 
-        public CompletableFuture<Pointer> getFuture() {
-            return future;
-        }
 
-        public PoolQueue<T> add(T type) {
-            this.queue.add(type);
+
+//        public void register() {
+//            this.register.run();
+//        }
+
+
+        public PoolQueue<T> add(T type, Consumer<PackageTarget> registration) {
+            this.queue.add(new PoolNode<>(type, registration));
             return this;
         }
 
-        /*
-            This is a destructive iterator in that all items will be removed from the Queue.
-         */
-        @NotNull
-        @Override
-        public Iterator<T> iterator() {
-            return new PoolQueueIterator(this.queue);
+        public PoolQueue<T> add(T type, Consumer<PackageTarget> registration, UUID proxy) {
+            this.queue.add(new ProxiedPoolNode<>(type, registration, proxy));
+            return this;
         }
 
-        private class PoolQueueIterator implements Iterator<T> {
-            private final Queue<T> queue;
+        public static class PoolNode<T> {
+            private final T value;
+            private final Consumer<PackageTarget> registration;
 
-            public PoolQueueIterator(Queue<T> queue) {
-                this.queue = queue;
+            PoolNode(T value, Consumer<PackageTarget> registration) {
+                this.value = value;
+                this.registration = registration;
             }
 
-            @Override
-            public boolean hasNext() {
-                return !this.queue.isEmpty();
+            public T getValue() {
+                return this.value;
             }
 
-            @Override
-            public T next() {
-                return queue.poll();
+            public void run(PackageTarget target) {
+                this.registration.accept(target);
             }
         }
+
+        public static class ProxiedPoolNode<T> extends PoolNode<T> {
+            private final UUID proxy;
+
+            ProxiedPoolNode(T value, Consumer<PackageTarget> registration, UUID proxy) {
+                super(value, registration);
+                this.proxy = proxy;
+            }
+
+            public UUID getProxy() {
+                return proxy;
+            }
+        }
+//
+//        /*
+//            This is a destructive iterator in that all items will be removed from the Queue.
+//         */
+//        @NotNull
+//        @Override
+//        public Iterator<T> iterator() {
+//            return new PoolQueueIterator(this.queue);
+//        }
+//
+//        private class PoolQueueIterator implements Iterator<T> {
+//            private final Queue<T> queue;
+//
+//            public PoolQueueIterator(Queue<T> queue) {
+//                this.queue = queue;
+//            }
+//
+//            @Override
+//            public boolean hasNext() {
+//                return !this.queue.isEmpty();
+//            }
+//
+//            @Override
+//            public T next() {
+//                return queue.poll();
+//            }
+//        }
     }
 }

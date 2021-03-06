@@ -74,6 +74,7 @@ L0
 
 
 
+
     @Override
     public void visitLineNumber(int line, Label start) {
         this.ln = line;
@@ -87,6 +88,7 @@ L0
 
     private Instruction.InstructionBuilder applyProxy(int ln) {
         Instruction.InstructionBuilder builder = new Instruction.InstructionBuilder();
+
 
         final Label l0 = new Label();
         final Label l1 = new Label();
@@ -125,7 +127,6 @@ L0
 
         builder.addInstruction(mv -> mv.visitJumpInsn(Opcodes.IFNE, l3));
 
-
         //Label 4
         builder.addInstruction(mv -> mv.visitLabel(l4));
         builder.addInstruction(mv -> mv.visitLineNumber(ln + 4, l4));
@@ -135,6 +136,7 @@ L0
         //Label 3
         builder.addInstruction(mv -> mv.visitLabel(l3));
         builder.addInstruction(mv -> mv.visitLineNumber(ln + 3, l3));
+//        builder.addInstruction(mv -> mv.visitInsn())
 
         return builder;
     }

@@ -17,14 +17,20 @@ public class MixinRegistry {
     private final ExternalLibRegistryPool libRegistry;
     private final MixinRegistryPool mixinRegistry;
 
-    MixinRegistry(RegistryConfigurator.Configuration configuration) {
+   private MixinRegistry(RegistryConfigurator.Configuration configuration) {
         this.configuration = configuration;
         this.libRegistry = new ExternalLibRegistryPool();
         this.mixinRegistry = new MixinRegistryPool();
-
-        for (SuppliedFuture<Pointer> target : this.configuration.targets)
-            ContextPoolManager.applyTarget(PointerManager.retrieve(target.get().getIdentifier()));
     }
+
+    public static MixinRegistry create(RegistryConfigurator.Configuration configuration) {
+        for (PackageTarget target : configuration.targets)
+            ContextPoolManager.applyTarget(target);
+
+        return new MixinRegistry(configuration);
+    }
+
+
 
     //TODO there needs to be a better way to have the mixin pool get dumped. Currently nothing will happen if one of our calls is not invoked. A solution could be spawning off another thread and then having a callback? For external libs its very simple and will just go when its needed.
 
@@ -96,6 +102,10 @@ public class MixinRegistry {
     public void dumpAll() {
         this.libRegistry.empty();
         this.mixinRegistry.empty();
+    }
+
+    public final Class<?> retrieveClass(String cls) throws ClassNotFoundException {
+        return ContextPoolManager.loadClass(cls);
     }
 
 //    private CompletableFuture<Pointer> registerMixin(MixinMetaData)

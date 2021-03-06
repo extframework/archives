@@ -47,4 +47,10 @@ public class GeneralTests {
         Matcher m = r.matcher(line);
         System.out.println(m.find());
     }
+
+    public void test() {
+        if (System.currentTimeMillis() > 10000) {
+            System.out.println("");
+        }
+    }
 }
