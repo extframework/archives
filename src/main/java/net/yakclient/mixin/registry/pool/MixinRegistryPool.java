@@ -90,7 +90,7 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 //                b = this.methodModifier.combine(sources, dest, proxy.getProxy());
 //            } else b = this.methodModifier.combine(sources, dest);
 
-            loader.defineClass(dest.getCls().getName(), this.methodModifier.combine(sources, dest));
+            loader.defineClass(dest.getCls().getName(), this.methodModifier.combine(dest, sources));
 
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);

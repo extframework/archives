@@ -5,6 +5,7 @@ import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.registry.pool.Location;
 import net.yakclient.mixin.registry.pool.MethodLocation;
 import net.yakclient.mixin.registry.pool.QualifiedMethodLocation;
+import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class BytecodeMethodModifier {
-    public byte[] combine(Source[] sources, MethodLocation dest) throws IOException {
+    public byte[] combine(MethodLocation dest, Source... sources) throws IOException {
         final Map<InjectionType, Queue<Instruction>> instructions = new HashMap<>();
 
         for (Source source : sources) {
@@ -56,6 +57,7 @@ public class BytecodeMethodModifier {
 //        return this.apply(instructions, dest);
 //    }
 
+    @Contract(pure = true)
     private byte[] apply(Map<InjectionType, Queue<Instruction>> injectors, MethodLocation dest) throws IOException {
 //        if (!instructionVisitor.found())
 //            throw new IllegalArgumentException("Failed to find specified method through ASM");
@@ -94,6 +96,19 @@ public class BytecodeMethodModifier {
 
         public UUID getPointer() {
             return pointer;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProxySource that = (ProxySource) o;
+            return Objects.equals(pointer, that.pointer);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pointer);
         }
     }
 

@@ -27,7 +27,10 @@ public class RegistryTest {
         }
 
         {
-            mixinRegistry.registerMixin(SecondMixinTestCase.class, (cancel -> System.out.println("Proxied"))).dumpAll();
+            mixinRegistry.registerMixin(SecondMixinTestCase.class, (cancel -> {
+                System.out.println("Proxied");
+                cancel.run();
+            })).dumpAll();
 
             final Class<?> aClass = mixinRegistry.retrieveClass(MixinSourceClassTest.class.getName());
             final Object obj = aClass.getConstructor(String.class).newInstance("YAY");

@@ -64,7 +64,8 @@ public abstract class ContextPool {
 
     @Nullable
     Class<?> loadClassOrNull(String name) {
-        final PackageTarget target = this.createTarget(name);
+        final PackageTarget baseTarget = this.createTarget(name);
+        final PackageTarget target = this.encapsulatedTargetExists(baseTarget) ? this.encapsulatedTarget(baseTarget) : baseTarget ;
         if (this.targets.containsKey(target)) return this.targets.get(target).findClass(name);
         else if (this.encapsulatedTargetExists(target)) return this.targets.get(this.encapsulatedTarget(target)).findClass(name);
         return null;

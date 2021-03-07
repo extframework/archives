@@ -25,7 +25,7 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
     //    int RETURN = 177; // -
     @Override
     public void visitInsn(int opcode) {
-        if (this.isReturn(opcode)) {
+        if (isReturn(opcode)) {
             this.state = FOUND_RETURN;
             this.returnType = opcode;
             return;
@@ -41,6 +41,8 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
 
         this.executeInsn();
         super.visitInsn(this.returnType);
+        //Should be calculated by the ClassWriter, otherwise it will through a verify error
+        super.visitMaxs(0,0);
         super.visitEnd();
     }
 

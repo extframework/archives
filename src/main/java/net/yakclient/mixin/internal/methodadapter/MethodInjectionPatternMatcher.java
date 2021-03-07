@@ -16,7 +16,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     public enum MatcherPattern {
         AFTER_BEGIN(AfterBeginPatternMatcher::new),
         BEFORE_END(BeforeEndPatternMatcher::new),
-        BEFORE_INVOKE(BeforeEndPatternMatcher::new),
+        BEFORE_INVOKE(BeforeInvokePatternMatcher::new),
         BEFORE_RETURN(BeforeReturnPatternMatcher::new);
 
         private final MatcherInitializer matcher;

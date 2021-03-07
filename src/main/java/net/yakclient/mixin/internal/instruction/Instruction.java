@@ -10,7 +10,7 @@ public class Instruction {
     private final Consumer<MethodVisitor>[] actions;
 
     @SuppressWarnings("unchecked")
-    protected Instruction(InstructionBuilder builder) {
+    public Instruction(InstructionBuilder builder) {
         this.actions = builder.actions.toArray(new Consumer[0]);
     }
 

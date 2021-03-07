@@ -1,7 +1,5 @@
 package net.yakclient.apitests;
 
-import org.junit.jupiter.api.Test;
-
 public class MixinSourceClassTest {
     private final String testString;
 
