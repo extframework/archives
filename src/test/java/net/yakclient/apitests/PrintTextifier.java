@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 
 public class PrintTextifier extends Textifier {
     protected PrintTextifier() {
-        super(Opcodes.ASM6);
+        super(Opcodes.ASM9);
     }
 
     @Override

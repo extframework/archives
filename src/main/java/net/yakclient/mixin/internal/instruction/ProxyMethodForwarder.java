@@ -138,9 +138,6 @@ L0
         builder.addInstruction(mv -> mv.visitLabel(l3));
         builder.addInstruction(mv -> mv.visitLineNumber(ln + 3, l3));
 //
-//        builder.addInstruction(mv->mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;"));
-//        builder.addInstruction(mv->mv.visitLdcInsn("This is where we do print stuff"));
-//        builder.addInstruction(mv->mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false));
 
         return builder;
     }

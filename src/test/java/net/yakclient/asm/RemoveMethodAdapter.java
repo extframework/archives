@@ -7,7 +7,7 @@ import org.objectweb.asm.Opcodes;
 
 public class RemoveMethodAdapter extends ClassVisitor {
     public RemoveMethodAdapter(ClassWriter writer) {
-        super(Opcodes.ASM6, writer);
+        super(Opcodes.ASM9, writer);
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.objectweb.asm.*;
 
 public class ClassPrinter extends ClassVisitor {
     public ClassPrinter() {
-        super(Opcodes.ASM6);
+        super(Opcodes.ASM9);
     }
 
     @Override

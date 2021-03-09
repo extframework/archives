@@ -13,7 +13,7 @@ public class BeforeReturnPatternMatcher extends MethodInjectionPatternMatcher {
 
     @Override
     public void visitInsn(int opcode) {
-        if (this.isReturn(opcode)) this.executeInsn();
+        if (isReturn(opcode)) this.executeInsn();
         super.visitInsn(opcode);
     }
 

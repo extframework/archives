@@ -63,7 +63,7 @@ public class BasicASMTests {
         ClassWriter writer2 = new ClassWriter(0);
 
         ClassReader reader2 = new ClassReader("net.yakclient.asm.ASMTestCase");
-        reader.accept(new ClassVisitor(Opcodes.ASM6, writer2) { }, 0);
+        reader.accept(new ClassVisitor(Opcodes.ASM9, writer2) { }, 0);
 
         System.gc();
 

@@ -42,13 +42,8 @@ public class RegistryConfigurator {
     }
 
     public PackageTarget addTarget(PackageTarget target) {
-//        final SuppliedFuture<Pointer> e = new SuppliedFuture<>(()->
-//            new RegistryPointer(PointerManager.register(target))
-//        );
         this.configuration.targets.add(target);
         return target;
-//        this.configuration.targets.add(e);
-//        return e;
     }
 
     public static class Configuration {

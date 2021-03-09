@@ -20,7 +20,7 @@ public class MixinProxyManager {
     }
 
     @Contract(pure = true)
-    public static FunctionalProxy.ProxyResponseData proxy(@NotNull UUID uuid) {
+    public static FunctionalProxy.ProxyResponseData proxy(UUID uuid) {
 //        return new FunctionalProxy.ProxyResponseData(false);
 
         final MixinProxyManager manager = getInstance();
@@ -28,7 +28,7 @@ public class MixinProxyManager {
         return FunctionalProxy.run(manager.proxys.get(uuid));
     }
 
-    public static void registerProxy(@NotNull UUID uuid, FunctionalProxy proxy) {
+    public static void registerProxy(UUID uuid, FunctionalProxy proxy) {
         final MixinProxyManager manager = getInstance();
 
         if (manager.proxys.containsKey(uuid) && manager.proxys.get(uuid) != null)

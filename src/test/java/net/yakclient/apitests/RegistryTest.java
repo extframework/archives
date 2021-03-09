@@ -1,10 +1,18 @@
 package net.yakclient.apitests;
 
+
+import net.questcraft.apitests.MixinSourceClassTest;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.MixinRegistry;
 import net.yakclient.mixin.registry.RegistryConfigurator;
+import net.yakclient.mixin.registry.pool.ClassLocation;
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
@@ -13,27 +21,37 @@ public class RegistryTest {
     //for runtiem -Djava.system.class.loader=net/yakclient/mixin/internal/loader/ProxyClassLoader
     //for testing
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+//        System.out.println( ClassLoader.getSystemResourceAsStream(MixinSourceClassTest.class.getName().replace('.', '/') + ".class").available());
+
         final RegistryConfigurator configure = RegistryConfigurator.configure();
-        final PackageTarget target = configure.addTarget(PackageTarget.create("net.yakclient"));
+        final PackageTarget target = configure.addTarget(PackageTarget.create("net.questcraft"));
         final MixinRegistry mixinRegistry = configure.create();
-
         {
-            mixinRegistry.registerMixin(MixinTestCase.class).dumpAll();
+            mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
 
-            final Class<?> aClass = mixinRegistry.retrieveClass(MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
+            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
             final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
 //            aClass.getMethod("printTheString").invoke(obj);
         }
 
         {
-            mixinRegistry.registerMixin(SecondMixinTestCase.class, (cancel -> {
+            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
                 System.out.println("Proxied");
                 cancel.run();
             })).dumpAll();
 
-            final Class<?> aClass = mixinRegistry.retrieveClass(MixinSourceClassTest.class.getName());
-            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
+
+
+            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
+            System.out.println("So we retrieved the class of " + aClass);
+
+            System.out.println("And the constructors are " + args.getClass().getConstructors());
+
+            final Constructor<?> constructor = aClass.getConstructor(String.class);
+            System.out.println("Well we got a constructor");
+            final Object obj = constructor.newInstance("YAY");
+            System.out.println("And we made a instance of it");
             aClass.getMethod("printTheString").invoke(obj);
         }
 //////
@@ -59,7 +77,7 @@ public class RegistryTest {
 //        byte[] b = methodModifier.combine(new QualifiedMethodLocation(MixinTestCase.class, "overrideIt", InjectionType.AFTER_BEGIN, Priority.MEDIUM), new MethodLocation(MixinSourceClassTest.class, "printTheString"));
 ////
 ////        ClassReader sourceReader = new ClassReader(b);
-////        ClassVisitor visitor = new ClassVisitor(Opcodes.ASM6, new ClassWriter(ClassWriter.COMPUTE_FRAMES)) {
+////        ClassVisitor visitor = new ClassVisitor(Opcodes.ASM9, new ClassWriter(ClassWriter.COMPUTE_FRAMES)) {
 ////            public MethodVisitor visitMethod(int access, String name,
 ////                                             String desc, String signature, String[] exceptions) {
 ////                MethodVisitor mv = cv.visitMethod(access, name, desc, signature,

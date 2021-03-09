@@ -15,11 +15,6 @@ public abstract class ContextPool {
         this.loader = Thread.currentThread().getContextClassLoader();
     }
 
-//    public Context addTarget(String path, ClassLoader loader) {
-//        final PackageTarget target = this.createTarget(path);
-//        return this.targets.put(target, this.createContext(loader, target));
-//    }
-
     private boolean encapsulatedTargetExists(PackageTarget target) {
         for (PackageTarget packageTarget : this.targets.keySet()) {
             if (packageTarget.isTargetOf(target)) return true;

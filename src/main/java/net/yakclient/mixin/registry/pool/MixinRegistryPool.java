@@ -10,11 +10,9 @@ import net.yakclient.mixin.registry.MixinMetaData;
 import net.yakclient.mixin.registry.proxy.MixinProxyManager;
 
 import java.io.IOException;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
-    //    private final Map<Location, byte[]> parents;
     /*
         The pool holds locations to where mixins will be injected. These will be and only be MethodLocations(No child).
         The PoolQueue
@@ -23,18 +21,16 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 
     public MixinRegistryPool() {
         this.methodModifier = new BytecodeMethodModifier();
-//        this.parents = new HashMap<>();
     }
 
     @Override
     public Location pool(MixinMetaData type) {
-        final MethodLocation key = MethodLocation.fromDataDest(type);
+        final ClassLocation key = ClassLocation.fromDataDest(type);
         if (!this.pool.containsKey(key))
             this.pool.put(key, new PoolQueue<>());
 
-//        PointerManager.register(this.register(key));
-        this.pool.get(key).add(type, (t)->{});
-//        this.parents.putIfAbsent(key, type.getClassTo());
+        this.pool.get(key).add(type, (t) -> {
+        });
 
         return key;
     }
@@ -45,14 +41,13 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
         complete our future.
      */
     public Location pool(MixinMetaData type, FunctionalProxy proxy) {
-        final MethodLocation key = MethodLocation.fromDataDest(type);
+        final ClassLocation key = ClassLocation.fromDataDest(type);
         if (!this.pool.containsKey(key))
             this.pool.put(key, new PoolQueue<>());
 
-//        final ProxiedPointer proxiedPointer =
         final UUID register = MixinProxyManager.register();
-        this.pool.get(key).add(type, (t) -> MixinProxyManager.registerProxy(register, proxy), register);
-//        this.parents.putIfAbsent(key, type.getClassTo());
+        MixinProxyManager.registerProxy(register, proxy);
+        this.pool.get(key).add(type, (t) -> {}, register);
 
         return key;
     }
@@ -66,49 +61,37 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
         try {
             final PoolQueue<MixinMetaData> pool = this.pool.get(location);
 
-            if (!(location instanceof MethodLocation))
-                throw new IllegalArgumentException("Provided location must be a MethodLocation!");
-            final MethodLocation dest = (MethodLocation) location;
+            if (!(location instanceof ClassLocation))
+                throw new IllegalArgumentException("Provided location must be a ClassLocation!");
 
-            final ClassTarget sysTarget = ClassTarget.create(((MethodLocation) location).getCls());
+            final ClassLocation dest = (ClassLocation) location;
+
+            final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
             final ProxyClassLoader loader = ContextPoolManager.createLoader(sysTarget);
             ContextPoolManager.applyTarget(sysTarget, loader);
 
-            final BytecodeMethodModifier.Source[] sources = pool.queue.stream().map(node -> node instanceof PoolQueue.ProxiedPoolNode<?> ?
-                    new BytecodeMethodModifier.ProxySource(QualifiedMethodLocation.fromDataOrigin(node.getValue()), ((PoolQueue.ProxiedPoolNode<MixinMetaData>) node).getProxy()) :
-                    new BytecodeMethodModifier.Source(QualifiedMethodLocation.fromDataOrigin(node.getValue())))
-                    .toArray(BytecodeMethodModifier.Source[]::new);
+            //Method destination, Destinations
+            final Map<String, BytecodeMethodModifier.MixinDestination> perfectDestinations = new HashMap<>();
 
-//            byte[] b = ;
+            for (PoolQueue.PoolNode<MixinMetaData> node : pool.queue) {
+                final String method = node.getValue().getMethodTo();
+                perfectDestinations.putIfAbsent(method, new BytecodeMethodModifier.MixinDestination(node.getValue().getClassTo().getName(), node.getValue().getMethodTo()));
 
-//            final QualifiedMethodLocation[] sources = pool.queue.stream().map(node -> QualifiedMethodLocation.fromDataOrigin(node.getValue())).toArray(QualifiedMethodLocation[]::new);
+                perfectDestinations.get(method).addSource(node instanceof PoolQueue.ProxiedPoolNode<?> ?
+                        new BytecodeMethodModifier.MixinProxySource(QualifiedMethodLocation.fromDataOrigin(node.getValue()), ((PoolQueue.ProxiedPoolNode<MixinMetaData>) node).getProxy()) :
+                        new BytecodeMethodModifier.MixinSource(QualifiedMethodLocation.fromDataOrigin(node.getValue())));
+            }
 
+            final Set<BytecodeMethodModifier.MixinDestination> destinations = new HashSet<>(perfectDestinations.values());
+//            perfectDestinations.values().forEach(destinations::addAll);
+            System.out.println(destinations);
 
-////            this.pool.get(location).queue
-//            if (location instanceof ProxiedMethodLocation) {
-//                ProxiedMethodLocation proxy = (ProxiedMethodLocation) location;
-//                b = this.methodModifier.combine(sources, dest, proxy.getProxy());
-//            } else b = this.methodModifier.combine(sources, dest);
-
-            loader.defineClass(dest.getCls().getName(), this.methodModifier.combine(dest, sources));
-
+            final byte[] b = this.methodModifier.combine(destinations.toArray(new BytecodeMethodModifier.MixinDestination[0]));
+            loader.defineClass(dest.getCls().getName(), b);
+            System.out.println(b.length);
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);
 
-
-//            for (MixinMetaData data : pools.queue.stream().sorted(new MixinSorter()).collect(Collectors.toList())) {
-//                byte[] b;
-//
-//                final QualifiedMethodLocation source = QualifiedMethodLocation.fromDataOrigin(data);
-//                final MethodLocation dest = MethodLocation.fromDataDest(data);
-//
-//                if (location instanceof QualifiedProxiedMethodLocation) {
-//                    QualifiedProxiedMethodLocation proxy = (QualifiedProxiedMethodLocation) location;
-//                    b = this.methodModifier.combine(source, dest, proxy.getProxy());
-//                } else b = this.methodModifier.combine(source, dest);
-//
-//                loader.defineClass(dest.getCls().getName(), b);
-//            }
             return sysTarget;
         } catch (IOException e) {
             throw new IllegalArgumentException("Given class has failed ASM reading. Ex: " + e.getMessage());

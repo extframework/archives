@@ -1,26 +1,18 @@
 package net.yakclient.asm.method;
 
-import net.yakclient.apitests.MixinSourceClassTest;
-import net.yakclient.apitests.SecondMixinTestCase;
-import net.yakclient.asm.ASMTestCase;
 import net.yakclient.asm.classloader.CustomClassLoader;
-import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
-import net.yakclient.mixin.registry.pool.MethodLocation;
-import net.yakclient.mixin.registry.pool.QualifiedMethodLocation;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.UUID;
 
 public class MethodByteCodeTester {
 
     @Test
     public void testByteCodeAdd() throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         final BytecodeMethodModifier modifier = new BytecodeMethodModifier();
-        final byte[] b = modifier.combine(new MethodLocation(MixinSourceClassTest.class, "printTheString"),
-                new BytecodeMethodModifier.ProxySource(new QualifiedMethodLocation(SecondMixinTestCase.class, "printTheString", InjectionType.AFTER_BEGIN, 2), new UUID(1,1)));
+        final byte[] b = modifier.combine(); //This is not a working test
 
 //        ClassReader sourceReader = new ClassReader(SecondMixinTestCase.class.getName());
 //        InstructionClassVisitor instructionVisitor =

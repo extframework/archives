@@ -50,7 +50,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     int state = NOT_MATCHED;
 
     public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
-        super(Opcodes.ASM6, visitor);
+        super(Opcodes.ASM9, visitor);
         this.instructions = instructions;
     }
 

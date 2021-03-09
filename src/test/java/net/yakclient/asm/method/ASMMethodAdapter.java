@@ -13,11 +13,11 @@ import static org.objectweb.asm.Opcodes.IFNE;
 public class ASMMethodAdapter extends MethodVisitor {
     private int ln = 0;
     public ASMMethodAdapter() {
-        super(Opcodes.ASM6);
+        super(Opcodes.ASM9);
     }
 
     public ASMMethodAdapter(MethodVisitor mv) {
-        super(Opcodes.ASM6, mv);
+        super(Opcodes.ASM9, mv);
     }
 
     @Override

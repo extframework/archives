@@ -13,7 +13,7 @@ public class MethodInstructionForwarder extends MethodVisitor {
     private final String ownerDest;
 
     public MethodInstructionForwarder(MethodVisitor mv, boolean shouldReturn, @NotNull String ownerSource, @NotNull String ownerDest) {
-        super(Opcodes.ASM6, mv);
+        super(Opcodes.ASM9, mv);
         this.builder = new Instruction.InstructionBuilder();
         this.shouldReturn = shouldReturn;
         this.ownerSource = ownerSource.replace('.', '/');

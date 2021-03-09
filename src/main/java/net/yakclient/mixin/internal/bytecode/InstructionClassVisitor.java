@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InstructionClassVisitor extends ClassVisitor {
-    //    private final Set<String> toFind;
     protected final String targetMethod;
     protected boolean found = false;
     protected MethodInstructionForwarder forwarder;
@@ -23,7 +22,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     private static final String VOID_RETURN_PATTERN = "(.*)V";
 
     public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, String source, String dest) {
-        super(Opcodes.ASM6, visitor);
+        super(Opcodes.ASM9, visitor);
         this.targetMethod = targetMethod;
         this.source = source;
         this.dest = dest;

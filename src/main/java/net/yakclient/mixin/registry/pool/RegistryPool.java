@@ -14,8 +14,6 @@ public abstract class RegistryPool<T> {
 
     public abstract Location pool(T type);
 
-
-
     public abstract PackageTarget register(Location location);
 
     public void empty(Location location) {
@@ -29,26 +27,12 @@ public abstract class RegistryPool<T> {
         }
     }
 
-//    public CompletableFuture<Pointer> retrieve(@NotNull Location location) {
-//       return this.pool.get(location).future;
-//    }
-
-    static class PoolQueue<T> /* implements Iterable<T> */ {
+    static class PoolQueue<T> {
         protected final Queue<PoolNode<T>> queue;
-//        private final Runnable register;
 
         public PoolQueue() {
-//            this.register = register;
-//            this.queue = new LinkedList<>();
             this.queue = new LinkedList<>();
         }
-
-
-
-//        public void register() {
-//            this.register.run();
-//        }
-
 
         public PoolQueue<T> add(T type, Consumer<PackageTarget> registration) {
             this.queue.add(new PoolNode<>(type, registration));
@@ -90,32 +74,5 @@ public abstract class RegistryPool<T> {
                 return proxy;
             }
         }
-//
-//        /*
-//            This is a destructive iterator in that all items will be removed from the Queue.
-//         */
-//        @NotNull
-//        @Override
-//        public Iterator<T> iterator() {
-//            return new PoolQueueIterator(this.queue);
-//        }
-//
-//        private class PoolQueueIterator implements Iterator<T> {
-//            private final Queue<T> queue;
-//
-//            public PoolQueueIterator(Queue<T> queue) {
-//                this.queue = queue;
-//            }
-//
-//            @Override
-//            public boolean hasNext() {
-//                return !this.queue.isEmpty();
-//            }
-//
-//            @Override
-//            public T next() {
-//                return queue.poll();
-//            }
-//        }
     }
 }

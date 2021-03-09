@@ -17,13 +17,6 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
         super(visitor, instructions);
     }
 
-
-    // int IRETURN = 172; // visitInsn
-    //    int LRETURN = 173; // -
-    //    int FRETURN = 174; // -
-    //    int DRETURN = 175; // -
-    //    int ARETURN = 176; // -
-    //    int RETURN = 177; // -
     @Override
     public void visitInsn(int opcode) {
         if (isReturn(opcode)) {

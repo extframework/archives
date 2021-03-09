@@ -4,7 +4,7 @@ import org.objectweb.asm.*;
 
 public class MethodPrinter extends MethodVisitor {
     public MethodPrinter() {
-        super(Opcodes.ASM6);
+        super(Opcodes.ASM9);
     }
 
     @Override
