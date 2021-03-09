@@ -1,9 +1,16 @@
 package net.yakclient.mixin.internal.loader;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 
 public class ProxyClassLoader extends ClassLoader {
     private static final String CONTEXT_POOL_MANAGER = "net.yakclient.mixin.internal.loader.ContextPoolManager";
+    protected final ProtectionDomain defaultDomain =
+            new ProtectionDomain(new CodeSource(null, (Certificate[]) null),
+                    null, this, null);
 
     public ProxyClassLoader(ClassLoader parent) {
         super(parent);
@@ -11,7 +18,7 @@ public class ProxyClassLoader extends ClassLoader {
     }
 
     public Class<?> defineClass(String name, byte[] b) {
-        return this.defineClass(name, b, 0, b.length);
+        return this.defineClass(name, ByteBuffer.wrap(b), this.defaultDomain);
     }
 //
 //

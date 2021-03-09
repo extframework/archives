@@ -7,10 +7,12 @@ import org.objectweb.asm.*;
 public class MethodInstructionForwarder extends MethodVisitor {
     protected final Instruction.InstructionBuilder builder;
     private final boolean shouldReturn;
-    @NotNull private final String ownerSource;
-    @NotNull private final String ownerDest;
+    @NotNull
+    private final String ownerSource;
+    @NotNull
+    private final String ownerDest;
 
-    public MethodInstructionForwarder(MethodVisitor mv, boolean shouldReturn, @NotNull String ownerSource,  @NotNull String ownerDest) {
+    public MethodInstructionForwarder(MethodVisitor mv, boolean shouldReturn, @NotNull String ownerSource, @NotNull String ownerDest) {
         super(Opcodes.ASM6, mv);
         this.builder = new Instruction.InstructionBuilder();
         this.shouldReturn = shouldReturn;
@@ -55,21 +57,25 @@ public class MethodInstructionForwarder extends MethodVisitor {
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-        this.builder.addInstruction(v -> v.visitFieldInsn(opcode, owner, name, desc));
+        if (this.ownerSource.equals(owner) && opcode != Opcodes.GETSTATIC && opcode != Opcodes.PUTSTATIC)
+            this.builder.addInstruction(v -> v.visitFieldInsn(opcode, this.ownerDest, name, desc));
+        else this.builder.addInstruction(v -> v.visitFieldInsn(opcode, owner, name, desc));
         super.visitFieldInsn(opcode, owner, name, desc);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC) this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc));
+        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC)
+            this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc));
         else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc));
         super.visitMethodInsn(opcode, owner, name, desc);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC) this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc, itf));
-       else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
+        if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC)
+            this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc, itf));
+        else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 

@@ -36,14 +36,15 @@ public abstract class ContextPool {
     }
 
     public Context addTarget(PackageTarget target, ClassLoader loader) {
-        return this.targets.put(this.getTarget(target), this.createContext(loader, target));
+        final PackageTarget realTarget = this.getTarget(target);
+        return this.targets.put(realTarget, this.createContext(loader, realTarget));
     }
 
     public Context addTarget(PackageTarget target) {
         return this.targets.putIfAbsent(this.getTarget(target), this.createContext(null, target));
     }
 
-    private PackageTarget getTarget(PackageTarget target) {
+    public PackageTarget getTarget(PackageTarget target) {
         return this.encapsulatedTargetExists(target) ? this.encapsulatedTarget(target) : target;
     }
 

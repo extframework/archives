@@ -1,6 +1,7 @@
 package net.yakclient.mixin.internal.methodadapter;
 
 import net.yakclient.mixin.api.InjectionType;
+import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -10,7 +11,7 @@ import java.util.Queue;
 public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     @FunctionalInterface
     private interface MatcherInitializer {
-        MethodInjectionPatternMatcher apply(MethodVisitor v, Queue<Instruction> insn);
+        MethodInjectionPatternMatcher apply(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn);
     }
 
     public enum MatcherPattern {
@@ -25,7 +26,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
             this.matcher = matcher;
         }
 
-        public MethodInjectionPatternMatcher match(MethodVisitor v, Queue<Instruction> insn) {
+        public MethodInjectionPatternMatcher match(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn) {
             return this.matcher.apply(v, insn);
         }
 
@@ -43,19 +44,19 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
         }
     }
 
-    private final Queue<Instruction> instructions;
+    private final Queue<BytecodeMethodModifier.PriorityInstruction> instructions;
     static final int NOT_MATCHED = 0;
 
     int state = NOT_MATCHED;
 
-    public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<Instruction> instructions) {
+    public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
         super(Opcodes.ASM6, visitor);
         this.instructions = instructions;
     }
 
     void executeInsn() {
-        for (Instruction insn : this.instructions) {
-            insn.execute(this.mv);
+        for (BytecodeMethodModifier.PriorityInstruction insn : this.instructions) {
+            insn.getInsn().execute(this.mv);
         }
     }
 

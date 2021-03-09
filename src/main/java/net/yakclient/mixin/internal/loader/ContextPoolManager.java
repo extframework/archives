@@ -92,7 +92,7 @@ public class ContextPoolManager {
         final ContextPoolManager instance = getInstance();
 
         if (!(instance.loader instanceof ProxyClassLoader)) throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
-        return new TargetClassLoader(instance.loader, target);
+        return new TargetClassLoader(instance.loader, instance.pool.getTarget(target));
     }
 
     public static ContextPoolManager getInstance() {

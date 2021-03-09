@@ -67,7 +67,7 @@ public class MixinRegistry {
         final Class<?> type = cls.getAnnotation(Mixer.class).value();
 
         Set<MixinMetaData> mixins = new HashSet<>();
-        for (Method method : cls.getMethods()) {
+        for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Injection.class)) {
                 final Injection injection = method.getAnnotation(Injection.class);
                 final String methodTo = this.mixinToMethodName(method);
@@ -92,7 +92,7 @@ public class MixinRegistry {
 
     private boolean declaredMethod(Class<?> cls, String method, Class<?>... parameterTypes) {
         try {
-            cls.getMethod(method, parameterTypes);
+            cls.getDeclaredMethod(method, parameterTypes);
         } catch (NoSuchMethodException e) {
             return false;
         }

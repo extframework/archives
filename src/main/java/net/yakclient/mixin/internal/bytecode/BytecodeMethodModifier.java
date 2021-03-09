@@ -6,6 +6,7 @@ import net.yakclient.mixin.registry.pool.Location;
 import net.yakclient.mixin.registry.pool.MethodLocation;
 import net.yakclient.mixin.registry.pool.QualifiedMethodLocation;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -15,7 +16,7 @@ import java.util.*;
 
 public class BytecodeMethodModifier {
     public byte[] combine(MethodLocation dest, Source... sources) throws IOException {
-        final Map<InjectionType, Queue<Instruction>> instructions = new HashMap<>();
+        final Map<InjectionType, Queue<PriorityInstruction>> instructions = new HashMap<>();
 
         for (Source source : sources) {
             final QualifiedMethodLocation location = source.getLocation();
@@ -27,9 +28,9 @@ public class BytecodeMethodModifier {
             sourceReader.accept(instructionVisitor, 0);
 
             if (!instructions.containsKey(location.getInjectionType()))
-                instructions.put(location.getInjectionType(), new LinkedList<>());
+                instructions.put(location.getInjectionType(), new PriorityQueue<>());
 
-            instructions.get(location.getInjectionType()).add(instructionVisitor.getInsn());
+            instructions.get(location.getInjectionType()).add(new PriorityInstruction(source.getLocation().getPriority(), instructionVisitor.getInsn()));
         }
 
         return this.apply(instructions, dest);
@@ -58,7 +59,7 @@ public class BytecodeMethodModifier {
 //    }
 
     @Contract(pure = true)
-    private byte[] apply(Map<InjectionType, Queue<Instruction>> injectors, MethodLocation dest) throws IOException {
+    private byte[] apply(Map<InjectionType, Queue<PriorityInstruction>> injectors, MethodLocation dest) throws IOException {
 //        if (!instructionVisitor.found())
 //            throw new IllegalArgumentException("Failed to find specified method through ASM");
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -72,6 +73,25 @@ public class BytecodeMethodModifier {
         return writer.toByteArray();
 //        final MixinClassLoader classloader = new MixinClassLoader(ClassManager.parentLoader());
 //        return ClassManager.applyOverload(classloader.defineClass(writer.toByteArray(), dest.getCls().getName()));
+    }
+
+    public static class PriorityInstruction implements Comparable<PriorityInstruction> {
+        private final int priority;
+        private final Instruction insn;
+
+        PriorityInstruction(int priority, Instruction insn) {
+            this.priority = priority;
+            this.insn = insn;
+        }
+
+        @Override
+        public int compareTo(@NotNull BytecodeMethodModifier.PriorityInstruction o) {
+            return o.priority - this.priority;
+        }
+
+        public Instruction getInsn() {
+            return this.insn;
+        }
     }
 
     public static class Source {

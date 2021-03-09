@@ -1,5 +1,6 @@
 package net.yakclient.mixin.internal.methodadapter;
 
+import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -12,7 +13,7 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
 
     private int returnType = Opcodes.RETURN;
 
-    public BeforeEndPatternMatcher(MethodVisitor visitor, Queue<Instruction> instructions) {
+    public BeforeEndPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
         super(visitor, instructions);
     }
 

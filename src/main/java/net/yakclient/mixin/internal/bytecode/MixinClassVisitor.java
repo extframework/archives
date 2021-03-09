@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Queue;
 
 public class MixinClassVisitor extends ClassVisitor {
-    private final Map<InjectionType, Queue<Instruction>> injectors;
+    private final Map<InjectionType, Queue<BytecodeMethodModifier.PriorityInstruction>> injectors;
     //    private final Instruction[] instructions;
 //    private final MethodInjectionPatternMatcher.MatcherPattern pattern;
     private final String targetMethod;
 
-    public MixinClassVisitor(ClassVisitor visitor, Map<InjectionType, Queue<Instruction>> injectors, String targetMethod) {
+    public MixinClassVisitor(ClassVisitor visitor, Map<InjectionType, Queue<BytecodeMethodModifier.PriorityInstruction>> injectors, String targetMethod) {
         super(Opcodes.ASM6, visitor);
         this.injectors = injectors;
         this.targetMethod = targetMethod;
