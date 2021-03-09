@@ -57,10 +57,6 @@ public class BytecodeMethodModifier {
      */
     @Contract(pure = true)
     private byte[] apply(Map<String, Map<InjectionType, Queue<PriorityInstruction>>> injectors, String targetCls) throws IOException {
-        System.out.println("Injectors " + injectors);
-        System.out.println("Target class " + targetCls);
-
-
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         ClassVisitor adapter = new MixinClassVisitor(writer, injectors);
