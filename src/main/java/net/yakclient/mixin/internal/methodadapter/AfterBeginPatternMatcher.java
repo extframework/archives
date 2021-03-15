@@ -7,9 +7,8 @@ import org.objectweb.asm.MethodVisitor;
 import java.util.Queue;
 
 public class AfterBeginPatternMatcher extends MethodInjectionPatternMatcher {
-
-    public AfterBeginPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
-        super(visitor, instructions);
+    public AfterBeginPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions, PatternFlag<?>... flags) {
+        super(visitor, instructions, flags);
     }
 
     @Override

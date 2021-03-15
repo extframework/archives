@@ -1,7 +1,5 @@
 package net.yakclient.mixin.registry;
 
-import net.yakclient.mixin.api.InjectionType;
-
 import java.util.Objects;
 
 public class MixinMetaData {
@@ -10,14 +8,14 @@ public class MixinMetaData {
     private final String classTo;
     private final String methodTo;
 
-    private final InjectionType type;
+    private final int type;
     private final int priority;
 
     public MixinMetaData(String classFrom,
                          String methodFrom,
                          String classTo,
                          String methodTo,
-                         InjectionType type,
+                         int type,
                          int priority) {
         this.classFrom = classFrom;
         this.methodFrom = methodFrom;
@@ -43,7 +41,7 @@ public class MixinMetaData {
         return methodTo;
     }
 
-    public InjectionType getType() {
+    public int getType() {
         return type;
     }
 
@@ -55,8 +53,8 @@ public class MixinMetaData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MixinMetaData that = (MixinMetaData) o;
-        return priority == that.priority && Objects.equals(classFrom, that.classFrom) && Objects.equals(methodFrom, that.methodFrom) && Objects.equals(classTo, that.classTo) && Objects.equals(methodTo, that.methodTo) && type == that.type;
+        MixinMetaData data = (MixinMetaData) o;
+        return type == data.type && priority == data.priority && Objects.equals(classFrom, data.classFrom) && Objects.equals(methodFrom, data.methodFrom) && Objects.equals(classTo, data.classTo) && Objects.equals(methodTo, data.methodTo);
     }
 
     @Override

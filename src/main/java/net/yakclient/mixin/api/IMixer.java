@@ -21,6 +21,7 @@ package net.yakclient.mixin.api;
  *
  * @author Durgan McBroom
  */
+@Deprecated
 public interface IMixer {
     /**
      * {@code IMixer#type()} provides the class that will

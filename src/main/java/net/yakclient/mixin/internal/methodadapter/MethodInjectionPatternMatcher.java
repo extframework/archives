@@ -2,7 +2,7 @@ package net.yakclient.mixin.internal.methodadapter;
 
 import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
-import net.yakclient.mixin.internal.instruction.Instruction;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -11,14 +11,16 @@ import java.util.Queue;
 public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     @FunctionalInterface
     private interface MatcherInitializer {
-        MethodInjectionPatternMatcher apply(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn);
+        MethodInjectionPatternMatcher apply(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn, PatternFlag<?>... flags);
     }
 
     public enum MatcherPattern {
         AFTER_BEGIN(AfterBeginPatternMatcher::new),
         BEFORE_END(BeforeEndPatternMatcher::new),
         BEFORE_INVOKE(BeforeInvokePatternMatcher::new),
-        BEFORE_RETURN(BeforeReturnPatternMatcher::new);
+        BEFORE_RETURN(BeforeReturnPatternMatcher::new),
+        OVERWRITE(OverwritePatternMatcher::new),
+        MATCH_OPCODE(OpcodeMatcherPattern::new);
 
         private final MatcherInitializer matcher;
 
@@ -26,32 +28,51 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
             this.matcher = matcher;
         }
 
-        public MethodInjectionPatternMatcher match(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn) {
-            return this.matcher.apply(v, insn);
+        public MethodInjectionPatternMatcher match(MethodVisitor v, Queue<BytecodeMethodModifier.PriorityInstruction> insn, PatternFlag<?>... flags) {
+            return this.matcher.apply(v, insn, flags);
         }
 
-        public static MatcherPattern pattern(InjectionType type) {
+        public static MatcherPattern pattern(int type) {
             switch (type) {
-                case BEFORE_END:
-                    return BEFORE_END;
-                case BEFORE_INVOKE:
-                    return BEFORE_INVOKE;
-                case BEFORE_RETURN:
-                    return BEFORE_RETURN;
-                default:
+                case InjectionType.AFTER_BEGIN:
                     return AFTER_BEGIN;
+                case InjectionType.BEFORE_INVOKE:
+                    return BEFORE_INVOKE;
+                case InjectionType.BEFORE_RETURN:
+                    return BEFORE_RETURN;
+                case InjectionType.BEFORE_END:
+                    return BEFORE_END;
+                case InjectionType.OVERWRITE:
+                    return OVERWRITE;
+                default:
+                    return MATCH_OPCODE;
             }
         }
     }
 
-    private final Queue<BytecodeMethodModifier.PriorityInstruction> instructions;
-    static final int NOT_MATCHED = 0;
+    public static class PatternFlag<T> {
+        @NotNull
+        private final T flag;
 
+        public PatternFlag(T parameter) {
+            this.flag = parameter;
+        }
+        @NotNull
+        public T getFlag() {
+            return flag;
+        }
+    }
+
+    private final Queue<BytecodeMethodModifier.PriorityInstruction> instructions;
+    private final PatternFlag<?>[] flags;
+
+    static final int NOT_MATCHED = 0;
     int state = NOT_MATCHED;
 
-    public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
+    public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions, PatternFlag<?>... flags) {
         super(Opcodes.ASM9, visitor);
         this.instructions = instructions;
+        this.flags = flags;
     }
 
     void executeInsn() {
@@ -59,7 +80,6 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
             insn.getInsn().execute(this.mv);
         }
     }
-
 
 
     @Override

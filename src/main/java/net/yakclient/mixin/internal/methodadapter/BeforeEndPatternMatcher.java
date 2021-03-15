@@ -13,8 +13,8 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
 
     private int returnType = Opcodes.RETURN;
 
-    public BeforeEndPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
-        super(visitor, instructions);
+    public BeforeEndPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions, PatternFlag<?>... flags) {
+        super(visitor, instructions, flags);
     }
 
     @Override

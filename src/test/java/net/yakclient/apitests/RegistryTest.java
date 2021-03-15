@@ -22,31 +22,26 @@ public class RegistryTest {
         final RegistryConfigurator configure = RegistryConfigurator.configure();
         final PackageTarget target = configure.addTarget(PackageTarget.create("net.questcraft"));
         final MixinRegistry mixinRegistry = configure.create();
-        {
-            mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
-
-            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
-            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
-//            aClass.getMethod("printTheString").invoke(obj);
-        }
+//        {
+//            mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
+//
+//            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
+//            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
+////            aClass.getMethod("printTheString").invoke(obj);
+//        }
 
         {
             mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
                 System.out.println("Proxied");
-                cancel.run();
+//                cancel.run();
             })).dumpAll();
 
 
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
-            System.out.println("So we retrieved the class of " + aClass);
-
-            System.out.println("And the constructors are " + args.getClass().getConstructors());
 
             final Constructor<?> constructor = aClass.getConstructor(String.class);
-            System.out.println("Well we got a constructor");
             final Object obj = constructor.newInstance("YAY");
-            System.out.println("And we made a instance of it");
             aClass.getMethod("printTheString").invoke(obj);
         }
 //////

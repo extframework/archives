@@ -15,7 +15,7 @@ import java.util.*;
 public class BytecodeMethodModifier {
     public byte[] combine(byte[] compiledSource, MixinDestination... destinations) throws IOException {
 
-        final Map<String, Map<InjectionType, Queue<PriorityInstruction>>> instructions = new HashMap<>(destinations.length);
+        final Map<String, Map<Integer, Queue<PriorityInstruction>>> instructions = new HashMap<>(destinations.length);
 
         if (!confirm(destinations)) throw new IllegalArgumentException("To combine all mixins must have the destination of the same class.");
 
@@ -56,7 +56,7 @@ public class BytecodeMethodModifier {
        Map<Method name, Map<Injection location(4 values), Queue<Instructions with priority>>>, The target.
      */
     @Contract(pure = true)
-    private byte[] apply(Map<String, Map<InjectionType, Queue<PriorityInstruction>>> injectors, byte[] sources) throws IOException {
+    private byte[] apply(Map<String, Map<Integer, Queue<PriorityInstruction>>> injectors, byte[] sources) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         ClassVisitor adapter = new MixinClassVisitor(writer, injectors);

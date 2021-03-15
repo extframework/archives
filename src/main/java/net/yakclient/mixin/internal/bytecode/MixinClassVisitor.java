@@ -1,6 +1,5 @@
 package net.yakclient.mixin.internal.bytecode;
 
-import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.methodadapter.MethodInjectionPatternMatcher;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -9,10 +8,12 @@ import org.objectweb.asm.Opcodes;
 import java.util.Map;
 import java.util.Queue;
 
-public class MixinClassVisitor extends ClassVisitor {
-    private final Map<String, Map<InjectionType, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors;
+import static net.yakclient.mixin.internal.methodadapter.MethodInjectionPatternMatcher.MatcherPattern.MATCH_OPCODE;
 
-    public MixinClassVisitor(ClassVisitor visitor, Map<String, Map<InjectionType, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors) {
+public class MixinClassVisitor extends ClassVisitor {
+    private final Map<String, Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors;
+
+    public MixinClassVisitor(ClassVisitor visitor, Map<String, Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors) {
         super(Opcodes.ASM9, visitor);
         this.injectors = injectors;
     }
@@ -23,8 +24,10 @@ public class MixinClassVisitor extends ClassVisitor {
         if (this.injectors.containsKey(name) && visitor != null) {
             MethodVisitor last = visitor;
 
-            for (InjectionType type : this.injectors.get(name).keySet()) {
-                last = MethodInjectionPatternMatcher.MatcherPattern.pattern(type).match(last, this.injectors.get(name).get(type));
+            for (int type : this.injectors.get(name).keySet()) {
+                final MethodInjectionPatternMatcher.MatcherPattern pattern = MethodInjectionPatternMatcher.MatcherPattern.pattern(type);
+                if (pattern == MATCH_OPCODE) last = pattern.match(last, this.injectors.get(name).get(type), new MethodInjectionPatternMatcher.PatternFlag<>(type));
+                else last = pattern.match(last, this.injectors.get(name).get(type));
             }
 
             return last;

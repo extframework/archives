@@ -1,15 +1,14 @@
 package net.yakclient.mixin.registry.pool;
 
-import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.registry.MixinMetaData;
 
 import java.util.Objects;
 
 public class QualifiedMethodLocation extends MethodLocation {
-    private final InjectionType injectionType;
+    private final int injectionType;
     private final int priority;
 
-    public QualifiedMethodLocation(String cls, String method, InjectionType injectionType, int priority) {
+    public QualifiedMethodLocation(String cls, String method, int injectionType, int priority) {
         super(cls, method);
         this.injectionType = injectionType;
         this.priority = priority;
@@ -24,7 +23,7 @@ public class QualifiedMethodLocation extends MethodLocation {
     }
 
 
-    public InjectionType getInjectionType() {
+    public int getInjectionType() {
         return injectionType;
     }
 

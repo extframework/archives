@@ -2,6 +2,7 @@ package net.yakclient;
 
 import net.yakclient.apitests.MixinSourceClassTest;
 import net.yakclient.apitests.RegistryTest;
+import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import org.junit.jupiter.api.Test;
 
@@ -52,5 +53,15 @@ public class GeneralTests {
         if (System.currentTimeMillis() > 10000) {
             System.out.println("");
         }
+    }
+
+    @Test
+    public void testBitWiseOR() {
+//        0b1   1   0  0 _1  0 0 1
+//          256 128 64 32_16 8 2 1
+
+//        0b1
+        System.out.println(0b1);
+        System.out.println(InjectionType.BEFORE_END << InjectionType.OVERWRITE);
     }
 }

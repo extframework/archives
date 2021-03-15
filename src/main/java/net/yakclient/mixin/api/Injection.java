@@ -65,7 +65,7 @@ public @interface Injection {
      *
      * @return the type of injection that will be performed.
      */
-    InjectionType type() default InjectionType.AFTER_BEGIN;
+    int type() default InjectionType.AFTER_BEGIN;
 
     /**
      * Specifies a injection priority that will in the end determine
