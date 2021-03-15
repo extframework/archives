@@ -12,7 +12,7 @@ public class MethodByteCodeTester {
     @Test
     public void testByteCodeAdd() throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         final BytecodeMethodModifier modifier = new BytecodeMethodModifier();
-        final byte[] b = modifier.combine(); //This is not a working test
+        final byte[] b = modifier.combine(null); //This is not a working test
 
 //        ClassReader sourceReader = new ClassReader(SecondMixinTestCase.class.getName());
 //        InstructionClassVisitor instructionVisitor =

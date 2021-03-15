@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class BytecodeMethodModifier {
-    public byte[] combine(MixinDestination... destinations) throws IOException {
+    public byte[] combine(byte[] compiledSource, MixinDestination... destinations) throws IOException {
 
         final Map<String, Map<InjectionType, Queue<PriorityInstruction>>> instructions = new HashMap<>(destinations.length);
 
@@ -26,10 +26,10 @@ public class BytecodeMethodModifier {
             for (MixinSource source : destination.getSources()) {
                 final QualifiedMethodLocation location = source.getLocation();
 
-                ClassReader sourceReader = new ClassReader(location.getCls().getName());
+                ClassReader sourceReader = new ClassReader(location.getCls());
                 InstructionClassVisitor instructionVisitor = source instanceof MixinProxySource ?
-                        new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), location.getMethod(), location.getCls().getName(), destination.getCls(), ((MixinProxySource) source).getPointer()) :
-                        new InstructionClassVisitor(new ClassWriter(0), location.getMethod(), location.getCls().getName(), destination.getCls());
+                        new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), location.getMethod(), location.getCls(), destination.getCls(), ((MixinProxySource) source).getPointer()) :
+                        new InstructionClassVisitor(new ClassWriter(0), location.getMethod(), location.getCls(), destination.getCls());
                 sourceReader.accept(instructionVisitor, 0);
 
                 instructions.putIfAbsent(methodDest, new HashMap<>());
@@ -40,7 +40,7 @@ public class BytecodeMethodModifier {
             }
         }
 
-        return this.apply(instructions, destinations[0].getCls());
+        return this.apply(instructions, compiledSource);
     }
 
     private boolean confirm(MixinDestination... destinations) {
@@ -56,12 +56,12 @@ public class BytecodeMethodModifier {
        Map<Method name, Map<Injection location(4 values), Queue<Instructions with priority>>>, The target.
      */
     @Contract(pure = true)
-    private byte[] apply(Map<String, Map<InjectionType, Queue<PriorityInstruction>>> injectors, String targetCls) throws IOException {
+    private byte[] apply(Map<String, Map<InjectionType, Queue<PriorityInstruction>>> injectors, byte[] sources) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         ClassVisitor adapter = new MixinClassVisitor(writer, injectors);
 
-        ClassReader reader = new ClassReader(targetCls);
+        ClassReader reader = new ClassReader(sources);
         reader.accept(adapter, 0);
 
         return writer.toByteArray();

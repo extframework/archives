@@ -5,7 +5,7 @@ import net.yakclient.mixin.api.Mixer;
 import net.yakclient.mixin.api.Shadow;
 import org.jetbrains.annotations.NotNull;
 
-@Mixer(MixinSourceClassTest.class)
+@Mixer("net.yakclient.apitests.MixinSourceClassTest")
 public abstract class MixinTestCase {
 
     @Shadow

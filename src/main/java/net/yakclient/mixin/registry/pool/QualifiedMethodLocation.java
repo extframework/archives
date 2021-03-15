@@ -9,7 +9,7 @@ public class QualifiedMethodLocation extends MethodLocation {
     private final InjectionType injectionType;
     private final int priority;
 
-    public QualifiedMethodLocation(Class<?> cls, String method, InjectionType injectionType, int priority) {
+    public QualifiedMethodLocation(String cls, String method, InjectionType injectionType, int priority) {
         super(cls, method);
         this.injectionType = injectionType;
         this.priority = priority;

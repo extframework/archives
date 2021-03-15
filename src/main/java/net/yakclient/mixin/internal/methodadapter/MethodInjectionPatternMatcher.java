@@ -60,10 +60,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
         }
     }
 
-    @Override
-    public void visitMaxs(int maxStack, int maxLocals) {
-        super.visitMaxs(maxStack, maxLocals);
-    }
+
 
     @Override
     public void visitInsn(int opcode) {

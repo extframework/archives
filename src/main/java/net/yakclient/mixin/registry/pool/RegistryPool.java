@@ -12,7 +12,7 @@ public abstract class RegistryPool<T> {
         this.pool = new HashMap<>();
     }
 
-    public abstract Location pool(T type);
+    public abstract Location pool(T type) throws ClassNotFoundException;
 
     public abstract PackageTarget register(Location location);
 

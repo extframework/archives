@@ -4,7 +4,7 @@ import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.Mixer;
 import net.yakclient.mixin.api.Shadow;
 
-@Mixer(MixinSourceClassTest.class)
+@Mixer("net.questcraft.apitests.MixinSourceClassTest")
 public abstract class MixinTestCase {
 
     @Shadow

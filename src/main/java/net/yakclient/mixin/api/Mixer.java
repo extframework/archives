@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  *
  * <pre>
  * {@code
- * @Mixer(ExampleMixTo.class)
+ * @Mixer("org.example.ExampleMixTo")
  *  public abstract class ExampleClass { ... }
  * }
  * </pre>
@@ -29,5 +29,5 @@ public @interface Mixer {
      *
      * @return returns the class that will be mixed into.
      */
-    Class<?> value();
+    String value();
 }

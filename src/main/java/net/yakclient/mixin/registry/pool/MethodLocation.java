@@ -7,7 +7,7 @@ import java.util.Objects;
 public class MethodLocation extends ClassLocation {
     private final String method;
 
-    public MethodLocation(Class<?> cls, String method) {
+    public MethodLocation(String cls, String method) {
       super(cls);
         this.method = method;
     }

@@ -5,17 +5,17 @@ import net.yakclient.mixin.api.InjectionType;
 import java.util.Objects;
 
 public class MixinMetaData {
-    private final Class<?> classFrom;
+    private final String classFrom;
     private final String methodFrom;
-    private final Class<?> classTo;
+    private final String classTo;
     private final String methodTo;
 
     private final InjectionType type;
     private final int priority;
 
-    public MixinMetaData(Class<?> classFrom,
+    public MixinMetaData(String classFrom,
                          String methodFrom,
-                         Class<?> classTo,
+                         String classTo,
                          String methodTo,
                          InjectionType type,
                          int priority) {
@@ -27,7 +27,7 @@ public class MixinMetaData {
         this.priority = priority;
     }
 
-    public Class<?> getClassFrom() {
+    public String getClassFrom() {
         return classFrom;
     }
 
@@ -35,7 +35,7 @@ public class MixinMetaData {
         return methodFrom;
     }
 
-    public Class<?> getClassTo() {
+    public String getClassTo() {
         return classTo;
     }
 

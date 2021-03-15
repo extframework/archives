@@ -17,7 +17,7 @@ public class MixinRegistry {
     private final ExternalLibRegistryPool libRegistry;
     private final MixinRegistryPool mixinRegistry;
 
-   private MixinRegistry(RegistryConfigurator.Configuration configuration) {
+    private MixinRegistry(RegistryConfigurator.Configuration configuration) {
         this.configuration = configuration;
         this.libRegistry = new ExternalLibRegistryPool();
         this.mixinRegistry = new MixinRegistryPool();
@@ -29,7 +29,6 @@ public class MixinRegistry {
 
         return new MixinRegistry(configuration);
     }
-
 
 
     //TODO there needs to be a better way to have the mixin pool get dumped. Currently nothing will happen if one of our calls is not invoked. A solution could be spawning off another thread and then having a callback? For external libs its very simple and will just go when its needed.
@@ -44,7 +43,7 @@ public class MixinRegistry {
      * @param cls The class to take mixins from
      * @return MixinRegistry for easy access.
      */
-    public MixinRegistry registerMixin(Class<?> cls) {
+    public MixinRegistry registerMixin(Class<?> cls) throws ClassNotFoundException {
         final Set<MixinMetaData> data = this.data(cls);
 
         for (MixinMetaData datum : data) this.mixinRegistry.pool(datum);
@@ -52,7 +51,7 @@ public class MixinRegistry {
         return this;
     }
 
-    public MixinRegistry registerMixin(Class<?> cls, FunctionalProxy proxy) {
+    public MixinRegistry registerMixin(Class<?> cls, FunctionalProxy proxy) throws ClassNotFoundException {
         final Set<MixinMetaData> data = this.data(cls);
 
         for (MixinMetaData datum : data) this.mixinRegistry.pool(datum, proxy);
@@ -64,7 +63,7 @@ public class MixinRegistry {
         //TODO redo this eventually
         if (!cls.isAnnotationPresent(Mixer.class))
             throw new IllegalArgumentException("Mixins must be annotated with @Mixer");
-        final Class<?> type = cls.getAnnotation(Mixer.class).value();
+        final String type = cls.getAnnotation(Mixer.class).value();
 
         Set<MixinMetaData> mixins = new HashSet<>();
         for (Method method : cls.getDeclaredMethods()) {
@@ -75,7 +74,7 @@ public class MixinRegistry {
                 if (!this.declaredMethod(type, methodTo, method.getParameterTypes()))
                     throw new IllegalArgumentException("Failed to find a appropriate method to mix to");
 
-                mixins.add(new MixinMetaData(cls,
+                mixins.add(new MixinMetaData(cls.getName(),
                         method.getName(),
                         type,
                         methodTo, injection.type(), injection.priority()));
@@ -90,12 +89,8 @@ public class MixinRegistry {
         return injection.to().equals(Injection.METHOD_SELF) ? method.getName() : injection.to();
     }
 
-    private boolean declaredMethod(Class<?> cls, String method, Class<?>... parameterTypes) {
-        try {
-            cls.getDeclaredMethod(method, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            return false;
-        }
+    private boolean declaredMethod(String cls, String method, Class<?>... parameterTypes) {
+        //TODO Might wanna replace with ASM
         return true;
     }
 

@@ -5,9 +5,9 @@ import net.yakclient.mixin.registry.MixinMetaData;
 import java.util.Objects;
 
 public class ClassLocation implements Location {
-    private final Class<?> cls;
+    private final String cls;
 
-    public ClassLocation(Class<?> cls) {
+    public ClassLocation(String cls) {
         this.cls = cls;
     }
 
@@ -19,7 +19,7 @@ public class ClassLocation implements Location {
         return new ClassLocation(data.getClassFrom());
     }
 
-    public Class<?> getCls() {
+    public String getCls() {
         return cls;
     }
 

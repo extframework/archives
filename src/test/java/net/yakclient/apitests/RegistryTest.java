@@ -1,15 +1,10 @@
 package net.yakclient.apitests;
 
 
-import net.questcraft.apitests.MixinSourceClassTest;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.MixinRegistry;
 import net.yakclient.mixin.registry.RegistryConfigurator;
-import net.yakclient.mixin.registry.pool.ClassLocation;
 import org.junit.jupiter.api.Test;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -65,7 +60,7 @@ public class RegistryTest {
     }
 
     @Test
-    public void testMixinRegistry() throws ExecutionException, InterruptedException {
+    public void testMixinRegistry() throws ExecutionException, InterruptedException, ClassNotFoundException {
         System.out.println("GOt here");
         RegistryConfigurator.configure().create().registerMixin(MixinTestCase.class).dumpAll();
         printSomething();

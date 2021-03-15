@@ -28,5 +28,5 @@ public interface IMixer {
      *
      * @return returns the class that will be mixed into.
      */
-    Class<?> type();
+    String type();
 }

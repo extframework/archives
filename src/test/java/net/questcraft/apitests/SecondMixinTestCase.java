@@ -4,7 +4,7 @@ import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.api.Mixer;
 
-@Mixer(MixinSourceClassTest.class)
+@Mixer("net.questcraft.apitests.MixinSourceClassTest")
 public class SecondMixinTestCase {
     @Injection(type = InjectionType.BEFORE_INVOKE)
     public void printTheString() {

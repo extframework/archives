@@ -35,10 +35,13 @@ public class BeforeEndPatternMatcher extends MethodInjectionPatternMatcher {
 
         this.executeInsn();
         super.visitInsn(this.returnType);
-        //Should be calculated by the ClassWriter, otherwise it will through a verify error
+        //Should be calculated by the ClassWriter, otherwise it will throw a verify error
         super.visitMaxs(0,0);
         super.visitEnd();
     }
+
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) { /* ... */}
 
     @Override
     public void visitInsn() {

@@ -22,7 +22,7 @@ public class TargetClassLoader extends ProxyClassLoader {
             Class<?> c = this.findLoadedClass(name);
 
             if (c == null) {
-                byte[] b = loadClassBytes(name.replace('.', '/') + ".class");
+                byte[] b = loadClassBytes(name);
                 c = defineClass(name, b, 0, b.length);
             }
 
@@ -34,8 +34,8 @@ public class TargetClassLoader extends ProxyClassLoader {
         }
     }
 
-    private byte[] loadClassBytes(String name) throws IOException, ClassNotFoundException {
-        InputStream cIn = this.getResourceAsStream(name);
+    public static byte[] loadClassBytes(String name) throws IOException, ClassNotFoundException {
+        InputStream cIn = ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class");
         if (cIn == null) throw new ClassNotFoundException("Failed to find class " + name);
 
         try (DataInputStream in = new DataInputStream(cIn)) {
