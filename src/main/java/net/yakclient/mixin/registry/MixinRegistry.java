@@ -32,6 +32,7 @@ public class MixinRegistry {
 
 
     //TODO there needs to be a better way to have the mixin pool get dumped. Currently nothing will happen if one of our calls is not invoked. A solution could be spawning off another thread and then having a callback? For external libs its very simple and will just go when its needed.
+    //TODO there are alot of issues with class reloading for example if a mixin class gets loaded(which it by definition has to) then it loads all of the classes it might reference in parameters etc. so we could fix this by not allowing the loading of mixin classes? that might be an option.
 
     /**
      * Registers a Mixin from the given class.
@@ -75,12 +76,51 @@ public class MixinRegistry {
                     throw new IllegalArgumentException("Failed to find a appropriate method to mix to");
 
                 mixins.add(new MixinMetaData(cls.getName(),
-                        method.getName(),
+                        this.byteCodeSignature(method),
                         type,
-                        methodTo, injection.type(), injection.priority()));
+                        this.byteCodeSignature(method, methodTo), injection.type(), injection.priority()));
             }
         }
         return mixins;
+    }
+
+    private String byteCodeSignature(Method method, String name) {
+        final Class<?> methodReturn = method.getReturnType();
+
+        final StringBuilder builder = new StringBuilder(name);
+
+        builder.append('(');
+        for (Class<?> type : method.getParameterTypes()) {
+            builder.append(type.isPrimitive() ?
+                    this.primitiveType(type) :
+                    type.isArray() ?
+                            type.getName() :
+                            "L" + type.getName().replace('.', '/') + ";");
+        }
+        builder.append(')');
+
+        builder.append(methodReturn.isPrimitive() ?
+                this.primitiveType(methodReturn) :
+                methodReturn.getName());
+
+        return builder.toString();
+    }
+
+    private String byteCodeSignature(Method method) {
+       return this.byteCodeSignature(method, method.getName());
+    }
+
+    private char primitiveType(Class<?> cls) {
+        if (cls == void.class) return 'V';
+        if (cls == boolean.class) return 'Z';
+        if (cls == char.class) return 'C';
+        if (cls == byte.class) return 'B';
+        if (cls == short.class) return 'S';
+        if (cls == int.class) return 'I';
+        if (cls == float.class) return 'F';
+        if (cls == long.class) return 'J';
+        if (cls == double.class) return 'D';
+        throw new IllegalArgumentException("Class must be a primitive!");
     }
 
     private String mixinToMethodName(Method method) {

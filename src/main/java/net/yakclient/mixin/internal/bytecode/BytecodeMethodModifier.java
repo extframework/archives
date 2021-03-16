@@ -1,6 +1,5 @@
 package net.yakclient.mixin.internal.bytecode;
 
-import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.registry.pool.QualifiedMethodLocation;
 import org.jetbrains.annotations.Contract;
@@ -56,7 +55,7 @@ public class BytecodeMethodModifier {
        Map<Method name, Map<Injection location(4 values), Queue<Instructions with priority>>>, The target.
      */
     @Contract(pure = true)
-    private byte[] apply(Map<String, Map<Integer, Queue<PriorityInstruction>>> injectors, byte[] sources) throws IOException {
+    private byte[] apply(Map<String, Map<Integer, Queue<PriorityInstruction>>> injectors, byte[] sources) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         ClassVisitor adapter = new MixinClassVisitor(writer, injectors);

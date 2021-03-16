@@ -21,13 +21,16 @@ public class MixinClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
-        if (this.injectors.containsKey(name) && visitor != null) {
+
+        final String qualifiedName = name + desc;
+        if (this.injectors.containsKey(qualifiedName) && visitor != null) {
             MethodVisitor last = visitor;
 
-            for (int type : this.injectors.get(name).keySet()) {
+            for (int type : this.injectors.get(qualifiedName).keySet()) {
                 final MethodInjectionPatternMatcher.MatcherPattern pattern = MethodInjectionPatternMatcher.MatcherPattern.pattern(type);
-                if (pattern == MATCH_OPCODE) last = pattern.match(last, this.injectors.get(name).get(type), new MethodInjectionPatternMatcher.PatternFlag<>(type));
-                else last = pattern.match(last, this.injectors.get(name).get(type));
+                if (pattern == MATCH_OPCODE)
+                    last = pattern.match(last, this.injectors.get(qualifiedName).get(type), new MethodInjectionPatternMatcher.PatternFlag<>(type));
+                else last = pattern.match(last, this.injectors.get(qualifiedName).get(type));
             }
 
             return last;

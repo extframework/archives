@@ -43,7 +43,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
-        if (visitor != null && targetMethod != null && targetMethod.equals(name) && !found) {
+        if (visitor != null && targetMethod != null && targetMethod.equals(name + desc) && !found) {
             this.found = true;
             return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source, this.dest);
         }
@@ -67,7 +67,7 @@ public class InstructionClassVisitor extends ClassVisitor {
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
             final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
-            if (visitor != null && targetMethod != null && targetMethod.equals(name) && !found) {
+            if (visitor != null && targetMethod != null && targetMethod.equals(name + desc) && !found) {
                 this.found = true;
                 return this.forwarder = new ProxyMethodForwarder(visitor, this.shouldReturn(desc), this.source, this.dest, this.pointer);
             }
