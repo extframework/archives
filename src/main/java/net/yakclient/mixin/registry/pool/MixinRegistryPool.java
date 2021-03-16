@@ -78,8 +78,8 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final ClassLocation dest = (ClassLocation) location;
 
             final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
-            final ProxyClassLoader loader = ContextPoolManager.createLoader(sysTarget);
-            ContextPoolManager.applyTarget(sysTarget, loader);
+//            final ProxyClassLoader loader = ContextPoolManager.createLoader(sysTarget);
+            final Context context = ContextPoolManager.applyTarget(sysTarget);
 
             //Method destination, Destinations
             final Map<String, BytecodeMethodModifier.MixinDestination> perfectDestinations = new HashMap<>();
@@ -96,7 +96,7 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final Set<BytecodeMethodModifier.MixinDestination> destinations = new HashSet<>(perfectDestinations.values());
 
             final byte[] b = this.methodModifier.combine(this.compiledSources.get(dest.getCls()), destinations.toArray(new BytecodeMethodModifier.MixinDestination[0]));
-            loader.defineClass(dest.getCls(), b);
+            context.getLoader().defineClass(dest.getCls(), b);
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);
 

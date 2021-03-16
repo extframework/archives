@@ -1,6 +1,7 @@
 package net.yakclient.mixin.internal.loader;
 
 import java.util.Arrays;
+import java.util.StringJoiner;
 
 public class PackageTarget {
     private final String[] path;
@@ -38,7 +39,7 @@ public class PackageTarget {
 
         boolean isTarget = false;
         for (int i = 0; i < this.path.length; i++) {
-             isTarget = target.path.length > i && this.path[i].equals(target.path[i]);
+            isTarget = target.path.length > i && this.path[i].equals(target.path[i]);
         }
 
         return isTarget;
@@ -55,5 +56,12 @@ public class PackageTarget {
     @Override
     public int hashCode() {
         return Arrays.hashCode(path);
+    }
+
+    @Override
+    public String toString() {
+        final StringJoiner joiner = new StringJoiner(".");
+        for (String s : this.path) joiner.add(s);
+        return joiner.toString();
     }
 }

@@ -51,4 +51,9 @@ public class ClassTarget extends PackageTarget {
     public int hashCode() {
         return Objects.hash(super.hashCode(), cls);
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "." + this.cls;
+    }
 }

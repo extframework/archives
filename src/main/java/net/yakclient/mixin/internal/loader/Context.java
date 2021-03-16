@@ -41,9 +41,9 @@ public class Context {
         }
     }
 
-    @Nullable
-    public ClassLoader getLoader() {
-        return loader;
+    public ProxyClassLoader getLoader() {
+        if (!(this.loader instanceof TargetClassLoader)) throw new IllegalStateException("Class loader for target " + this.target.toString());
+        return (ProxyClassLoader) loader;
     }
 
     public PackageTarget getTarget() {

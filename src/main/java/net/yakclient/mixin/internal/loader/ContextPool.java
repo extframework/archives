@@ -36,7 +36,9 @@ public abstract class ContextPool {
     }
 
     public Context addTarget(PackageTarget target) {
-        return this.targets.putIfAbsent(this.getTarget(target), this.createContext(null, target));
+        final PackageTarget realTarget = this.getTarget(target);
+        final ClassLoader loader = this.targets.containsKey(realTarget) ? this.targets.get(realTarget).getLoader() : ContextPoolManager.createLoader(realTarget);
+        return this.targets.putIfAbsent(this.getTarget(target), this.createContext(loader, target));
     }
 
     public PackageTarget getTarget(PackageTarget target) {

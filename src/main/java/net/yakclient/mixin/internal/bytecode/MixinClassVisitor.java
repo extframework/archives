@@ -23,19 +23,37 @@ public class MixinClassVisitor extends ClassVisitor {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
 
         final String qualifiedName = name + desc;
-        if (this.injectors.containsKey(qualifiedName) && visitor != null) {
+        if (this.hasInjection(qualifiedName)) {
             MethodVisitor last = visitor;
 
-            for (int type : this.injectors.get(qualifiedName).keySet()) {
+            for (int type : this.getInjection(qualifiedName).keySet()) {
                 final MethodInjectionPatternMatcher.MatcherPattern pattern = MethodInjectionPatternMatcher.MatcherPattern.pattern(type);
                 if (pattern == MATCH_OPCODE)
-                    last = pattern.match(last, this.injectors.get(qualifiedName).get(type), new MethodInjectionPatternMatcher.PatternFlag<>(type));
-                else last = pattern.match(last, this.injectors.get(qualifiedName).get(type));
+                    last = pattern.match(last, this.getInjection(qualifiedName).get(type), new MethodInjectionPatternMatcher.PatternFlag<>(type));
+                else last = pattern.match(last, this.getInjection(qualifiedName).get(type));
             }
 
             return last;
         }
 
         return visitor;
+    }
+
+    private boolean hasInjection(String name) {
+        for (String s : this.injectors.keySet()) {
+            if (this.removeReturnType(name).equals(this.removeReturnType(s))) return true;
+        }
+        return false;
+    }
+
+    private Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>> getInjection(String name) {
+        for (String s : this.injectors.keySet()) {
+            if (this.removeReturnType(name).equals(this.removeReturnType(s))) return this.injectors.get(s);
+        }
+        throw new IllegalArgumentException("Failed to find injection");
+    }
+
+    private String removeReturnType(String type) {
+        return type.substring(0, type.indexOf(')') + 1);
     }
 }

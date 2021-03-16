@@ -88,7 +88,7 @@ public class ContextPoolManager {
      * @param target The String to target for.
      * @return The classloader produced.
      */
-    public static TargetClassLoader createLoader(PackageTarget target) {
+    static TargetClassLoader createLoader(PackageTarget target) {
         final ContextPoolManager instance = getInstance();
 
         if (!(instance.loader instanceof ProxyClassLoader)) throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
