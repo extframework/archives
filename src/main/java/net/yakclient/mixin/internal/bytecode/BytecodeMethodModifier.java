@@ -21,7 +21,6 @@ public class BytecodeMethodModifier {
         for (MixinDestination destination : destinations) {
             final String methodDest = destination.getMethod();
 
-
             for (MixinSource source : destination.getSources()) {
                 final QualifiedMethodLocation location = source.getLocation();
 

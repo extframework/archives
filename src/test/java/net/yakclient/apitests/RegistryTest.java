@@ -1,6 +1,7 @@
 package net.yakclient.apitests;
 
 
+import net.questcraft.apitests.MixinTestCase;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.MixinRegistry;
 import net.yakclient.mixin.registry.RegistryConfigurator;
@@ -13,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 
 //@RunWith(TestingProxyCSL.class)
 public class RegistryTest {
-    //for runtiem -Djava.system.class.loader=net/yakclient/mixin/internal/loader/ProxyClassLoader
+    //for runtiem -Djava.system.class.loader=net.yakclient.mixin.internal.loader.ProxyClassLoader
     //for testing
 
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
@@ -22,18 +23,17 @@ public class RegistryTest {
         final RegistryConfigurator configure = RegistryConfigurator.configure();
         final PackageTarget target = configure.addTarget(PackageTarget.create("net.questcraft"));
         final MixinRegistry mixinRegistry = configure.create();
-//        {
-//            mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
-//
-//            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
-//            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
-////            aClass.getMethod("printTheString").invoke(obj);
-//        }
+        {
+            mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
+
+            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
+            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
+//            aClass.getMethod("printTheString").invoke(obj);
+        }
 
         {
             mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
                 System.out.println("Proxied");
-//                cancel.run();
             })).dumpAll();
 
 

@@ -3,30 +3,19 @@ package net.yakclient.mixin.internal.loader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class TargetClassLoader extends ProxyClassLoader {
     private final PackageTarget target;
-    private final Map<String, byte[]> overridden;
 //    private final ProxyClassLoader lazyParent;
 
     public TargetClassLoader(ClassLoader parent, PackageTarget target) {
         super(parent);
 //        this.lazyParent = parent;
         this.target = target;
-        this.overridden = new HashMap<>();
     }
 
     @Override
     public Class<?> defineClass(String name, byte[] b) {
-        try {
-            if (loadClassBytes(name).length != b.length) this.overridden.put(name, b);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         return super.defineClass(name, b);
     }
 
@@ -60,5 +49,9 @@ public class TargetClassLoader extends ProxyClassLoader {
             in.readFully(buf);
             return buf;
         }
+    }
+
+    public PackageTarget getTarget() {
+        return target;
     }
 }

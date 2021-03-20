@@ -41,19 +41,16 @@ public class MixinClassVisitor extends ClassVisitor {
 
     private boolean hasInjection(String name) {
         for (String s : this.injectors.keySet()) {
-            if (this.removeReturnType(name).equals(this.removeReturnType(s))) return true;
+            if (ByteCodeUtils.descriptorsSame(name, s)) return true;
         }
         return false;
     }
 
     private Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>> getInjection(String name) {
         for (String s : this.injectors.keySet()) {
-            if (this.removeReturnType(name).equals(this.removeReturnType(s))) return this.injectors.get(s);
+            if (ByteCodeUtils.descriptorsSame(name, s)) return this.injectors.get(s);
         }
         throw new IllegalArgumentException("Failed to find injection");
     }
 
-    private String removeReturnType(String type) {
-        return type.substring(0, type.indexOf(')') + 1);
-    }
 }

@@ -7,7 +7,6 @@ import net.yakclient.mixin.registry.MixinMetaData;
 import net.yakclient.mixin.registry.proxy.MixinProxyManager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
@@ -78,8 +77,7 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final ClassLocation dest = (ClassLocation) location;
 
             final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
-//            final ProxyClassLoader loader = ContextPoolManager.createLoader(sysTarget);
-            final Context context = ContextPoolManager.applyTarget(sysTarget);
+//            final Context context = ContextPoolManager.applyTarget(sysTarget);
 
             //Method destination, Destinations
             final Map<String, BytecodeMethodModifier.MixinDestination> perfectDestinations = new HashMap<>();
@@ -96,7 +94,8 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final Set<BytecodeMethodModifier.MixinDestination> destinations = new HashSet<>(perfectDestinations.values());
 
             final byte[] b = this.methodModifier.combine(this.compiledSources.get(dest.getCls()), destinations.toArray(new BytecodeMethodModifier.MixinDestination[0]));
-            context.getLoader().defineClass(dest.getCls(), b);
+            ContextPoolManager.defineClass(dest.getCls(), b);
+//            context.getLoader().redefineClass(dest.getCls(), b);
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);
 
