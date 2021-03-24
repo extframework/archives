@@ -1,5 +1,6 @@
 package net.yakclient.mixin.registry;
 
+import net.yakclient.mixin.internal.loader.ClassTarget;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.pool.SuppliedFuture;
 
@@ -27,29 +28,45 @@ public class RegistryConfigurator {
         return MixinRegistry.create(this.configuration);
     }
 
+    public static void safeTarget(Configuration config, PackageTarget target) {
+        if (config.packageSafeList.size() > 0 && !contains(config.packageSafeList, target))
+            throw new IllegalArgumentException("Class package is not on the whitelist!");
+        if (contains(config.packageBlockList, target))
+            throw new IllegalArgumentException("This package has been blocked from mixins!");
+    }
+
+    private static boolean contains(Set<PackageTarget> targets, PackageTarget target) {
+        for (PackageTarget packageTarget : targets) {
+            if (target instanceof ClassTarget && packageTarget.equals(target)) return true;
+            if (!(target instanceof ClassTarget) && packageTarget.isTargetOf(target)) return true;
+        }
+        return false;
+    }
+
 
     /*
         Public actions
      */
     public RegistryConfigurator addSafePackage(String location) {
-        this.configuration.packageSafeList.add(location);
+        this.configuration.packageSafeList.add(PackageTarget.create(location));
         return this;
     }
 
     public RegistryConfigurator addBlockedPackage(String location) {
-        this.configuration.packageBlockList.add(location);
+        this.configuration.packageBlockList.add(PackageTarget.create(location));
         return this;
     }
 
-    public PackageTarget addTarget(PackageTarget target) {
+    public RegistryConfigurator addTarget(PackageTarget target) {
+        safeTarget(this.configuration, target);
         this.configuration.targets.add(target);
-        return target;
+        return this;
     }
 
     public static class Configuration {
-        final List<String> packageBlockList;
+        final Set<PackageTarget> packageBlockList;
 
-        final List<String> packageSafeList;
+        final Set<PackageTarget> packageSafeList;
 
         final Set<PackageTarget> targets;
 
@@ -66,8 +83,8 @@ public class RegistryConfigurator {
     }
 
     private static class DefaultConfiguration {
-        public static final FunctionalConfiguration<List<String>> BLOCK_LIST = ArrayList::new;
-        public static final FunctionalConfiguration<List<String>> SAFE_LIST = ArrayList::new;
+        public static final FunctionalConfiguration<Set<PackageTarget>> BLOCK_LIST = HashSet::new;
+        public static final FunctionalConfiguration<Set<PackageTarget>> SAFE_LIST = HashSet::new;
         public static final FunctionalConfiguration<Set<PackageTarget>> TARGETS = HashSet::new;
     }
 }

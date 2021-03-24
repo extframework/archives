@@ -38,6 +38,10 @@ public class ClassTarget extends PackageTarget {
         return new ClassTarget(split, fromPath[i]);
     }
 
+    public PackageTarget toPackage() {
+        return new PackageTarget(this.path);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

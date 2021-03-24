@@ -77,7 +77,6 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final ClassLocation dest = (ClassLocation) location;
 
             final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
-//            final Context context = ContextPoolManager.applyTarget(sysTarget);
 
             //Method destination, Destinations
             final Map<String, BytecodeMethodModifier.MixinDestination> perfectDestinations = new HashMap<>();
@@ -95,7 +94,6 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 
             final byte[] b = this.methodModifier.combine(this.compiledSources.get(dest.getCls()), destinations.toArray(new BytecodeMethodModifier.MixinDestination[0]));
             ContextPoolManager.defineClass(dest.getCls(), b);
-//            context.getLoader().redefineClass(dest.getCls(), b);
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);
 

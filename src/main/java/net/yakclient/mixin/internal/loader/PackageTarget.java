@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.StringJoiner;
 
 public class PackageTarget {
-    private final String[] path;
+    protected final String[] path;
 
     public PackageTarget(String path) {
         this.path = fromPath(path);

@@ -1,4 +1,4 @@
-package net.yakclient.mixin.versionadapter;
+package net.yakclient.mixin.api.versionadapter;
 
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 

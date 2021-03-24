@@ -1,8 +1,8 @@
 package net.yakclient.verstionadapter;
 
-import net.yakclient.mixin.versionadapter.ClassVersion;
-import net.yakclient.mixin.versionadapter.VersionManager;
-import net.yakclient.mixin.versionadapter.VersionMapping;
+import net.yakclient.mixin.api.versionadapter.ClassVersion;
+import net.yakclient.mixin.api.versionadapter.VersionManager;
+import net.yakclient.mixin.api.versionadapter.VersionMapping;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

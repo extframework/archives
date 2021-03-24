@@ -3,6 +3,7 @@ package net.yakclient.mixin.registry;
 import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.Mixer;
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
+import net.yakclient.mixin.internal.loader.ClassTarget;
 import net.yakclient.mixin.internal.loader.ContextPoolManager;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.pool.*;
@@ -61,11 +62,17 @@ public class MixinRegistry {
         return this;
     }
 
+    private void validateMixin(String cls) {
+        RegistryConfigurator.safeTarget(this.configuration, ClassTarget.create(cls).toPackage());
+    }
+
+
     private Set<MixinMetaData> data(Class<?> cls) {
         if (!cls.isAnnotationPresent(Mixer.class))
             throw new IllegalArgumentException("Mixins must be annotated with @Mixer");
         final String type = cls.getAnnotation(Mixer.class).value();
 
+        this.validateMixin(type);
         Set<MixinMetaData> mixins = new HashSet<>();
         for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Injection.class)) {
