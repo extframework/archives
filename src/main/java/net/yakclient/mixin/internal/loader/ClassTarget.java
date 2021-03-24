@@ -38,6 +38,10 @@ public class ClassTarget extends PackageTarget {
         return new ClassTarget(split, fromPath[i]);
     }
 
+    public PackageTarget toPackage() {
+        return new PackageTarget(this.path);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,5 +54,10 @@ public class ClassTarget extends PackageTarget {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), cls);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "." + this.cls;
     }
 }

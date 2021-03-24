@@ -66,7 +66,7 @@ public class ContextPoolManager {
      * @return The loaded class.
      * @throws ClassNotFoundException If this class isn't found.
      */
-   public static Class<?> loadClass(String name) throws ClassNotFoundException {
+    public static Class<?> loadClass(String name) throws ClassNotFoundException {
         final ContextPoolManager manager = getInstance();
 
         if (!isTargeted(name)) manager.loader.loadClass(name);
@@ -77,21 +77,26 @@ public class ContextPoolManager {
         return aClass;
     }
 
+    public static Class<?> defineClass(String name, byte[] bytes) {
+        return getInstance().pool.defineClass(ClassTarget.create(name), bytes);
+    }
+
     /**
      * Creates a new TargetClassLoader targeted with the location given. For any
      * operation with MixinUtils the ProxyClassLoader must be the default but an
      * exception can be throw here if that is not the case.
-     *
+     * <p>
      * A side note; The return of this method SHOULD NOT BE STORED! This could
      * very well cause massive leaks in class reloading through memory.
      *
      * @param target The String to target for.
      * @return The classloader produced.
      */
-    public static TargetClassLoader createLoader(PackageTarget target) {
+    static TargetClassLoader createLoader(PackageTarget target) {
         final ContextPoolManager instance = getInstance();
 
-        if (!(instance.loader instanceof ProxyClassLoader)) throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
+        if (!(instance.loader instanceof ProxyClassLoader))
+            throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
         return new TargetClassLoader(instance.loader, instance.pool.getTarget(target));
     }
 

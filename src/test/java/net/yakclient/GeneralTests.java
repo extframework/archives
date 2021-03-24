@@ -1,6 +1,5 @@
 package net.yakclient;
 
-import net.yakclient.apitests.MixinSourceClassTest;
 import net.yakclient.apitests.RegistryTest;
 import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.internal.loader.PackageTarget;
@@ -13,12 +12,7 @@ import java.util.regex.Pattern;
 
 public class GeneralTests {
     //
-    @Test
-    public void clsToPackageTest() {
-       final Class<?> cls = MixinSourceClassTest.class;
 
-        System.out.println(PackageTarget.create(cls.getPackage().getName()));
-    }
 
     @Test
     public void reDefineCls() throws ClassNotFoundException, IOException {
@@ -41,13 +35,101 @@ public class GeneralTests {
 
     @Test
     public void testShouldReturn() {
-        String pattern = "(.*)V";
+        String pattern = "[(].*[)]V";
         String line = "(asdfasdfasdfsadf)V";
 
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(line);
         System.out.println(m.find());
     }
+
+    @Test
+    public void testMethodSignature() {
+        String pattern = "^((?:[a-zA-Z0-9$_])+)" +
+                "\\(((?:[ZCBSIFJD]|(?:L[a-zA-Z0-9$_.]+;)|(?:\\[[ZCBSIFJD])|(?:\\[L[a-zA-Z0-9$_.]+;))*)\\)" +
+                "(?:[ZCBSIFJDV]|(?:L.+;)|(?:\\[[ZCBSIFJD]|(?:\\[L.+;)))";
+
+        String line = "asdf([Lasdfasdf;[Ladsfadsf;)[B";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.find());
+        System.out.println(m.groupCount());
+
+        System.out.println(m.group(1)); //Name
+        System.out.println(m.group(2)); //Params
+
+    }
+
+    @Test
+    public void testMethodReturnSignature() {
+        String pattern = "^(?:[ZCBSIFJDV]|(?:L[a-zA-Z0-9$_]+;)|(?:\\[[ZCBSIFJD])|(?:\\[L[a-zA-Z0-9$_]+;))$";
+        String line = "[Lasdfasdf;";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.groupCount());
+
+        System.out.println(m.find());
+    }
+
+
+    @Test
+    public void testParamsSignature() {
+        //This will produce a match here which is incorrect...
+        String pattern = "^\\(((?:[ZCBSIFJD]|(?:L[a-zA-Z0-9$_.]+;)|(?:\\[[ZCBSIFJD])|(?:\\[L[a-zA-Z0-9$_.]+;))*)\\)$";
+        String line = "(Ljava.lang.String;Ljava.lang.String;[Lasdfasdf;)";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.find());
+        System.out.println(m.groupCount());
+
+        System.out.println(m.group(1)); //This will be the signature for the params
+    }
+
+    @Test
+    public void testParamsArraySignature() {
+        //This will produce a match here which is incorrect...
+        String pattern = "^\\(((?:(?:\\[[ZCBSIFJD])|(?:\\[L[a-zA-Z0-9$_]+;))*)\\)$";
+        String line = "([B[Z[Lasdfasdf;[Lasdfasdf;)";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.find());
+        System.out.println(m.groupCount());
+
+//        System.out.println(m.group(1)); //
+    }
+
+    @Test
+    public void testMethodParamsReturn() {
+        String pattern = "\\(((?:[ZCBSIFJD]|(?:L.+;)|(?:\\[[ZCBSIFJD]|(?:\\[L.+;)))*)\\)" +
+                "(?:[ZCBSIFJDV]|(?:L.+;)|(?:\\[[ZCBSIFJD]|(?:\\[L.+;)))";
+        String line = "([Lasdfasdf;)V";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.find());
+        System.out.println(m.groupCount());
+
+        System.out.println(m.group(1));
+//        System.out.println(m.group(2));
+
+    }
+
+    @Test
+    public void testMethodName() {
+        String pattern = "^((?:[a-zA-Z0-9$_])+)\\(";
+        String line = "methodName1__$(";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(line);
+        System.out.println(m.find());
+
+        System.out.println(m.group(1)); //This will be the signature for the method name
+    }
+
 
     public void test() {
         if (System.currentTimeMillis() > 10000) {

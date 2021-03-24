@@ -1,5 +1,6 @@
 package net.yakclient.mixin.internal.loader;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -12,7 +13,7 @@ public abstract class ContextPool {
 
     public ContextPool() {
         this.targets = new HashMap<>();
-        this.loader = Thread.currentThread().getContextClassLoader();
+        this.loader = ClassLoader.getSystemClassLoader();
     }
 
     private boolean encapsulatedTargetExists(PackageTarget target) {
@@ -36,19 +37,19 @@ public abstract class ContextPool {
     }
 
     public Context addTarget(PackageTarget target) {
-        return this.targets.putIfAbsent(this.getTarget(target), this.createContext(null, target));
+        final PackageTarget realTarget = this.getTarget(target);
+        final ClassLoader loader = this.targets.containsKey(realTarget) ? this.targets.get(realTarget).getLoader() : ContextPoolManager.createLoader(realTarget);
+        return this.targets.putIfAbsent(this.getTarget(target), this.createContext(loader, target));
     }
 
+    @Contract(pure = true)
     public PackageTarget getTarget(PackageTarget target) {
         return this.encapsulatedTargetExists(target) ? this.encapsulatedTarget(target) : target;
     }
 
     public boolean isTargeted(String target) {
         final PackageTarget packageTarget = this.createTarget(target);
-        for (final PackageTarget pT : this.targets.keySet()) {
-            if (pT.isTargetOf(packageTarget)) return true;
-        }
-        return false;
+        return this.isTargeted(packageTarget);
     }
 
     public boolean isTargeted(PackageTarget target) {
@@ -59,12 +60,9 @@ public abstract class ContextPool {
     }
 
     @Nullable
-    Class<?> loadClassOrNull(String name) {
-        final PackageTarget baseTarget = this.createTarget(name);
-        final PackageTarget target = this.encapsulatedTargetExists(baseTarget) ? this.encapsulatedTarget(baseTarget) : baseTarget ;
-        if (this.targets.containsKey(target)) return this.targets.get(target).findClass(name);
-        else if (this.encapsulatedTargetExists(target)) return this.targets.get(this.encapsulatedTarget(target)).findClass(name);
-        return null;
+    public Class<?> loadClassOrNull(String name) {
+        final PackageTarget target = this.getTarget(this.createTarget(name));
+        return this.targets.get(target).findClass(name);
     }
 
     private Context createContext(ClassLoader loader, PackageTarget target) {
@@ -78,5 +76,16 @@ public abstract class ContextPool {
         } catch (ClassNotFoundException e) {
             return PackageTarget.create(path);
         }
+    }
+
+    public Class<?> defineClass(ClassTarget target, byte[] bytes) {
+        final PackageTarget finalTarget = this.getTarget(target);
+        final Context context = this.targets.get(finalTarget);
+        final String name = target.toString();
+
+        if (!context.getLoader().isDefined(name)) return context.getLoader().defineClass(name, bytes);
+        else this.targets.put(finalTarget, this.createContext(ContextPoolManager.createLoader(finalTarget), finalTarget));
+
+        return this.targets.get(finalTarget).getLoader().defineClass(name, bytes);
     }
 }

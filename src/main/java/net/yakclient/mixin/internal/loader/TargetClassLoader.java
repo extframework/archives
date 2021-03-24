@@ -15,6 +15,11 @@ public class TargetClassLoader extends ProxyClassLoader {
     }
 
     @Override
+    public Class<?> defineClass(String name, byte[] b) {
+        return super.defineClass(name, b);
+    }
+
+    @Override
     protected final Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         final ClassTarget target = ClassTarget.create(name);
         if (!this.target.isTargetOf(target)) return super.loadClass(name, resolve);
@@ -44,5 +49,9 @@ public class TargetClassLoader extends ProxyClassLoader {
             in.readFully(buf);
             return buf;
         }
+    }
+
+    public PackageTarget getTarget() {
+        return target;
     }
 }

@@ -2,6 +2,8 @@ package net.yakclient.mixin.registry;
 
 import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.Mixer;
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
+import net.yakclient.mixin.internal.loader.ClassTarget;
 import net.yakclient.mixin.internal.loader.ContextPoolManager;
 import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.pool.*;
@@ -60,12 +62,17 @@ public class MixinRegistry {
         return this;
     }
 
+    private void validateMixin(String cls) {
+        RegistryConfigurator.safeTarget(this.configuration, ClassTarget.create(cls).toPackage());
+    }
+
+
     private Set<MixinMetaData> data(Class<?> cls) {
-        //TODO redo this eventually
         if (!cls.isAnnotationPresent(Mixer.class))
             throw new IllegalArgumentException("Mixins must be annotated with @Mixer");
         final String type = cls.getAnnotation(Mixer.class).value();
 
+        this.validateMixin(type);
         Set<MixinMetaData> mixins = new HashSet<>();
         for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Injection.class)) {
@@ -92,7 +99,7 @@ public class MixinRegistry {
         builder.append('(');
         for (Class<?> type : method.getParameterTypes()) {
             builder.append(type.isPrimitive() ?
-                    this.primitiveType(type) :
+                    ByteCodeUtils.primitiveType(type) :
                     type.isArray() ?
                             type.getName() :
                             "L" + type.getName().replace('.', '/') + ";");
@@ -100,7 +107,7 @@ public class MixinRegistry {
         builder.append(')');
 
         builder.append(methodReturn.isPrimitive() ?
-                this.primitiveType(methodReturn) :
+                ByteCodeUtils.primitiveType(methodReturn) :
                 methodReturn.getName());
 
         return builder.toString();
@@ -110,18 +117,7 @@ public class MixinRegistry {
        return this.byteCodeSignature(method, method.getName());
     }
 
-    private char primitiveType(Class<?> cls) {
-        if (cls == void.class) return 'V';
-        if (cls == boolean.class) return 'Z';
-        if (cls == char.class) return 'C';
-        if (cls == byte.class) return 'B';
-        if (cls == short.class) return 'S';
-        if (cls == int.class) return 'I';
-        if (cls == float.class) return 'F';
-        if (cls == long.class) return 'J';
-        if (cls == double.class) return 'D';
-        throw new IllegalArgumentException("Class must be a primitive!");
-    }
+
 
     private String mixinToMethodName(Method method) {
         if (!method.isAnnotationPresent(Injection.class)) return method.getName();

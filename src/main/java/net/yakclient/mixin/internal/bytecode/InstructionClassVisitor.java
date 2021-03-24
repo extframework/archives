@@ -3,10 +3,7 @@ package net.yakclient.mixin.internal.bytecode;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.internal.instruction.MethodInstructionForwarder;
 import net.yakclient.mixin.internal.instruction.ProxyMethodForwarder;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -19,7 +16,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     protected final String source;
     protected final String dest;
 
-    private static final String VOID_RETURN_PATTERN = "(.*)V";
+    private static final String VOID_RETURN_PATTERN = "[(].*[)]V";
 
     public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, String source, String dest) {
         super(Opcodes.ASM9, visitor);
@@ -43,11 +40,16 @@ public class InstructionClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
-        if (visitor != null && targetMethod != null && targetMethod.equals(name + desc) && !found) {
+        if (visitor != null && targetMethod != null && ByteCodeUtils.descriptorsSame(targetMethod, name + desc) && !found) {
             this.found = true;
             return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source, this.dest);
         }
         return visitor;
+    }
+
+    @Override
+    public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+        return super.visitField(access, name, descriptor, signature, value);
     }
 
     boolean shouldReturn(String signature) {
@@ -67,7 +69,7 @@ public class InstructionClassVisitor extends ClassVisitor {
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
             final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
-            if (visitor != null && targetMethod != null && targetMethod.equals(name + desc) && !found) {
+            if (visitor != null && targetMethod != null && ByteCodeUtils.descriptorsSame(targetMethod, name + desc) && !found) {
                 this.found = true;
                 return this.forwarder = new ProxyMethodForwarder(visitor, this.shouldReturn(desc), this.source, this.dest, this.pointer);
             }
