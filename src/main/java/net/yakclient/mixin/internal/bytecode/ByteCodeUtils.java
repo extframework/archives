@@ -66,7 +66,7 @@ public class ByteCodeUtils {
 
     public static boolean classExists(String clazz) {
         try {
-            return loadClassBytes(clazz) == null;
+            return loadClassBytes(clazz) != null;
         } catch (IOException | ClassNotFoundException e) {
             return false;
         }
