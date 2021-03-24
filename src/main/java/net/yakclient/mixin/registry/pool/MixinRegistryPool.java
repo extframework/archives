@@ -1,5 +1,6 @@
 package net.yakclient.mixin.registry.pool;
 
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
 import net.yakclient.mixin.internal.loader.*;
 import net.yakclient.mixin.registry.FunctionalProxy;
@@ -56,7 +57,7 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 
     private byte[] loadClass(String name) throws ClassNotFoundException {
         try {
-            return TargetClassLoader.loadClassBytes(name);
+            return ByteCodeUtils.loadClassBytes(name);
         } catch (IOException e) {
             throw new ClassNotFoundException("Failed to load system resources for class: " + name);
         }

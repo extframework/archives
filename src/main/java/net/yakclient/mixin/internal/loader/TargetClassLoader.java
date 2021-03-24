@@ -1,8 +1,9 @@
 package net.yakclient.mixin.internal.loader;
 
-import java.io.DataInputStream;
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
+
 import java.io.IOException;
-import java.io.InputStream;
+
 
 public class TargetClassLoader extends ProxyClassLoader {
     private final PackageTarget target;
@@ -27,7 +28,7 @@ public class TargetClassLoader extends ProxyClassLoader {
             Class<?> c = this.findLoadedClass(name);
 
             if (c == null) {
-                byte[] b = loadClassBytes(name);
+                byte[] b = ByteCodeUtils.loadClassBytes(name);
                 c = defineClass(name, b, 0, b.length);
             }
 
@@ -39,17 +40,7 @@ public class TargetClassLoader extends ProxyClassLoader {
         }
     }
 
-    public static byte[] loadClassBytes(String name) throws IOException, ClassNotFoundException {
-        InputStream cIn = ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class");
-        if (cIn == null) throw new ClassNotFoundException("Failed to find class " + name);
 
-        try (DataInputStream in = new DataInputStream(cIn)) {
-            byte[] buf = new byte[cIn.available()];
-
-            in.readFully(buf);
-            return buf;
-        }
-    }
 
     public PackageTarget getTarget() {
         return target;

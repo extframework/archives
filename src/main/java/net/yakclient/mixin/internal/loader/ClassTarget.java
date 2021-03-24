@@ -1,5 +1,7 @@
 package net.yakclient.mixin.internal.loader;
 
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
+
 import java.util.Objects;
 
 public class ClassTarget extends PackageTarget {
@@ -12,7 +14,7 @@ public class ClassTarget extends PackageTarget {
 
     public static ClassTarget create(String path) {
         try {
-            if (ClassTarget.class.getClassLoader().loadClass(path) != null) {
+            if (ByteCodeUtils.classExists(path)) {
                 final String[] fromPath = PackageTarget.fromPath(path);
 
                 final int i = fromPath.length - 1;
