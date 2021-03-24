@@ -10,9 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutionException;
 
-//@RunWith(TestingProxyCSL.class)
 public class RegistryTest {
     //for runtime -Djava.system.class.loader=net.yakclient.mixin.internal.loader.ProxyClassLoader
 
