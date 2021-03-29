@@ -11,8 +11,13 @@ public class MixinSourceClassTest {
         System.out.println("A shadow method has been called!");
     }
 
-    public void printTheString() {
-        System.out.println(this.testString);
+
+    public void printTheString(int integer) {
+        System.out.println("ok");
+//        if (integer < 10) System.out.println("THis");
+//        System.out.println("Other this");
+//        System.out.println(this.testString);
+//        System.out.println(integer);
     }
 
 

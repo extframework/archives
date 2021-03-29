@@ -42,7 +42,7 @@ public class InstructionClassVisitor extends ClassVisitor {
         final MethodVisitor visitor = this.visitSuperMethod(access, name, desc, signature, exceptions);
         if (visitor != null && targetMethod != null && ByteCodeUtils.descriptorsSame(targetMethod, name + desc) && !found) {
             this.found = true;
-            return this.forwarder = new MethodInstructionForwarder(visitor, this.shouldReturn(desc), this.source, this.dest);
+            return this.forwarder = new MethodInstructionForwarder(visitor, this.source, this.dest);
         }
         return visitor;
     }

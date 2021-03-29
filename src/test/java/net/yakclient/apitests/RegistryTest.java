@@ -22,22 +22,24 @@ public class RegistryTest {
             mixinRegistry.registerMixin(net.questcraft.apitests.MixinTestCase.class).dumpAll();
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
-            final Object obj = aClass.getConstructor(String.class).newInstance("YAY");
-        }
-
-        {
-            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
-                System.out.println("Proxied");
-            })).dumpAll();
-
-
-
-            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
-
             final Constructor<?> constructor = aClass.getConstructor(String.class);
-            final Object obj = constructor.newInstance("YAY");
-            aClass.getMethod("printTheString").invoke(obj);
+//            final Object obj = constructor.newInstance("YAY");
+//            obj.getClass().getMethod("printTheString", int.class).invoke(obj,10);
         }
+
+//        {
+//            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
+//                System.out.println("Proxied");
+//            })).dumpAll();
+//
+//
+//
+//            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
+//
+//            final Constructor<?> constructor = aClass.getConstructor(String.class);
+//            final Object obj = constructor.newInstance("YAY");
+//            aClass.getMethod("printTheString", int.class).invoke(obj, 10);
+//        }
 
     }
 

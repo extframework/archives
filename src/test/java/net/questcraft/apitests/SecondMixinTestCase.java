@@ -7,8 +7,8 @@ import org.objectweb.asm.Opcodes;
 
 @Mixer("net.questcraft.apitests.MixinSourceClassTest")
 public abstract class SecondMixinTestCase {
-    @Injection(type = InjectionType.OVERWRITE)
-    public void printTheString() {
+    @Injection
+    public void printTheString(int integer) {
         System.out.println("I also wanna print this");
     }
 }

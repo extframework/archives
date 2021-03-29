@@ -2,7 +2,6 @@ package net.yakclient.mixin.internal.instruction;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ public class ProxyMethodForwarder extends MethodInstructionForwarder {
     private int ln = 0;
 
     public ProxyMethodForwarder(MethodVisitor mv, boolean shouldReturn, String ownerSource, String ownerDest, UUID pointer) {
-        super(mv, shouldReturn, ownerSource, ownerDest);
+        super(mv, ownerSource, ownerDest);
         this.pointer = pointer;
     }
 

@@ -19,7 +19,7 @@ public class AdapterTests {
                         .buildFields().add("1st", "configuration").build().build()).build().build();
         VersionManager.apply(mapping.build().build(), "1");
         System.out.println(VersionManager.clazz("org.example", "IDENTIFIER"));
-        System.out.println(VersionManager.method("org.example", "IDENTIFIER", "2nd"));
+        System.out.println(VersionManager.method("org.example", "IDENTIFIER", "1st"));
         System.out.println(VersionManager.field("org.example", "IDENTIFIER", "1st"));
 
 

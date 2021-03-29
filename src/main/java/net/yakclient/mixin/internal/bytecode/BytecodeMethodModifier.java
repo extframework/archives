@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class BytecodeMethodModifier {
+    //TODO figure out if compiled sources are really needed which i doubt they are.
     public byte[] combine(byte[] compiledSource, MixinDestination... destinations) throws IOException {
-
         final Map<String, Map<Integer, Queue<PriorityInstruction>>> instructions = new HashMap<>(destinations.length);
 
         if (!confirm(destinations)) throw new IllegalArgumentException("To combine all mixins must have the destination of the same class.");
@@ -62,7 +62,8 @@ public class BytecodeMethodModifier {
         ClassReader reader = new ClassReader(sources);
         reader.accept(adapter, 0);
 
-        return writer.toByteArray();
+        final byte[] bytes = writer.toByteArray();
+        return bytes;
     }
 
     public static class MixinDestination {
@@ -107,7 +108,7 @@ public class BytecodeMethodModifier {
         private final int priority;
         private final Instruction insn;
 
-        PriorityInstruction(int priority, Instruction insn) {
+        public PriorityInstruction(int priority, Instruction insn) {
             this.priority = priority;
             this.insn = insn;
         }

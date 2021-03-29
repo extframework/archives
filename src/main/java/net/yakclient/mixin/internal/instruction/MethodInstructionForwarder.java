@@ -1,52 +1,71 @@
 package net.yakclient.mixin.internal.instruction;
 
-import net.yakclient.mixin.internal.methodadapter.MethodInjectionPatternMatcher;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.*;
 
 public class MethodInstructionForwarder extends MethodVisitor {
     protected final Instruction.InstructionBuilder builder;
-    private final boolean shouldReturn;
     @NotNull
     private final String ownerSource;
     @NotNull
     private final String ownerDest;
 
-    public MethodInstructionForwarder(MethodVisitor mv, boolean shouldReturn, @NotNull String ownerSource, @NotNull String ownerDest) {
+    private static final int NOTHING_FOUND = 0;
+    private static final int RETURN_FOUND = 1;
+    private static final int FINAL_RETURN_FOUND = 2;
+
+
+    private int state;
+
+    public MethodInstructionForwarder(MethodVisitor mv, @NotNull String ownerSource, @NotNull String ownerDest) {
         super(Opcodes.ASM9, mv);
         this.builder = new Instruction.InstructionBuilder();
-        this.shouldReturn = shouldReturn;
         this.ownerSource = ownerSource.replace('.', '/');
         this.ownerDest = ownerDest.replace('.', '/');
+
+        this.state = NOTHING_FOUND;
     }
 
     public Instruction toInstructions() {
         return this.builder.build();
     }
 
-    @Override
-    public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
-        this.builder.addInstruction(v -> v.visitFrame(type, nLocal, local, nStack, stack));
-        super.visitFrame(type, nLocal, local, nStack, stack);
+    private void visitInsn() {
+        if (this.state == RETURN_FOUND) {
+            this.state = NOTHING_FOUND;
+            this.visitInsn(Opcodes.RETURN);
+        }
     }
 
     @Override
     public void visitInsn(int opcode) {
-        if (!(!this.shouldReturn && MethodInjectionPatternMatcher.isReturn(opcode)))
+        if (opcode == Opcodes.RETURN) this.state = RETURN_FOUND;
+        else {
+            visitInsn();
             this.builder.addInstruction(v -> v.visitInsn(opcode));
+        }
         super.visitInsn(opcode);
+    }
+
+    @Override
+    public void visitVarInsn(int opcode, int var) {
+        this.visitInsn();
+        this.builder.addInstruction(v -> v.visitVarInsn(opcode, var));
+        super.visitVarInsn(opcode, var);
+    }
+
+    @Override
+    public void visitEnd() {
+        if (this.state == RETURN_FOUND) {
+            this.state = FINAL_RETURN_FOUND;
+        }
+        super.visitEnd();
     }
 
     @Override
     public void visitIntInsn(int opcode, int operand) {
         this.builder.addInstruction(v -> v.visitIntInsn(opcode, operand));
         super.visitIntInsn(opcode, operand);
-    }
-
-    @Override
-    public void visitVarInsn(int opcode, int var) {
-        this.builder.addInstruction(v -> v.visitVarInsn(opcode, var));
-        super.visitVarInsn(opcode, var);
     }
 
     @Override
@@ -145,17 +164,17 @@ public class MethodInstructionForwarder extends MethodVisitor {
         return super.visitTryCatchAnnotation(typeRef, typePath, desc, visible);
     }
 
-    @Override
-    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-        this.builder.addInstruction(v -> v.visitLocalVariable(name, desc, signature, start, end, index));
-        super.visitLocalVariable(name, desc, signature, start, end, index);
-    }
-
-    @Override
-    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible) {
-        this.builder.addInstruction(v -> v.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible));
-        return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
-    }
+//    @Override
+//    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+//        this.builder.addInstruction(v -> v.visitLocalVariable(name, desc, signature, start, end, index));
+//        super.visitLocalVariable(name, desc, signature, start, end, index);
+//    }
+//
+//    @Override
+//    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible) {
+//        this.builder.addInstruction(v -> v.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible));
+//        return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
+//    }
 
     @Override
     public void visitLineNumber(int line, Label start) {
