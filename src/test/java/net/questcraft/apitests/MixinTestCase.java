@@ -23,5 +23,6 @@ public  class MixinTestCase {
         boolean myTru = false;
         if (myTru) System.out.println("THis");
         System.out.println("Other this");
+
     }
 }
