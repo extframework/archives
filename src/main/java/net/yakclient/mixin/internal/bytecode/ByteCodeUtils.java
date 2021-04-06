@@ -15,6 +15,7 @@ public class ByteCodeUtils {
         return type.substring(0, type.indexOf(')') + 1);
     }
 
+    public static final int ASM_VERSION = Opcodes.ASM9;
     public static boolean descriptorsSame(String method1, String method2) {
         return removeReturnType(method1).equals(removeReturnType(method2));
     }

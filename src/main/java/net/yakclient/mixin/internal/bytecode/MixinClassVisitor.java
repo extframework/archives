@@ -14,7 +14,7 @@ public class MixinClassVisitor extends ClassVisitor {
     private final Map<String, Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors;
 
     public MixinClassVisitor(ClassVisitor visitor, Map<String, Map<Integer, Queue<BytecodeMethodModifier.PriorityInstruction>>> injectors) {
-        super(Opcodes.ASM9, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.injectors = injectors;
     }
 

@@ -17,12 +17,24 @@ public  class MixinTestCase {
 //    public static void staticTest() {
 //        System.out.println("The current class is this");
 //    }
+/***
+ *
+ *  AFTER_BEGIN - WORKS
+ *  BEFORE_END - FAILS
+ *  BEFORE_RETURN - FAILS
+ *  BEFORE_INVOKE - FAILS
+ *  OVERWRITE - WORKS
+ */
+
 
     @Injection(to = "printTheString(I)V", type = InjectionType.BEFORE_END)
     public void overrideIt(int integer) {
         boolean myTru = false;
-        if (myTru) System.out.println("THis");
-        System.out.println("Other this");
+//        if (myTru) System.out.println("THis");
+        if (myTru) {
+            String hello = "myStr";
+        }
+//        System.out.println("Other this");
 
     }
 }

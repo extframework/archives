@@ -26,8 +26,8 @@ public class BytecodeMethodModifier {
 
                 ClassReader sourceReader = new ClassReader(location.getCls());
                 InstructionClassVisitor instructionVisitor = source instanceof MixinProxySource ?
-                        new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), location.getMethod(), location.getCls(), destination.getCls(), ((MixinProxySource) source).getPointer()) :
-                        new InstructionClassVisitor(new ClassWriter(0), location.getMethod(), location.getCls(), destination.getCls());
+                        new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(ClassWriter.COMPUTE_FRAMES), location.getMethod(), location.getCls(), destination.getCls(), ((MixinProxySource) source).getPointer()) :
+                        new InstructionClassVisitor(new ClassWriter(ClassWriter.COMPUTE_FRAMES), location.getMethod(), location.getCls(), destination.getCls());
                 sourceReader.accept(instructionVisitor, 0);
 
                 instructions.putIfAbsent(methodDest, new HashMap<>());
