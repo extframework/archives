@@ -1,12 +1,13 @@
 package net.yakclient.asm.method;
 
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class ASMClassAdapter extends ClassVisitor {
     public ASMClassAdapter( ClassVisitor cv) {
-        super(Opcodes.ASM9, cv);
+        super(ByteCodeUtils.ASM_VERSION, cv);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.yakclient.mixin.internal.methodadapter;
 
 import net.yakclient.mixin.api.InjectionType;
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
 import net.yakclient.mixin.internal.instruction.InstructionInterceptor;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ public abstract class MethodInjectionPatternMatcher extends MethodVisitor {
     int state = NOT_MATCHED;
 
     public MethodInjectionPatternMatcher(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions, PatternFlag<?>... flags) {
-        super(Opcodes.ASM9, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.instructions = instructions;
         this.flags = flags;
     }

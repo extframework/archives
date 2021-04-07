@@ -19,7 +19,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     private static final String VOID_RETURN_PATTERN = "[(].*[)]V";
 
     public InstructionClassVisitor(ClassVisitor visitor, String targetMethod, String source, String dest) {
-        super(Opcodes.ASM9, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.targetMethod = targetMethod;
         this.source = source;
         this.dest = dest;

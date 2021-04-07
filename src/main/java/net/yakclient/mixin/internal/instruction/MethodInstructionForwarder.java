@@ -1,5 +1,6 @@
 package net.yakclient.mixin.internal.instruction;
 
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.*;
 
@@ -18,7 +19,7 @@ public class MethodInstructionForwarder extends MethodVisitor {
     private int state;
 
     public MethodInstructionForwarder(MethodVisitor mv, @NotNull String ownerSource, @NotNull String ownerDest) {
-        super(Opcodes.ASM9, mv);
+        super(ByteCodeUtils.ASM_VERSION, mv);
         this.builder = new Instruction.InstructionBuilder();
         this.ownerSource = ownerSource.replace('.', '/');
         this.ownerDest = ownerDest.replace('.', '/');

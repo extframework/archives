@@ -1,5 +1,6 @@
 package net.yakclient.asm.method;
 
+import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -13,11 +14,11 @@ import static org.objectweb.asm.Opcodes.IFNE;
 public class ASMMethodAdapter extends MethodVisitor {
     private int ln = 0;
     public ASMMethodAdapter() {
-        super(Opcodes.ASM9);
+        super(ByteCodeUtils.ASM_VERSION);
     }
 
     public ASMMethodAdapter(MethodVisitor mv) {
-        super(Opcodes.ASM9, mv);
+        super(ByteCodeUtils.ASM_VERSION, mv);
     }
 
     @Override

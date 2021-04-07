@@ -10,7 +10,7 @@ public class InstructionInterceptor extends MethodVisitor {
     private final List<String> instructions;
 
     public InstructionInterceptor(MethodVisitor visitor) {
-        super(Opcodes.ASM9, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.instructions = new ArrayList<>();
     }
 
