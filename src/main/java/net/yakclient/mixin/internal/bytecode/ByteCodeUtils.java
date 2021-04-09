@@ -428,4 +428,17 @@ public class ByteCodeUtils {
         }
         return new String(hexChars);
     }
+
+    public static boolean isReturn(int opcode) {
+        switch (opcode) {
+            case Opcodes.IRETURN:
+            case Opcodes.LRETURN:
+            case Opcodes.FRETURN:
+            case Opcodes.DRETURN:
+            case Opcodes.ARETURN:
+            case Opcodes.RETURN:
+                return true;
+        }
+        return false;
+    }
 }

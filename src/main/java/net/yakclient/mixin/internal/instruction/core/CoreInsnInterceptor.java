@@ -1,35 +1,47 @@
-package net.yakclient.mixin.internal.instruction;
+package net.yakclient.mixin.internal.instruction.core;
 
+import net.yakclient.YakMixins;
+import net.yakclient.mixin.internal.instruction.InstructionInterceptor;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.*;
 
-public class MethodInstructionForwarder extends MethodVisitor {
-    protected final Instruction.InstructionBuilder builder;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CoreInsnInterceptor extends MethodVisitor implements InstructionInterceptor<CoreInstruction> {
+    private static final int NOTHING_FOUND = 0;
+    private static final int RETURN_FOUND = 1;
+    private static final int FINAL_RETURN_FOUND = 2;
+
+    protected final List<ByteCodeConsumer> insn;
     @NotNull
     private final String ownerSource;
     @NotNull
     private final String ownerDest;
 
-    private static final int NOTHING_FOUND = 0;
-    private static final int RETURN_FOUND = 1;
-    private static final int FINAL_RETURN_FOUND = 2;
-
-
     private int state;
 
-    public MethodInstructionForwarder(MethodVisitor mv, @NotNull String ownerSource, @NotNull String ownerDest) {
-        super(Opcodes.ASM9, mv);
-        this.builder = new Instruction.InstructionBuilder();
+    public CoreInsnInterceptor(@NotNull String ownerSource, @NotNull String ownerDest) {
+        super(YakMixins.ASM_VERSION);
+        this.insn = new ArrayList<>();
         this.ownerSource = ownerSource.replace('.', '/');
         this.ownerDest = ownerDest.replace('.', '/');
 
         this.state = NOTHING_FOUND;
     }
 
-    public Instruction toInstructions() {
-        return this.builder.build();
+    @Override
+    public CoreInstruction intercept() {
+        return new CoreInstruction(insn.toArray(new ByteCodeConsumer[0]));
     }
 
+    @Override
+    public void visitCode() {
+        this.insn.clear();
+        super.visitCode();
+    }
+
+    //Internal
     private void visitInsn() {
         if (this.state == RETURN_FOUND) {
             this.state = NOTHING_FOUND;
@@ -42,7 +54,7 @@ public class MethodInstructionForwarder extends MethodVisitor {
         if (opcode == Opcodes.RETURN) this.state = RETURN_FOUND;
         else {
             visitInsn();
-            this.builder.addInstruction(v -> v.visitInsn(opcode));
+            this.insn.add(v -> v.visitInsn(opcode));
         }
         super.visitInsn(opcode);
     }
@@ -50,7 +62,7 @@ public class MethodInstructionForwarder extends MethodVisitor {
     @Override
     public void visitVarInsn(int opcode, int var) {
         this.visitInsn();
-        this.builder.addInstruction(v -> v.visitVarInsn(opcode, var));
+        this.insn.add(v -> v.visitVarInsn(opcode, var));
         super.visitVarInsn(opcode, var);
     }
 
@@ -64,121 +76,111 @@ public class MethodInstructionForwarder extends MethodVisitor {
 
     @Override
     public void visitIntInsn(int opcode, int operand) {
-        this.builder.addInstruction(v -> v.visitIntInsn(opcode, operand));
+        this.insn.add(v -> v.visitIntInsn(opcode, operand));
         super.visitIntInsn(opcode, operand);
     }
 
     @Override
     public void visitTypeInsn(int opcode, String type) {
-        this.builder.addInstruction(v -> v.visitTypeInsn(opcode, type));
+        this.insn.add(v -> v.visitTypeInsn(opcode, type));
         super.visitTypeInsn(opcode, type);
     }
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
         if (this.ownerSource.equals(owner) && opcode != Opcodes.GETSTATIC && opcode != Opcodes.PUTSTATIC)
-            this.builder.addInstruction(v -> v.visitFieldInsn(opcode, this.ownerDest, name, desc));
-        else this.builder.addInstruction(v -> v.visitFieldInsn(opcode, owner, name, desc));
+            this.insn.add(v -> v.visitFieldInsn(opcode, this.ownerDest, name, desc));
+        else this.insn.add(v -> v.visitFieldInsn(opcode, owner, name, desc));
         super.visitFieldInsn(opcode, owner, name, desc);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
         if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC)
-            this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc));
-        else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc));
+            this.insn.add(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc));
+        else this.insn.add(v -> v.visitMethodInsn(opcode, owner, name, desc));
         super.visitMethodInsn(opcode, owner, name, desc);
     }
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (this.ownerSource.equals(owner) && opcode != Opcodes.INVOKESTATIC)
-            this.builder.addInstruction(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc, itf));
-        else this.builder.addInstruction(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
+            this.insn.add(v -> v.visitMethodInsn(opcode, this.ownerDest, name, desc, itf));
+        else this.insn.add(v -> v.visitMethodInsn(opcode, owner, name, desc, itf));
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
     @Override
     public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
-        this.builder.addInstruction(v -> v.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs));
+        this.insn.add(v -> v.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs));
         super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
     }
 
     @Override
     public void visitJumpInsn(int opcode, Label label) {
-        this.builder.addInstruction(v -> v.visitJumpInsn(opcode, label));
+        this.insn.add(v -> v.visitJumpInsn(opcode, label));
         super.visitJumpInsn(opcode, label);
     }
 
     @Override
     public void visitLabel(Label label) {
-        this.builder.addInstruction(v -> v.visitLabel(label));
+        this.insn.add(v -> v.visitLabel(label));
         super.visitLabel(label);
     }
 
     @Override
     public void visitLdcInsn(Object cst) {
-        this.builder.addInstruction(v -> v.visitLdcInsn(cst));
+        this.insn.add(v -> v.visitLdcInsn(cst));
         super.visitLdcInsn(cst);
     }
 
     @Override
     public void visitIincInsn(int var, int increment) {
-        this.builder.addInstruction(v -> v.visitIincInsn(var, increment));
+        this.insn.add(v -> v.visitIincInsn(var, increment));
         super.visitIincInsn(var, increment);
     }
 
     @Override
     public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
-        this.builder.addInstruction(v -> v.visitTableSwitchInsn(min, max, dflt, labels));
+        this.insn.add(v -> v.visitTableSwitchInsn(min, max, dflt, labels));
         super.visitTableSwitchInsn(min, max, dflt, labels);
     }
 
     @Override
     public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
-        this.builder.addInstruction(v -> v.visitLookupSwitchInsn(dflt, keys, labels));
+        this.insn.add(v -> v.visitLookupSwitchInsn(dflt, keys, labels));
         super.visitLookupSwitchInsn(dflt, keys, labels);
     }
 
     @Override
     public void visitMultiANewArrayInsn(String desc, int dims) {
-        this.builder.addInstruction(v -> v.visitMultiANewArrayInsn(desc, dims));
+        this.insn.add(v -> v.visitMultiANewArrayInsn(desc, dims));
         super.visitMultiANewArrayInsn(desc, dims);
     }
 
     @Override
     public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
-        this.builder.addInstruction(v -> v.visitInsnAnnotation(typeRef, typePath, desc, visible));
+        this.insn.add(v -> v.visitInsnAnnotation(typeRef, typePath, desc, visible));
         return super.visitInsnAnnotation(typeRef, typePath, desc, visible);
     }
 
     @Override
     public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
-        this.builder.addInstruction(v -> v.visitTryCatchBlock(start, end, handler, type));
+        this.insn.add(v -> v.visitTryCatchBlock(start, end, handler, type));
         super.visitTryCatchBlock(start, end, handler, type);
     }
 
     @Override
     public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
-        this.builder.addInstruction(v -> v.visitTryCatchAnnotation(typeRef, typePath, desc, visible));
+        this.insn.add(v -> v.visitTryCatchAnnotation(typeRef, typePath, desc, visible));
         return super.visitTryCatchAnnotation(typeRef, typePath, desc, visible);
     }
 
-//    @Override
-//    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-//        this.builder.addInstruction(v -> v.visitLocalVariable(name, desc, signature, start, end, index));
-//        super.visitLocalVariable(name, desc, signature, start, end, index);
-//    }
-//
-//    @Override
-//    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible) {
-//        this.builder.addInstruction(v -> v.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible));
-//        return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
-//    }
-
     @Override
     public void visitLineNumber(int line, Label start) {
-        this.builder.addInstruction(v -> v.visitLineNumber(line, start));
+        this.insn.add(v -> v.visitLineNumber(line, start));
         super.visitLineNumber(line, start);
     }
+
+
 }

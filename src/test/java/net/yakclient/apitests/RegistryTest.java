@@ -6,6 +6,7 @@ import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.MixinRegistry;
 import net.yakclient.mixin.registry.RegistryConfigurator;
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.Label;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -23,8 +24,9 @@ public class RegistryTest {
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
             final Constructor<?> constructor = aClass.getConstructor(String.class);
-//            final Object obj = constructor.newInstance("YAY");
-//            obj.getClass().getMethod("printTheString", int.class).invoke(obj,10);
+            final Object obj = constructor.newInstance("YAY");
+            obj.getClass().getMethod("printTheString", int.class).invoke(obj,10);
+//            new Label().toString();
         }
 
 //        {

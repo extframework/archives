@@ -1,21 +1,17 @@
-package net.yakclient.mixin.internal.methodadapter;
+package net.yakclient.mixin.internal.methodadapter.core;
 
-import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
+import net.yakclient.mixin.internal.bytecode.PriorityInstruction;
+import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
 import org.objectweb.asm.*;
 
 import java.util.Queue;
 
-public class OpcodeMatcherPattern extends MethodInjectionPatternMatcher {
+public class CoreOpcodeMatcherPattern extends CoreMixinPatternMatcher {
     private final int opcode;
 
-    public OpcodeMatcherPattern(MethodVisitor visitor, Queue<BytecodeMethodModifier.PriorityInstruction> instructions, PatternFlag<?>... flags) {
-        super(visitor, instructions, flags);
-        final Object flag = flags[0].getFlag();
-
-        if (flags.length != 1) throw new IllegalArgumentException("Incorrect number of flags for OpcodePatternMatcher found");
-        if (!(flag instanceof Integer)) throw new IllegalArgumentException("Wrong argument types for flag: " + flag);
-
-        this.opcode = (Integer) flag;
+    public CoreOpcodeMatcherPattern(MethodVisitor visitor, CoreInstruction instructions, int opcode) {
+        super(visitor, instructions);
+        this.opcode = opcode;
     }
 
     @Override

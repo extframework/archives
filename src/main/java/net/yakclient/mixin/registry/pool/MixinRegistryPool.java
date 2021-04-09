@@ -2,6 +2,8 @@ package net.yakclient.mixin.registry.pool;
 
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier;
+import net.yakclient.mixin.internal.bytecode.MixinDestination;
+import net.yakclient.mixin.internal.bytecode.MixinSource;
 import net.yakclient.mixin.internal.loader.*;
 import net.yakclient.mixin.registry.FunctionalProxy;
 import net.yakclient.mixin.registry.MixinMetaData;
@@ -80,20 +82,20 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
 
             //Method destination, Destinations
-            final Map<String, BytecodeMethodModifier.MixinDestination> perfectDestinations = new HashMap<>();
+            final Map<String, MixinDestination> perfectDestinations = new HashMap<>();
 
             for (PoolQueue.PoolNode<MixinMetaData> node : pool.queue) {
                 final String method = node.getValue().getMethodTo();
-                perfectDestinations.putIfAbsent(method, new BytecodeMethodModifier.MixinDestination(node.getValue().getClassTo(), node.getValue().getMethodTo()));
+                perfectDestinations.putIfAbsent(method, new MixinDestination(node.getValue().getClassTo(), node.getValue().getMethodTo()));
 
                 perfectDestinations.get(method).addSource(node instanceof PoolQueue.ProxiedPoolNode<?> ?
-                        new BytecodeMethodModifier.MixinProxySource(QualifiedMethodLocation.fromDataOrigin(node.getValue()), ((PoolQueue.ProxiedPoolNode<MixinMetaData>) node).getProxy()) :
-                        new BytecodeMethodModifier.MixinSource(QualifiedMethodLocation.fromDataOrigin(node.getValue())));
+                        new MixinSource.MixinProxySource(QualifiedMethodLocation.fromDataOrigin(node.getValue()), ((PoolQueue.ProxiedPoolNode<MixinMetaData>) node).getProxy()) :
+                        new MixinSource(QualifiedMethodLocation.fromDataOrigin(node.getValue())));
             }
 
-            final Set<BytecodeMethodModifier.MixinDestination> destinations = new HashSet<>(perfectDestinations.values());
+            final Set<MixinDestination> destinations = new HashSet<>(perfectDestinations.values());
 
-            final byte[] b = this.methodModifier.combine(this.compiledSources.get(dest.getCls()), destinations.toArray(new BytecodeMethodModifier.MixinDestination[0]));
+            final byte[] b = this.methodModifier.combine(this.compiledSources.get(dest.getCls()), destinations.toArray(new MixinDestination[0]));
             ContextPoolManager.defineClass(dest.getCls(), b);
             for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
                 datum.run(sysTarget);

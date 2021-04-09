@@ -1,6 +1,6 @@
 package net.yakclient.asm.method;
 
-import net.yakclient.mixin.internal.instruction.Instruction;
+import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -31,7 +31,7 @@ public class ASMMethodAdapter extends MethodVisitor {
         super.visitCode();
 
         final UUID uuid = UUID.randomUUID();
-        Instruction.InstructionBuilder builder = new Instruction.InstructionBuilder();
+        CoreInstruction.InstructionBuilder builder = new CoreInstruction.InstructionBuilder();
 
         final Label l0 = new Label();
         final Label l1 = new Label();

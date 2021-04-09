@@ -14,7 +14,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     compile 'org.jetbrains:annotations:16.0.2'
     compile 'org.ow2.asm:asm:9.1'
-    testCompile 'org.ow2.asm:asm-util:9.1'
+    compile 'org.ow2.asm:asm-util:9.1'
 }
 
 test {

@@ -1,4 +1,4 @@
-package net.yakclient.mixin.internal.methodadapter;
+package net.yakclient.mixin.internal.instruction.core;
 
 import org.objectweb.asm.MethodVisitor;
 
