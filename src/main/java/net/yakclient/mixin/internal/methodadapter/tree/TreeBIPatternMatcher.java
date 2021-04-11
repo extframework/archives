@@ -4,14 +4,13 @@ import net.yakclient.mixin.internal.instruction.ASMInstruction;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.tree.InsnList;
 
-public class TreeABPatternMatcher extends TreeMixinPatternMatcher {
-    public TreeABPatternMatcher(Instruction instructions) {
+public class TreeBIPatternMatcher extends TreeMixinPatternMatcher {
+    public TreeBIPatternMatcher(Instruction instructions) {
         super(instructions);
     }
 
-
     @Override
-    public void transform(InsnList instructions) {
+    public void transform(InsnList insn) {
 
     }
 }

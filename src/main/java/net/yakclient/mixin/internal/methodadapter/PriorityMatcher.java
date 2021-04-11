@@ -16,5 +16,7 @@ public class PriorityMatcher<T extends MixinPatternMatcher> implements Comparabl
         return this.priority - o.priority;
     }
 
-
+    public T get() {
+        return pm;
+    }
 }

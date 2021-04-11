@@ -1,4 +1,4 @@
-package net.yakclient.mixin.internal.instruction.core;
+package net.yakclient.mixin.internal.instruction;
 
 import net.yakclient.YakMixins;
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;

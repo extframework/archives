@@ -1,47 +1,30 @@
 package net.yakclient.mixin.internal.methodadapter.core;
 
 import net.yakclient.YakMixins;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.internal.instruction.core.CoreInsnExecutor;
-import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
 import net.yakclient.mixin.internal.methodadapter.MixinPatternMatcher;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
 
 public abstract class CoreMixinPatternMatcher extends MethodVisitor implements MixinPatternMatcher {
     static final int NOT_MATCHED = 0;
-    private final CoreInstruction instructions;
+    private final Instruction instructions;
     int state = NOT_MATCHED;
 
-    public CoreMixinPatternMatcher(MethodVisitor visitor, CoreInstruction instructions) {
+    public CoreMixinPatternMatcher(MethodVisitor visitor, Instruction instructions) {
         super(YakMixins.ASM_VERSION, visitor);
         this.instructions = instructions;
     }
 
-//    @Override
-//    public void transform(InsnList instructions) {
-//        for (AbstractInsnNode insn : instructions) {
-//            insn.accept(this);
-//        }
-//    }
 
     void executeInsn() {
         this.executeInsn(this.instructions);
     }
 
-    private void executeInsn(CoreInstruction insn) {
+    private void executeInsn(Instruction insn) {
         if (this.mv instanceof CoreMixinPatternMatcher) ((CoreMixinPatternMatcher) this.mv).executeInsn(insn);
-        else new CoreInsnExecutor(insn).execute(this.mv);
+        else new CoreInsnExecutor(insn, this.mv).execute();
     }
-
-//    void executeInsn(Queue<BytecodeMethodModifier.PriorityInstruction> instructions) {
-//        if (this.mv instanceof MethodInjectionPatternMatcher)
-//            ((MethodInjectionPatternMatcher) this.mv).executeInsn(instructions);
-//        else for (BytecodeMethodModifier.PriorityInstruction insn : instructions) {
-//            insn.getInsn().execute(this.mv);
-////            visitor.print();
-//        }
-//    }
 
     @Override
     public void visitInsn(int opcode) {

@@ -1,11 +1,8 @@
 package net.yakclient.mixin.internal.methodadapter.core;
 
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
-import net.yakclient.mixin.internal.bytecode.PriorityInstruction;
-import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.*;
-
-import java.util.Queue;
 
 public class CoreBEPatternMatcher extends CoreMixinPatternMatcher {
     private static final int FOUND_RETURN = 1;
@@ -13,7 +10,7 @@ public class CoreBEPatternMatcher extends CoreMixinPatternMatcher {
 
     private int returnType;
 
-    public CoreBEPatternMatcher(MethodVisitor visitor, CoreInstruction instructions) {
+    public CoreBEPatternMatcher(MethodVisitor visitor, Instruction instructions) {
         super(visitor, instructions);
         this.returnType = Opcodes.RETURN;
     }

@@ -16,12 +16,11 @@ public abstract class RegistryPool<T> {
 
     public abstract PackageTarget register(Location location);
 
-    public void empty(Location location) {
-
+    public void registerAll(Location location) {
         if (this.pool.containsKey(location)) this.register(location);
     }
 
-    public void empty() {
+    public void registerAll() {
         for (Location location : this.pool.keySet()) {
             this.register(location);
         }

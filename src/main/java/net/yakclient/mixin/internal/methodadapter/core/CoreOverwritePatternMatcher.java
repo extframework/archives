@@ -1,13 +1,10 @@
 package net.yakclient.mixin.internal.methodadapter.core;
 
-import net.yakclient.mixin.internal.bytecode.PriorityInstruction;
-import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.*;
 
-import java.util.Queue;
-
 public class CoreOverwritePatternMatcher extends CoreMixinPatternMatcher {
-    public CoreOverwritePatternMatcher(MethodVisitor visitor, CoreInstruction instructions) {
+    public CoreOverwritePatternMatcher(MethodVisitor visitor, Instruction instructions) {
         super(visitor, instructions);
     }
 

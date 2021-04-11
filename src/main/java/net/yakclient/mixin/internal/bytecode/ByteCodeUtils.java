@@ -1,5 +1,6 @@
 package net.yakclient.mixin.internal.bytecode;
 
+import net.yakclient.mixin.internal.ASMType;
 import net.yakclient.mixin.internal.loader.ProxyClassLoader;
 import org.objectweb.asm.Opcodes;
 
@@ -9,7 +10,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 
 public class ByteCodeUtils {
-
+    public static final ASMType DEFAULT_ASM_MODE = ASMType.TREE;
 
     public static String removeReturnType(String type) {
         return type.substring(0, type.indexOf(')') + 1);

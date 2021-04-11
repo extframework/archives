@@ -1,14 +1,11 @@
 package net.yakclient.mixin.internal.methodadapter.core;
 
-import net.yakclient.mixin.internal.bytecode.PriorityInstruction;
-import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 
-import java.util.Queue;
-
 public class CoreBIPatternMatcher extends CoreMixinPatternMatcher {
-    public CoreBIPatternMatcher(MethodVisitor visitor, CoreInstruction instructions) {
+    public CoreBIPatternMatcher(MethodVisitor visitor, Instruction instructions) {
         super(visitor, instructions);
     }
 

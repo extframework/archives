@@ -1,4 +1,4 @@
-package net.yakclient.mixin.internal.instruction.tree;
+package net.yakclient.mixin.internal.instruction;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.tree.*;
@@ -7,15 +7,15 @@ import java.util.UUID;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class ProxyTreeInsnInterceptor extends TreeInsnInterceptor {
+public class ProxyASMInsnInterceptor extends ASMInsnInterceptor {
     private final UUID pointer;
 
-    public ProxyTreeInsnInterceptor(UUID pointer) {
+    public ProxyASMInsnInterceptor(UUID pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public TreeInstruction intercept() {
+    public ASMInstruction intercept() {
         final InsnList insn = new InsnList();
 
 
@@ -51,6 +51,6 @@ public class ProxyTreeInsnInterceptor extends TreeInsnInterceptor {
 
         insn.add(l3);
 
-        return new TreeInstruction(insn);
+        return new ASMInstruction(insn);
     }
 }

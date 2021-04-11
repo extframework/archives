@@ -9,10 +9,8 @@ import net.yakclient.mixin.internal.loader.PackageTarget;
 import net.yakclient.mixin.registry.pool.*;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class MixinRegistry {
     private final RegistryConfigurator.Configuration configuration;
@@ -131,8 +129,8 @@ public class MixinRegistry {
     }
 
     public void dumpAll() {
-        this.libRegistry.empty();
-        this.mixinRegistry.empty();
+        this.libRegistry.registerAll();
+        this.mixinRegistry.registerAll();
     }
 
     public final Class<?> retrieveClass(String cls) throws ClassNotFoundException {

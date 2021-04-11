@@ -1,15 +1,12 @@
 package net.yakclient.mixin.internal.methodadapter.core;
 
-import net.yakclient.mixin.internal.bytecode.PriorityInstruction;
-import net.yakclient.mixin.internal.instruction.core.CoreInstruction;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import org.objectweb.asm.*;
 
-import java.util.Queue;
-
-public class CoreOpcodeMatcherPattern extends CoreMixinPatternMatcher {
+public class CoreOpcodePatternMatcher extends CoreMixinPatternMatcher {
     private final int opcode;
 
-    public CoreOpcodeMatcherPattern(MethodVisitor visitor, CoreInstruction instructions, int opcode) {
+    public CoreOpcodePatternMatcher(MethodVisitor visitor, Instruction instructions, int opcode) {
         super(visitor, instructions);
         this.opcode = opcode;
     }

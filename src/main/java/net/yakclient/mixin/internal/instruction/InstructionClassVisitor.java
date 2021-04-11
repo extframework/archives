@@ -2,26 +2,18 @@ package net.yakclient.mixin.internal.instruction;
 
 import net.yakclient.YakMixins;
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
-import net.yakclient.mixin.internal.instruction.InstructionInterceptor;
-import net.yakclient.mixin.internal.instruction.core.CoreInsnInterceptor;
-import net.yakclient.mixin.internal.instruction.tree.ProxyTreeInsnInterceptor;
-import net.yakclient.mixin.internal.instruction.tree.TreeInsnInterceptor;
 import org.objectweb.asm.*;
 
 public class InstructionClassVisitor extends ClassVisitor {
     private final String targetMethod;
-    private final InstructionInterceptor<?> interceptor;
-    private final String source;
-    private final String dest;
+    private final InstructionInterceptor interceptor;
 
 //    private static final String VOID_RETURN_PATTERN = "[(].*[)]V";
 
-    public InstructionClassVisitor(InstructionInterceptor<?> interceptor, String targetMethod, String source, String dest) {
+    public InstructionClassVisitor(InstructionInterceptor interceptor, String targetMethod) {
         super(YakMixins.ASM_VERSION);
         this.interceptor = interceptor;
         this.targetMethod = targetMethod;
-        this.source = source;
-        this.dest = dest;
     }
 
     public Instruction getInstructions() {
@@ -41,6 +33,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
         if (visitor != null && targetMethod != null && ByteCodeUtils.descriptorsSame(targetMethod, name + desc) ) {
+            if (!(this.interceptor instanceof MethodVisitor)) throw new IllegalArgumentException("InstructionInterceptor must inherit from the MethodVisitor");
             return (MethodVisitor) this.interceptor;
         }
         return visitor;

@@ -1,23 +1,26 @@
 package net.yakclient.mixin.internal.instruction.tree;
 
+import net.yakclient.mixin.internal.instruction.ASMInstruction;
+import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.internal.instruction.InstructionExecutor;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.InsnList;
 
 public class TreeInsnExecutor implements InstructionExecutor {
-    final TreeInstruction insn;
+    private final InsnList insnList;
     final AbstractInsnNode index;
+    final Instruction insn;
 
-    public TreeInsnExecutor(TreeInstruction insn, AbstractInsnNode index) {
-        this.insn = insn;
+    public TreeInsnExecutor(InsnList insnList, AbstractInsnNode index, Instruction insn) {
+        this.insnList = insnList;
         this.index = index;
+        this.insn = insn;
     }
 
     @Override
-    public void execute(MethodVisitor visitor) {
-        if (!(visitor instanceof MethodNode)) return;
-        final MethodNode node = (MethodNode) visitor;
-        node.instructions.insert(this.index, this.insn.getInstructions());
+    public void execute() {
+        this.insnList.insert(this.index, this.insn.getInstructions());
     }
+
+
 }
