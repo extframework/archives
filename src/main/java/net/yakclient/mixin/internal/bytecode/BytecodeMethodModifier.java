@@ -1,17 +1,19 @@
 package net.yakclient.mixin.internal.bytecode;
 
-import net.yakclient.mixin.internal.instruction.Instruction;
-import net.yakclient.mixin.internal.instruction.InstructionClassVisitor;
-import net.yakclient.mixin.internal.instruction.ProxyASMInsnInterceptor;
-import net.yakclient.mixin.internal.instruction.ASMInsnInterceptor;
-import net.yakclient.mixin.registry.pool.QualifiedMethodLocation;
+import net.yakclient.mixin.internal.instruction.*;
+import net.yakclient.mixin.internal.instruction.adapter.FieldSelfInsnAdapter;
+import net.yakclient.mixin.internal.instruction.adapter.MethodSelfInsnAdapter;
+import net.yakclient.mixin.internal.instruction.adapter.ReturnRemoverInsnAdapter;
 import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class BytecodeMethodModifier {
     public <T extends Instruction> byte[] combine(String classTo, MixinDestination... destinations) throws IOException {
@@ -23,38 +25,18 @@ public class BytecodeMethodModifier {
             final Queue<QualifiedInstruction> current = new PriorityQueue<>();
 
             for (MixinSource source : destination.getSources()) {
+                Instruction insn = this.applyInsnAdapters(
+                        this.getInsn(source.getLocation().getCls(), source),
+                        classTo,
+                        source.getLocation().getCls());
+
                 current.add(new QualifiedInstruction(
                         source.getLocation().getPriority(),
                         source.getLocation().getInjectionType(),
-                        this.getInsn(source.getLocation().getCls(), source)));
+                        insn));
             }
             instructions.put(destination.getMethod(), current);
         }
-
-//        for (MixinDestination destination : destinations) {
-//            final String methodDest = destination.getMethod();
-//
-//            for (MixinSource source : destination.getSources()) {
-//                final QualifiedMethodLocation location = source.getLocation();
-//
-//                final ClassReader sourceReader = new ClassReader(location.getCls());
-//
-//                final InstructionClassVisitor cv = new InstructionClassVisitor(source instanceof MixinSource.MixinProxySource ?
-//                        new ProxyASMInsnInterceptor(((MixinSource.MixinProxySource) source).getPointer()) :
-//                        new ASMInsnInterceptor(), source.getLocation().getMethod()); //, , location.getCls(),classTo
-//
-////                InstructionClassVisitor instructionVisitor = source instanceof MixinSource.MixinProxySource ?
-////                        new InstructionClassVisitor.InstructionProxyVisitor(new ClassWriter(0), location.getMethod(), location.getCls(), classTo, ((MixinSource.MixinProxySource) source).getPointer()) :
-////                        new InstructionClassVisitor(new ClassWriter(0), location.getMethod(), location.getCls(),classTo);
-////                sourceReader.accept(instructionVisitor, 0);
-//
-//                instructions.putIfAbsent(methodDest, new HashMap<>());
-//                if (!instructions.get(methodDest).containsKey(location.getInjectionType()))
-//                    instructions.get(methodDest).put(location.getInjectionType(), new PriorityQueue<>());
-//
-//                instructions.get(methodDest).get(location.getInjectionType()).add(new QualifiedInstruction(source.getLocation().getPriority(), cv.getInstructions()));
-//            }
-//        }
 
         return this.apply(instructions, classTo);
     }
@@ -70,10 +52,15 @@ public class BytecodeMethodModifier {
         return cv.getInstructions();
     }
 
+    private Instruction applyInsnAdapters(Instruction instruction, String classTo, String classFrom) {
+        final InsnAdapter returnAdapter = new ReturnRemoverInsnAdapter(),
+                fieldAdapter = new FieldSelfInsnAdapter(returnAdapter, classTo, classFrom),
+                methodAdapter = new MethodSelfInsnAdapter(fieldAdapter, classTo, classFrom);
 
-    /*
-       Map<Method name, Map<Injection location(4 values), Queue<Instructions with priority>>>, The target.
-     */
+        return methodAdapter.adapt(instruction);
+    }
+
+
     @Contract(pure = true)
     private byte[] apply(Map<String, Queue<QualifiedInstruction>> injectors, String mixin) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
