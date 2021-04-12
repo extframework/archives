@@ -25,7 +25,7 @@ public class RegistryTest {
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
             final Constructor<?> constructor = aClass.getConstructor(String.class);
             final Object obj = constructor.newInstance("YAY");
-            obj.getClass().getMethod("printTheString", int.class).invoke(obj,10);
+            obj.getClass().getMethod("printTheString", int.class).invoke(obj,11);
 //            new Label().toString();
         }
 

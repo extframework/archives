@@ -18,9 +18,8 @@ public class MixinTestCase {
 //        System.out.println("The current class is this");
 //    }
 
-    @Injection(to = "printTheString(I)V", type = InjectionType.BEFORE_END)
-    public void overrideIt() {
-        boolean boolVa = true;
-        if (boolVa) System.out.println("THis");
+    @Injection(to = "printTheString(I)V", type = InjectionType.AFTER_BEGIN)
+    public void overrideIt(int test) {
+        if (test > 10) System.out.println("THis");
     }
 }

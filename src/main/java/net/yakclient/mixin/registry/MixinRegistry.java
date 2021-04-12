@@ -75,6 +75,7 @@ public class MixinRegistry {
         for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Injection.class)) {
                 final Injection injection = method.getAnnotation(Injection.class);
+//                if (injection.to().equals(Injection.METHOD_SELF))
                 final String methodTo = this.mixinToMethodName(method);
 
                 if (!this.declaredMethod(type, methodTo, method.getParameterTypes()))
@@ -83,7 +84,7 @@ public class MixinRegistry {
                 mixins.add(new MixinMetaData(cls.getName(),
                         this.byteCodeSignature(method),
                         type,
-                        this.byteCodeSignature(method, methodTo), injection.type(), injection.priority()));
+                       injection.to().equals(Injection.METHOD_SELF) ? this.byteCodeSignature(method) : methodTo, injection.type(), injection.priority()));
             }
         }
         return mixins;
@@ -114,8 +115,6 @@ public class MixinRegistry {
     private String byteCodeSignature(Method method) {
        return this.byteCodeSignature(method, method.getName());
     }
-
-
 
     private String mixinToMethodName(Method method) {
         if (!method.isAnnotationPresent(Injection.class)) return method.getName();

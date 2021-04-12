@@ -3,6 +3,8 @@ package net.yakclient.mixin.internal.instruction;
 import net.yakclient.YakMixins;
 import net.yakclient.mixin.internal.bytecode.ByteCodeUtils;
 import org.objectweb.asm.*;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class InstructionClassVisitor extends ClassVisitor {
     private final String targetMethod;
@@ -11,7 +13,7 @@ public class InstructionClassVisitor extends ClassVisitor {
 //    private static final String VOID_RETURN_PATTERN = "[(].*[)]V";
 
     public InstructionClassVisitor(InstructionInterceptor interceptor, String targetMethod) {
-        super(YakMixins.ASM_VERSION);
+        super(YakMixins.ASM_VERSION, new ClassNode());
         this.interceptor = interceptor;
         this.targetMethod = targetMethod;
     }
