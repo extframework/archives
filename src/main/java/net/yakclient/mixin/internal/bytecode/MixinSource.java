@@ -39,7 +39,7 @@ public class MixinSource {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            MixinProxySource that = (MixinProxySource) o;
+            final var that = (MixinProxySource) o;
             return Objects.equals(pointer, that.pointer);
         }
 

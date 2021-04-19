@@ -7,10 +7,10 @@ import java.net.URL;
 public class ExternalLibRegistryPool extends RegistryPool<URL> {
     @Override
     public Location pool(URL type) {
-        final ExternalLibLocation key = new ExternalLibLocation(type);
+        final var key = new ExternalLibLocation(type);
         if (!this.pool.containsKey(key)) this.pool.put(key, new PoolQueue<>());
 
-        this.pool.get(key).add(type, (t)->{}, null);
+        this.pool.get(key).add(type, null);
 
         return key;
     }

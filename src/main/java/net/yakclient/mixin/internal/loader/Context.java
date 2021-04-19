@@ -21,7 +21,7 @@ public class Context {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Context context = (Context) o;
+        final var context = (Context) o;
         return Objects.equals(loader, context.loader) && Objects.equals(target, context.target) && Objects.equals(pool, context.pool);
     }
 

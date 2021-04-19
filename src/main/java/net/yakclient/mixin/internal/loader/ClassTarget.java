@@ -49,7 +49,7 @@ public class ClassTarget extends PackageTarget {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        ClassTarget that = (ClassTarget) o;
+        final var that = (ClassTarget) o;
         return Objects.equals(cls, that.cls);
     }
 

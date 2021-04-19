@@ -1,6 +1,5 @@
 package net.yakclient.mixin.internal.instruction.tree;
 
-import net.yakclient.mixin.internal.instruction.ASMInstruction;
 import net.yakclient.mixin.internal.instruction.Instruction;
 import net.yakclient.mixin.internal.instruction.InstructionExecutor;
 import org.objectweb.asm.tree.AbstractInsnNode;

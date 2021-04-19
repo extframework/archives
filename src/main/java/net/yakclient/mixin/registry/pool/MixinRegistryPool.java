@@ -26,11 +26,11 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 
     @Override
     public Location pool(MixinMetaData type) throws ClassNotFoundException {
-        final ClassLocation key = ClassLocation.fromDataDest(type);
+        final var key = ClassLocation.fromDataDest(type);
         if (!this.pool.containsKey(key))
             this.pool.put(key, new PoolQueue<>());
 
-        this.pool.get(key).add(type, (t) -> { });
+        this.pool.get(key).add(type);
 
         return key;
     }
@@ -41,23 +41,15 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
         complete our future.
      */
     public Location pool(MixinMetaData type, FunctionalProxy proxy) throws ClassNotFoundException {
-        final ClassLocation key = ClassLocation.fromDataDest(type);
+        final var key = ClassLocation.fromDataDest(type);
         if (!this.pool.containsKey(key))
             this.pool.put(key, new PoolQueue<>());
 
         final UUID register = MixinProxyManager.register();
         MixinProxyManager.registerProxy(register, proxy);
-        this.pool.get(key).add(type, (t) -> {}, register);
+        this.pool.get(key).add(type, register);
 
         return key;
-    }
-
-    private byte[] loadClass(String name) throws ClassNotFoundException {
-        try {
-            return ByteCodeUtils.loadClassBytes(name);
-        } catch (IOException e) {
-            throw new ClassNotFoundException("Failed to load system resources for class: " + name);
-        }
     }
 
     /*
@@ -72,12 +64,12 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
             if (!(location instanceof ClassLocation))
                 throw new IllegalArgumentException("Provided location must be a ClassLocation!");
 
-            final ClassLocation dest = (ClassLocation) location;
+            final var dest = (ClassLocation) location;
 
-            final ClassTarget sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
+            final var sysTarget = ClassTarget.create(((ClassLocation) location).getCls());
 
             //Method destination, Destinations
-            final Map<String, MixinDestination.MixinDestBuilder> perfectDestinations = new HashMap<>();
+            final var perfectDestinations = new HashMap<String, MixinDestination.MixinDestBuilder>();
 
             for (PoolQueue.PoolNode<MixinMetaData> node : pool.queue) {
                 final String method = node.getValue().getMethodTo();
@@ -91,9 +83,6 @@ public class MixinRegistryPool extends RegistryPool<MixinMetaData> {
 
             final byte[] b = this.methodModifier.combine(dest.getCls(), perfectDestinations.values().stream().map(MixinDestination.MixinDestBuilder::build).distinct().toArray(MixinDestination[]::new));
             ContextPoolManager.defineClass(dest.getCls(), b);
-
-            for (PoolQueue.PoolNode<MixinMetaData> datum : pool.queue)
-                datum.run(sysTarget);
 
             return sysTarget;
         } catch (IOException e) {

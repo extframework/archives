@@ -71,7 +71,7 @@ public class ContextPoolManager {
 
         if (!isTargeted(name)) manager.loader.loadClass(name);
 
-        final Class<?> aClass = manager.pool.loadClassOrNull(name);
+        final var aClass = manager.pool.loadClassOrNull(name);
         if (aClass == null) throw new ClassNotFoundException("Failed to find class: " + name);
 
         return aClass;

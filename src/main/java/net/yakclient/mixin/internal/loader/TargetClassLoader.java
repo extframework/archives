@@ -7,11 +7,9 @@ import java.io.IOException;
 
 public class TargetClassLoader extends ProxyClassLoader {
     private final PackageTarget target;
-//    private final ProxyClassLoader lazyParent;
 
     public TargetClassLoader(ClassLoader parent, PackageTarget target) {
         super(parent);
-//        this.lazyParent = parent;
         this.target = target;
     }
 
@@ -22,13 +20,13 @@ public class TargetClassLoader extends ProxyClassLoader {
 
     @Override
     protected final Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        final ClassTarget target = ClassTarget.create(name);
+        final var target = ClassTarget.create(name);
         if (!this.target.isTargetOf(target)) return super.loadClass(name, resolve);
         try {
             Class<?> c = this.findLoadedClass(name);
 
             if (c == null) {
-                byte[] b = ByteCodeUtils.loadClassBytes(name);
+                final var b = ByteCodeUtils.loadClassBytes(name);
                 c = defineClass(name, b, 0, b.length);
             }
 

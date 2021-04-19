@@ -20,11 +20,11 @@ public class TreeMixinCV extends MixinCV {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
 
-        final String qualifiedName = name + desc;
+        final var qualifiedName = name + desc;
         if (this.hasInjection(qualifiedName)) {
             final Queue<QualifiedInstruction> instructions = this.getInjection(qualifiedName);
             final YakMixinsInternal.TreeMixinPatternMatcherBuilder builder = YakMixinsInternal.treePatternMatcher();
-            for (QualifiedInstruction insn : instructions) {
+            for (var insn : instructions) {
                 builder.addNode(insn.getInjectionType(), insn.getInsn(), insn.getPriority());
             }
             return builder.build(visitor);

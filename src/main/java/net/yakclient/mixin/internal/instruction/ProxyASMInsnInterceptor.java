@@ -19,11 +19,11 @@ public class ProxyASMInsnInterceptor extends ASMInsnInterceptor {
         final InsnList insn = new InsnList();
 
 
-        final LabelNode l0 = new LabelNode(new Label());
-        final LabelNode l1 = new LabelNode(new Label());
-        final LabelNode l2 = new LabelNode(new Label());
-        final LabelNode l3 = new LabelNode(new Label());
-        final LabelNode l4 = new LabelNode(new Label());
+        final var l0 = new LabelNode(new Label());
+        final var l1 = new LabelNode(new Label());
+        final var l2 = new LabelNode(new Label());
+        final var l3 = new LabelNode(new Label());
+        final var l4 = new LabelNode(new Label());
 
 
 //        label 0

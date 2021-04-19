@@ -18,7 +18,7 @@ public class ExternalLibLocation implements Location {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExternalLibLocation that = (ExternalLibLocation) o;
+        final var that = (ExternalLibLocation) o;
         return Objects.equals(url, that.url);
     }
 

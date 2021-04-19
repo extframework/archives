@@ -28,7 +28,7 @@ public class ClassLocation implements Location {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ClassLocation that = (ClassLocation) o;
+        final var that = (ClassLocation) o;
         return Objects.equals(cls, that.cls);
     }
 

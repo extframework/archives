@@ -36,7 +36,7 @@ public class RegistryConfigurator {
     }
 
     private static boolean contains(Set<PackageTarget> targets, PackageTarget target) {
-        for (PackageTarget packageTarget : targets) {
+        for (var packageTarget : targets) {
             if (target instanceof ClassTarget && packageTarget.equals(target)) return true;
             if (!(target instanceof ClassTarget) && packageTarget.isTargetOf(target)) return true;
         }

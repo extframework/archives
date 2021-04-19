@@ -12,8 +12,8 @@ public class MethodSelfInsnAdapter extends InsnAdapter {
 
     public MethodSelfInsnAdapter(InsnAdapter adapter, String clsTo, String clsFrom) {
         super(adapter);
-        this.clsTo = clsTo;
-        this.clsFrom = clsFrom;
+        this.clsTo = clsTo.replaceAll("\\.", "/");
+        this.clsFrom = clsFrom.replaceAll("\\.", "/");
     }
 
     public MethodSelfInsnAdapter(String clsTo, String clsFrom) {

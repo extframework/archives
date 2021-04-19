@@ -21,8 +21,6 @@ public class MixinProxyManager {
 
     @Contract(pure = true)
     public static FunctionalProxy.ProxyResponseData proxy(UUID uuid) {
-//        return new FunctionalProxy.ProxyResponseData(false);
-
         final MixinProxyManager manager = getInstance();
         if (!manager.proxys.containsKey(uuid)) throw new IllegalArgumentException("Invalid UUID, no proxy found");
         return FunctionalProxy.run(manager.proxys.get(uuid));
@@ -38,7 +36,7 @@ public class MixinProxyManager {
     }
 
     public static UUID register() {
-        final UUID key = UUID.randomUUID();
+        final var key = UUID.randomUUID();
         getInstance().proxys.put(key, null);
         return key;
     }

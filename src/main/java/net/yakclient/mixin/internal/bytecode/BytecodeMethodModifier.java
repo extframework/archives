@@ -17,12 +17,12 @@ import java.util.Queue;
 
 public class BytecodeMethodModifier {
     public <T extends Instruction> byte[] combine(String classTo, MixinDestination... destinations) throws IOException {
-        final Map<String, Queue<QualifiedInstruction>> instructions = new HashMap<>(destinations.length);
+        final var instructions = new HashMap<String, Queue<QualifiedInstruction>>(destinations.length);
 
         if (destinations.length == 0) throw new IllegalArgumentException("Must provide destinations to mixin!");
 
-        for (MixinDestination destination : destinations) {
-            final Queue<QualifiedInstruction> current = new PriorityQueue<>();
+        for (var destination : destinations) {
+            final var current = new PriorityQueue<QualifiedInstruction>();
 
             for (MixinSource source : destination.getSources()) {
                 Instruction insn = this.applyInsnAdapters(
@@ -42,9 +42,9 @@ public class BytecodeMethodModifier {
     }
 
     private Instruction getInsn(String cls, MixinSource source) throws IOException {
-        final ClassReader sourceReader = new ClassReader(cls);
+        final var sourceReader = new ClassReader(cls);
 
-        final InstructionClassVisitor cv = new InstructionClassVisitor(source instanceof MixinSource.MixinProxySource ?
+        final var cv = new InstructionClassVisitor(source instanceof MixinSource.MixinProxySource ?
                 new ProxyASMInsnInterceptor(((MixinSource.MixinProxySource) source).getPointer()) :
                 new ASMInsnInterceptor(), source.getLocation().getMethod());
 
@@ -63,11 +63,11 @@ public class BytecodeMethodModifier {
 
     @Contract(pure = true)
     private byte[] apply(Map<String, Queue<QualifiedInstruction>> injectors, String mixin) throws IOException {
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        var writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
-        ClassVisitor adapter = new CoreMixinCV(writer, injectors);
+        var adapter = new CoreMixinCV(writer, injectors);
 
-        ClassReader reader = new ClassReader(mixin);
+        var reader = new ClassReader(mixin);
         reader.accept(adapter, 0);
 
         return writer.toByteArray();

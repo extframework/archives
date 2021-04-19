@@ -51,8 +51,6 @@ public class ASMMethodProxy extends MethodNode implements MixinPatternMatcher {
             return new MethodProxyAdapter(new ASMMethodProxy(this.matchers), parent);
         }
     }
-
-
 }
 
 

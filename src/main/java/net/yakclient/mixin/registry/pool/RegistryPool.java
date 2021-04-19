@@ -33,39 +33,33 @@ public abstract class RegistryPool<T> {
             this.queue = new LinkedList<>();
         }
 
-        public PoolQueue<T> add(T type, Consumer<PackageTarget> registration) {
-            this.queue.add(new PoolNode<>(type, registration));
+        public PoolQueue<T> add(T type) {
+            this.queue.add(new PoolNode<>(type));
             return this;
         }
 
-        public PoolQueue<T> add(T type, Consumer<PackageTarget> registration, UUID proxy) {
-            this.queue.add(new ProxiedPoolNode<>(type, registration, proxy));
+        public PoolQueue<T> add(T type, UUID proxy) {
+            this.queue.add(new ProxiedPoolNode<>(type, proxy));
             return this;
         }
 
         public static class PoolNode<T> {
             private final T value;
-            private final Consumer<PackageTarget> registration;
 
-            PoolNode(T value, Consumer<PackageTarget> registration) {
+            PoolNode(T value) {
                 this.value = value;
-                this.registration = registration;
             }
 
             public T getValue() {
                 return this.value;
-            }
-
-            public void run(PackageTarget target) {
-                this.registration.accept(target);
             }
         }
 
         public static class ProxiedPoolNode<T> extends PoolNode<T> {
             private final UUID proxy;
 
-            ProxiedPoolNode(T value, Consumer<PackageTarget> registration, UUID proxy) {
-                super(value, registration);
+            ProxiedPoolNode(T value, UUID proxy) {
+                super(value);
                 this.proxy = proxy;
             }
 

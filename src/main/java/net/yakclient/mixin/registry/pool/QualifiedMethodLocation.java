@@ -35,7 +35,7 @@ public class QualifiedMethodLocation extends MethodLocation {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        QualifiedMethodLocation that = (QualifiedMethodLocation) o;
+        final var that = (QualifiedMethodLocation) o;
         return priority == that.priority && injectionType == that.injectionType;
     }
 

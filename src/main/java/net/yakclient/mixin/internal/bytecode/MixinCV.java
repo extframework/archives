@@ -16,14 +16,14 @@ public class MixinCV extends ClassVisitor {
     }
 
     protected boolean hasInjection(String name) {
-        for (String s : this.injectors.keySet()) {
+        for (var s : this.injectors.keySet()) {
             if (ByteCodeUtils.descriptorsSame(name, s)) return true;
         }
         return false;
     }
 
     protected Queue<QualifiedInstruction> getInjection(String name) {
-        for (String s : this.injectors.keySet()) {
+        for (var s : this.injectors.keySet()) {
             if (ByteCodeUtils.descriptorsSame(name, s)) return this.injectors.get(s);
         }
         throw new IllegalArgumentException("Failed to find injection");

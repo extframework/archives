@@ -16,9 +16,9 @@ public class CoreMixinCV extends MixinCV {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor visitor = super.visitMethod(access, name, desc, signature, exceptions);
 
-        final String qualifiedName = name + desc;
+        final var qualifiedName = name + desc;
         if (this.hasInjection(qualifiedName)) {
-            MethodVisitor last = visitor;
+            var last = visitor;
 
             final Queue<QualifiedInstruction> instructions = this.getInjection(qualifiedName);
             for (QualifiedInstruction insn : instructions) {

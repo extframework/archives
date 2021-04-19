@@ -53,7 +53,7 @@ public class MixinMetaData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MixinMetaData data = (MixinMetaData) o;
+        final var data = (MixinMetaData) o;
         return type == data.type && priority == data.priority && Objects.equals(classFrom, data.classFrom) && Objects.equals(methodFrom, data.methodFrom) && Objects.equals(classTo, data.classTo) && Objects.equals(methodTo, data.methodTo);
     }
 

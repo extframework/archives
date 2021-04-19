@@ -47,7 +47,7 @@ public class MixinRegistry {
     public MixinRegistry registerMixin(Class<?> cls) throws ClassNotFoundException {
         final Set<MixinMetaData> data = this.data(cls);
 
-        for (MixinMetaData datum : data) this.mixinRegistry.pool(datum);
+        for (var datum : data) this.mixinRegistry.pool(datum);
 
         return this;
     }
@@ -55,7 +55,7 @@ public class MixinRegistry {
     public MixinRegistry registerMixin(Class<?> cls, FunctionalProxy proxy) throws ClassNotFoundException {
         final Set<MixinMetaData> data = this.data(cls);
 
-        for (MixinMetaData datum : data) this.mixinRegistry.pool(datum, proxy);
+        for (var datum : data) this.mixinRegistry.pool(datum, proxy);
 
         return this;
     }
@@ -71,12 +71,11 @@ public class MixinRegistry {
         final String type = cls.getAnnotation(Mixer.class).value();
 
         this.validateMixin(type);
-        Set<MixinMetaData> mixins = new HashSet<>();
+       final var mixins = new HashSet<MixinMetaData>();
         for (Method method : cls.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Injection.class)) {
                 final Injection injection = method.getAnnotation(Injection.class);
-//                if (injection.to().equals(Injection.METHOD_SELF))
-                final String methodTo = this.mixinToMethodName(method);
+                final var methodTo = this.mixinToMethodName(method);
 
                 if (!this.declaredMethod(type, methodTo, method.getParameterTypes()))
                     throw new IllegalArgumentException("Failed to find a appropriate method to mix to");
@@ -93,7 +92,7 @@ public class MixinRegistry {
     private String byteCodeSignature(Method method, String name) {
         final Class<?> methodReturn = method.getReturnType();
 
-        final StringBuilder builder = new StringBuilder(name);
+        final var builder = new StringBuilder(name);
 
         builder.append('(');
         for (Class<?> type : method.getParameterTypes()) {
@@ -135,9 +134,4 @@ public class MixinRegistry {
     public final Class<?> retrieveClass(String cls) throws ClassNotFoundException {
         return ContextPoolManager.loadClass(cls);
     }
-
-//    private CompletableFuture<Pointer> registerMixin(MixinMetaData)
-
-
-//    public ClassLoader retrieveLoader(UUID)
 }

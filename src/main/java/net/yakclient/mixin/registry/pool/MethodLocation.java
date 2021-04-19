@@ -8,7 +8,7 @@ public class MethodLocation extends ClassLocation {
     private final String method;
 
     public MethodLocation(String cls, String method) {
-      super(cls);
+        super(cls);
         this.method = method;
     }
 
@@ -30,7 +30,7 @@ public class MethodLocation extends ClassLocation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        MethodLocation that = (MethodLocation) o;
+        final var that = (MethodLocation) o;
         return Objects.equals(method, that.method);
     }
 

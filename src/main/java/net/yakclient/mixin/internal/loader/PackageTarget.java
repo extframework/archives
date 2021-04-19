@@ -49,7 +49,7 @@ public class PackageTarget {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PackageTarget that = (PackageTarget) o;
+        final var that = (PackageTarget) o;
         return Arrays.equals(path, that.path);
     }
 
@@ -60,8 +60,8 @@ public class PackageTarget {
 
     @Override
     public String toString() {
-        final StringJoiner joiner = new StringJoiner(".");
-        for (String s : this.path) joiner.add(s);
+        final var joiner = new StringJoiner(".");
+        for (var s : this.path) joiner.add(s);
         return joiner.toString();
     }
 }

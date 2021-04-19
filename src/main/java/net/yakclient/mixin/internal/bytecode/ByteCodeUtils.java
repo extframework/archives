@@ -2,6 +2,7 @@ package net.yakclient.mixin.internal.bytecode;
 
 import net.yakclient.mixin.internal.ASMType;
 import net.yakclient.mixin.internal.loader.ProxyClassLoader;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 
 import java.io.DataInputStream;
@@ -77,15 +78,16 @@ public class ByteCodeUtils {
         }
     }
 
+    @Nullable
     public static byte[] loadClassBytes(String name) throws IOException, ClassNotFoundException {
-        InputStream cIn = ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class");
-        if (cIn == null) throw new ClassNotFoundException("Failed to find class " + name);
+        try (var cIn = ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class")) {
+            if (cIn == null) return null;
+            try (var in = new DataInputStream(cIn)) {
+                final var buf = new byte[cIn.available()];
 
-        try (DataInputStream in = new DataInputStream(cIn)) {
-            byte[] buf = new byte[cIn.available()];
-
-            in.readFully(buf);
-            return buf;
+                in.readFully(buf);
+                return buf;
+            }
         }
     }
 
@@ -421,9 +423,9 @@ public class ByteCodeUtils {
     public static String bytesToHex(byte[] bytes) {
         final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
+        final char[] hexChars = new char[bytes.length * 2];
+        for (var j = 0; j < bytes.length; j++) {
+            final int v = bytes[j] & 0xFF;
             hexChars[j * 2] = HEX_ARRAY[v >>> 4];
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
