@@ -1,5 +1,6 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
+import net.yakclient.mixin.base.internal.YakMixinsInternal;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
@@ -21,7 +22,7 @@ public class CoreMixinCV extends MixinCV {
 
             final Queue<QualifiedInstruction> instructions = this.getInjection(qualifiedName);
             for (QualifiedInstruction insn : instructions) {
-                last = net.yakclient.mixin.mixin.base.internal.YakMixinsInternal.corePatternMatcher(insn.getInjectionType(), last, insn.getInsn());
+                last = YakMixinsInternal.corePatternMatcher(insn.getInjectionType(), last, insn.getInsn());
             }
 
             return last;

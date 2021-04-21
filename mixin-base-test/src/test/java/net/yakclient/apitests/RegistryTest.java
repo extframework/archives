@@ -28,19 +28,17 @@ public class RegistryTest {
 //            new Label().toString();
         }
 
-//        {
-//            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, (cancel -> {
-//                System.out.println("Proxied");
-//            })).dumpAll();
-//
-//
-//
-//            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
-//
-//            final Constructor<?> constructor = aClass.getConstructor(String.class);
-//            final Object obj = constructor.newInstance("YAY");
-//            aClass.getMethod("printTheString", int.class).invoke(obj, 10);
-//        }
+        {
+            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class).dumpAll();
+
+
+
+            final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
+
+            final Constructor<?> constructor = aClass.getConstructor(String.class);
+            final Object obj = constructor.newInstance("YAY");
+            aClass.getMethod("printTheString", int.class).invoke(obj, 10);
+        }
 
     }
 

@@ -6,7 +6,6 @@ import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 
 public class ProxyClassLoader extends ClassLoader {
-    private static final String CONTEXT_POOL_MANAGER = "net.yakclient.mixin.internal.loader.ContextPoolManager";
     protected final ProtectionDomain defaultDomain =
             new ProtectionDomain(new CodeSource(null, (Certificate[]) null),
                     null, this, null);
@@ -25,11 +24,13 @@ public class ProxyClassLoader extends ClassLoader {
         return super.findLoadedClass(cls) != null;
     }
 
-    @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (this.isDefined(CONTEXT_POOL_MANAGER) && ContextPoolManager.isTargeted(name))
-            return ContextPoolManager.loadClass(name);
-        return super.loadClass(name, resolve);
-    }
+//    @Override
+//    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+//        if (this.isDefined(CONTEXT_POOL_MANAGER) && ContextPoolManager.isTargeted(name))
+//            return ContextPoolManager.loadClass(name);
+//        return super.loadClass(name, resolve);
+//    }
+
+
 
 }

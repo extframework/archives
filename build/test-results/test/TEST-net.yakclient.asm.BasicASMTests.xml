@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="net.yakclient.asm.BasicASMTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-03-25T16:16:51" hostname="Durgans-iMac.local" time="0.032">
+  <properties/>
+  <testcase name="testCreateClass()" classname="net.yakclient.asm.BasicASMTests" time="0.02"/>
+  <testcase name="testClassPrint()" classname="net.yakclient.asm.BasicASMTests" time="0.011"/>
+  <system-out><![CDATA[ Ljava/lang/String; testString
+ <init>(Ljava/lang/String;)V
+ getTestString()Ljava/lang/String;
+ print()V
+ create()Lnet/yakclient/asm/ASMTestCase;
+}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

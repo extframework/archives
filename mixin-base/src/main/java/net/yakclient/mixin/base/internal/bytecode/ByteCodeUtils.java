@@ -1,7 +1,6 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
 import net.yakclient.mixin.mixin.base.internal.ASMType;
-import net.yakclient.mixin.base.internal.loader.ProxyClassLoader;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 
@@ -59,13 +58,6 @@ public class ByteCodeUtils {
                 return true;
         }
         return false;
-    }
-
-    public static boolean isLoaded(String clazz) {
-        if (!(ClassLoader.getSystemClassLoader() instanceof ProxyClassLoader))
-            throw new IllegalStateException("Failed to provide ProxyClassLoader as the system default!");
-
-        return ((ProxyClassLoader) ClassLoader.getSystemClassLoader()).isDefined(clazz);
     }
 
     public static boolean classExists(String clazz) {

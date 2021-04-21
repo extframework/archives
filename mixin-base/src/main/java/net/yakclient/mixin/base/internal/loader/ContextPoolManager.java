@@ -95,8 +95,8 @@ public class ContextPoolManager {
     static TargetClassLoader createLoader(PackageTarget target) {
         final ContextPoolManager instance = getInstance();
 
-        if (!(instance.loader instanceof ProxyClassLoader))
-            throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
+//        if (!(instance.loader instanceof ProxyClassLoader))
+//            throw new IllegalStateException("Failed to provide the default classloader as " + ProxyClassLoader.class.getName());
         return new TargetClassLoader(instance.loader, instance.pool.getTarget(target));
     }
 

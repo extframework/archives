@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="net.yakclient.verstionadapter.AdapterTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-03-25T16:16:51" hostname="Durgans-iMac.local" time="0.012">
+  <properties/>
+  <testcase name="testVersionAdapter()" classname="net.yakclient.verstionadapter.AdapterTests" time="0.012"/>
+  <system-out><![CDATA[class net.yakclient.mixin.registry.MixinRegistry
+private boolean net.yakclient.mixin.registry.MixinRegistry.declaredMethod(java.lang.String,java.lang.String,java.lang.Class[])
+private final net.yakclient.mixin.registry.RegistryConfigurator$Configuration net.yakclient.mixin.registry.MixinRegistry.configuration
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,170 @@
+net/yakclient/mixin/internal/instruction/core/CoreInsnExecutor.java
+ net.yakclient.mixin.internal.instruction.core.CoreInsnExecutor
+net/yakclient/mixin/internal/methodadapter/tree/ASMMethodProxy.java
+ net.yakclient.mixin.internal.methodadapter.tree.ASMMethodProxy
+ net.yakclient.mixin.internal.methodadapter.tree.ASMMethodProxy$MethodProxyBuilder
+net/yakclient/mixin/internal/methodadapter/tree/TreeMixinPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeMixinPatternMatcher
+net/yakclient/mixin/registry/pool/RegistryPool.java
+ net.yakclient.mixin.registry.pool.RegistryPool
+ net.yakclient.mixin.registry.pool.RegistryPool$PoolQueue
+ net.yakclient.mixin.registry.pool.RegistryPool$PoolQueue$PoolNode
+ net.yakclient.mixin.registry.pool.RegistryPool$PoolQueue$ProxiedPoolNode
+net/yakclient/mixin/internal/methodadapter/core/CoreOpcodePatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreOpcodePatternMatcher
+net/yakclient/mixin/internal/methodadapter/core/CoreMixinPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreMixinPatternMatcher
+net/yakclient/mixin/internal/methodadapter/tree/TreeOverwritePatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeOverwritePatternMatcher
+net/yakclient/mixin/internal/methodadapter/core/CoreBIPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreBIPatternMatcher
+net/yakclient/mixin/internal/methodadapter/core/CoreABPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreABPatternMatcher
+net/yakclient/mixin/internal/loader/ContextPoolManager.java
+ net.yakclient.mixin.internal.loader.ContextPoolManager
+net/yakclient/mixin/registry/MixinMetaData.java
+ net.yakclient.mixin.registry.MixinMetaData
+net/yakclient/mixin/registry/pool/ExternalLibRegistryPool.java
+ net.yakclient.mixin.registry.pool.ExternalLibRegistryPool
+net/yakclient/mixin/internal/instruction/InsnAdapter.java
+ net.yakclient.mixin.internal.instruction.InsnAdapter
+net/yakclient/mixin/internal/methodadapter/MixinPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.MixinPatternMatcher
+net/yakclient/mixin/internal/instruction/ASMInstruction.java
+ net.yakclient.mixin.internal.instruction.ASMInstruction
+net/yakclient/mixin/internal/bytecode/TreeMixinCV.java
+ net.yakclient.mixin.internal.bytecode.TreeMixinCV
+net/yakclient/mixin/YakMixins.java
+ net.yakclient.mixin.YakMixins
+net/yakclient/mixin/internal/loader/ProxyClassLoader.java
+ net.yakclient.mixin.internal.loader.ProxyClassLoader
+net/yakclient/mixin/internal/bytecode/CoreMixinCV.java
+ net.yakclient.mixin.internal.bytecode.CoreMixinCV
+net/yakclient/mixin/api/Injection.java
+ net.yakclient.mixin.api.Injection
+net/yakclient/mixin/internal/instruction/adapter/MethodSelfInsnAdapter.java
+ net.yakclient.mixin.internal.instruction.adapter.MethodSelfInsnAdapter
+net/yakclient/mixin/internal/instruction/ASMInsnInterceptor.java
+ net.yakclient.mixin.internal.instruction.ASMInsnInterceptor
+net/yakclient/mixin/internal/methodadapter/tree/TreeBIPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeBIPatternMatcher
+net/yakclient/mixin/registry/pool/MixinRegistryPool.java
+ net.yakclient.mixin.registry.pool.MixinRegistryPool
+net/yakclient/mixin/registry/pool/Location.java
+ net.yakclient.mixin.registry.pool.Location
+net/yakclient/mixin/internal/methodadapter/tree/TreeBRPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeBRPatternMatcher
+net/yakclient/mixin/registry/pool/QualifiedMethodLocation.java
+ net.yakclient.mixin.registry.pool.QualifiedMethodLocation
+net/yakclient/mixin/api/Shadow.java
+ net.yakclient.mixin.api.Shadow
+net/yakclient/mixin/internal/instruction/tree/TreeInsnExecutor.java
+ net.yakclient.mixin.internal.instruction.tree.TreeInsnExecutor
+net/yakclient/mixin/internal/loader/PackageTarget.java
+ net.yakclient.mixin.internal.loader.PackageTarget
+net/yakclient/mixin/internal/bytecode/MethodModifier.java
+ net.yakclient.mixin.internal.bytecode.MethodModifier
+net/yakclient/mixin/api/versionadapter/VersionManager.java
+ net.yakclient.mixin.api.versionadapter.VersionManager
+ net.yakclient.mixin.api.versionadapter.VersionManager$VersionState
+net/yakclient/mixin/internal/instruction/ProxyASMInsnInterceptor.java
+ net.yakclient.mixin.internal.instruction.ProxyASMInsnInterceptor
+net/yakclient/mixin/registry/pool/SuppliedFuture.java
+ net.yakclient.mixin.registry.pool.SuppliedFuture
+net/yakclient/mixin/internal/instruction/InstructionPrinter.java
+ net.yakclient.mixin.internal.instruction.InstructionPrinter
+ net.yakclient.mixin.internal.instruction.InstructionPrinter$1
+net/yakclient/mixin/api/versionadapter/CollatedVMapping.java
+ net.yakclient.mixin.api.versionadapter.CollatedVMapping
+net/yakclient/mixin/registry/FunctionalProxy.java
+ net.yakclient.mixin.registry.FunctionalProxy
+ net.yakclient.mixin.registry.FunctionalProxy$ProxyResponseData
+ net.yakclient.mixin.registry.FunctionalProxy$ProxyResponseData$Builder
+net/yakclient/mixin/internal/bytecode/MixinSource.java
+ net.yakclient.mixin.internal.bytecode.MixinSource
+ net.yakclient.mixin.internal.bytecode.MixinSource$MixinProxySource
+net/yakclient/mixin/internal/bytecode/ByteCodeUtils.java
+ net.yakclient.mixin.internal.bytecode.ByteCodeUtils
+net/yakclient/mixin/registry/MixinRegistry.java
+ net.yakclient.mixin.registry.MixinRegistry
+net/yakclient/mixin/internal/loader/ClassTarget.java
+ net.yakclient.mixin.internal.loader.ClassTarget
+net/yakclient/mixin/api/Priority.java
+ net.yakclient.mixin.api.Priority
+net/yakclient/mixin/internal/methodadapter/core/CoreBRPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreBRPatternMatcher
+net/yakclient/mixin/internal/instruction/adapter/ReturnRemoverInsnAdapter.java
+ net.yakclient.mixin.internal.instruction.adapter.ReturnRemoverInsnAdapter
+net/yakclient/mixin/api/versionadapter/VersionMapping.java
+ net.yakclient.mixin.api.versionadapter.VersionMapping
+ net.yakclient.mixin.api.versionadapter.VersionMapping$MappingsBuilder
+ net.yakclient.mixin.api.versionadapter.VersionMapping$MappingsBuilder$VersionsBuilder
+net/yakclient/mixin/internal/YakMixinsInternal.java
+ net.yakclient.mixin.internal.YakMixinsInternal
+ net.yakclient.mixin.internal.YakMixinsInternal$TreeMixinPatternMatcherBuilder
+net/yakclient/mixin/internal/methodadapter/tree/TreeBEPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeBEPatternMatcher
+net/yakclient/mixin/internal/loader/ContextPool.java
+ net.yakclient.mixin.internal.loader.ContextPool
+net/yakclient/mixin/internal/instruction/adapter/FieldSelfInsnAdapter.java
+ net.yakclient.mixin.internal.instruction.adapter.FieldSelfInsnAdapter
+net/yakclient/mixin/api/versionadapter/ClassVersion.java
+ net.yakclient.mixin.api.versionadapter.ClassVersion
+ net.yakclient.mixin.api.versionadapter.ClassVersion$ClassVersionBuilder
+ net.yakclient.mixin.api.versionadapter.ClassVersion$ClassVersionBuilder$1
+ net.yakclient.mixin.api.versionadapter.ClassVersion$ClassVersionBuilder$2
+ net.yakclient.mixin.api.versionadapter.ClassVersion$ClassVersionBuilder$ClassValueBuilder
+net/yakclient/mixin/internal/methodadapter/core/CoreOverwritePatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreOverwritePatternMatcher
+net/yakclient/mixin/internal/bytecode/QualifiedInstruction.java
+ net.yakclient.mixin.internal.bytecode.QualifiedInstruction
+net/yakclient/mixin/internal/bytecode/MixinDestination.java
+ net.yakclient.mixin.internal.bytecode.MixinDestination
+ net.yakclient.mixin.internal.bytecode.MixinDestination$MixinDestBuilder
+net/yakclient/mixin/registry/pool/MethodLocation.java
+ net.yakclient.mixin.registry.pool.MethodLocation
+net/yakclient/mixin/internal/loader/TargetClassLoader.java
+ net.yakclient.mixin.internal.loader.TargetClassLoader
+net/yakclient/mixin/registry/RegistryConfigurator.java
+ net.yakclient.mixin.registry.RegistryConfigurator
+ net.yakclient.mixin.registry.RegistryConfigurator$Configuration
+ net.yakclient.mixin.registry.RegistryConfigurator$DefaultConfiguration
+ net.yakclient.mixin.registry.RegistryConfigurator$FunctionalConfiguration
+net/yakclient/mixin/api/InjectionType.java
+ net.yakclient.mixin.api.InjectionType
+net/yakclient/mixin/internal/instruction/InstructionClassVisitor.java
+ net.yakclient.mixin.internal.instruction.InstructionClassVisitor
+net/yakclient/mixin/internal/methodadapter/tree/MethodProxyAdapter.java
+ net.yakclient.mixin.internal.methodadapter.tree.MethodProxyAdapter
+net/yakclient/mixin/internal/instruction/InstructionExecutor.java
+ net.yakclient.mixin.internal.instruction.InstructionExecutor
+net/yakclient/mixin/registry/proxy/MixinProxyManager.java
+ net.yakclient.mixin.registry.proxy.MixinProxyManager
+net/yakclient/mixin/internal/loader/Context.java
+ net.yakclient.mixin.internal.loader.Context
+net/yakclient/mixin/internal/methodadapter/PriorityMatcher.java
+ net.yakclient.mixin.internal.methodadapter.PriorityMatcher
+net/yakclient/mixin/internal/methodadapter/tree/TreeABPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeABPatternMatcher
+net/yakclient/mixin/internal/loader/DynamicContextPool.java
+ net.yakclient.mixin.internal.loader.DynamicContextPool
+net/yakclient/mixin/internal/ASMType.java
+ net.yakclient.mixin.internal.ASMType
+net/yakclient/mixin/internal/bytecode/MixinCV.java
+ net.yakclient.mixin.internal.bytecode.MixinCV
+net/yakclient/mixin/internal/methodadapter/core/CoreBEPatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.core.CoreBEPatternMatcher
+net/yakclient/mixin/registry/pool/ClassLocation.java
+ net.yakclient.mixin.registry.pool.ClassLocation
+net/yakclient/mixin/registry/pool/ExternalLibLocation.java
+ net.yakclient.mixin.registry.pool.ExternalLibLocation
+net/yakclient/mixin/internal/bytecode/BytecodeMethodModifier.java
+ net.yakclient.mixin.internal.bytecode.BytecodeMethodModifier
+net/yakclient/mixin/internal/methodadapter/tree/TreeOpcodePatternMatcher.java
+ net.yakclient.mixin.internal.methodadapter.tree.TreeOpcodePatternMatcher
+net/yakclient/mixin/internal/instruction/InstructionInterceptor.java
+ net.yakclient.mixin.internal.instruction.InstructionInterceptor
+net/yakclient/mixin/internal/instruction/Instruction.java
+ net.yakclient.mixin.internal.instruction.Instruction
+net/yakclient/mixin/api/Mixer.java
+ net.yakclient.mixin.api.Mixer
