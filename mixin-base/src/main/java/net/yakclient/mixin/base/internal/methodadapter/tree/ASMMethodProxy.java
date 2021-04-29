@@ -1,6 +1,6 @@
 package net.yakclient.mixin.base.internal.methodadapter.tree;
 
-import net.yakclient.mixin.base.YakMixins;
+import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.base.internal.methodadapter.MixinPatternMatcher;
 import net.yakclient.mixin.base.internal.methodadapter.PriorityMatcher;
 import org.objectweb.asm.MethodVisitor;
@@ -13,7 +13,7 @@ public class ASMMethodProxy extends MethodNode implements MixinPatternMatcher {
     private final Queue<PriorityMatcher<TreeMixinPatternMatcher>> matchers;
 
     public ASMMethodProxy(Queue<PriorityMatcher<TreeMixinPatternMatcher>> matchers) {
-        super(YakMixins.ASM_VERSION);
+        super(ByteCodeUtils.ASM_VERSION);
         this.matchers = matchers;
     }
 

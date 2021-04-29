@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.internal.methodadapter.core;
 
-import net.yakclient.mixin.base.YakMixins;
 import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils;
 import net.yakclient.mixin.base.internal.instruction.Instruction;
 import net.yakclient.mixin.base.internal.instruction.core.CoreInsnExecutor;
@@ -14,7 +13,7 @@ public abstract class CoreMixinPatternMatcher extends MethodVisitor implements M
     private int locals = 1;
 
     public CoreMixinPatternMatcher(MethodVisitor visitor, Instruction instructions) {
-        super(YakMixins.ASM_VERSION, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.instructions = instructions;
     }
 

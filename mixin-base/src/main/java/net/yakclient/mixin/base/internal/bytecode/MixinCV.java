@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
-import net.yakclient.mixin.base.YakMixins;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.Map;
@@ -10,7 +9,7 @@ public class MixinCV extends ClassVisitor {
     protected final Map<String, Queue<QualifiedInstruction>> injectors;
 
     public MixinCV(ClassVisitor cv, Map<String, Queue<QualifiedInstruction>> injectors) {
-        super(YakMixins.ASM_VERSION, cv);
+        super(ByteCodeUtils.ASM_VERSION, cv);
         this.injectors = injectors;
     }
 

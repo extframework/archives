@@ -8,6 +8,7 @@ import net.yakclient.mixin.base.internal.instruction.adapter.ReturnRemoverInsnAd
 import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class BytecodeMethodModifier {
+
     public <T extends Instruction> byte[] combine(String classTo, MixinDestination... destinations) throws IOException {
         final var instructions = new HashMap<String, Queue<QualifiedInstruction>>(destinations.length);
 

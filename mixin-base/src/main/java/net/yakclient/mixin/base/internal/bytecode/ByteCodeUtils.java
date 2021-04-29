@@ -9,6 +9,8 @@ import java.io.IOException;
 
 public class ByteCodeUtils {
     public static final ASMType DEFAULT_ASM_MODE = ASMType.TREE;
+    public static final int ASM_VERSION = Opcodes.ASM9;
+
 
     public static String removeReturnType(String type) {
         return type.substring(0, type.indexOf(')') + 1);

@@ -19,7 +19,7 @@ public class MixinTestCase {
 //        System.out.println("The current class is this");
 //    }
 
-    @Injection(type = InjectionType.BEFORE_RETURN)
+    @Injection(type = InjectionType.BEFORE_INVOKE)
     public void printTheString(int test, float other) {
         final var otherString = "clashing?";
        System.out.println(otherString);

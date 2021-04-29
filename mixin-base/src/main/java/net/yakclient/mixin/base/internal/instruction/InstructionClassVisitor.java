@@ -10,7 +10,7 @@ public class InstructionClassVisitor extends ClassVisitor {
     private final InstructionInterceptor interceptor;
 
     public InstructionClassVisitor(InstructionInterceptor interceptor, String targetMethod) {
-        super(net.yakclient.mixin.base.YakMixins.ASM_VERSION, new ClassNode());
+        super(ByteCodeUtils.ASM_VERSION, new ClassNode());
         this.interceptor = interceptor;
         this.targetMethod = targetMethod;
     }

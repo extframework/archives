@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.internal.instruction;
 
-import net.yakclient.mixin.base.YakMixins;
 import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils;
 import org.jetbrains.annotations.TestOnly;
 import org.objectweb.asm.*;
@@ -13,7 +12,7 @@ public class InstructionPrinter extends MethodVisitor {
     private final List<String> instructions;
 
     public InstructionPrinter(MethodVisitor visitor) {
-        super(YakMixins.ASM_VERSION, visitor);
+        super(ByteCodeUtils.ASM_VERSION, visitor);
         this.instructions = new ArrayList<String>() {
             @Override
             public boolean add(String o) {
