@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.internal.instruction.adapter;
 
-import net.yakclient.mixin.base.internal.instruction.InsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.Instruction;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;

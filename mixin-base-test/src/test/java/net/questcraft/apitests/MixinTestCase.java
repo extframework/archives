@@ -21,6 +21,7 @@ public class MixinTestCase {
 
     @Injection(type = InjectionType.BEFORE_RETURN)
     public void printTheString(int test, float other) {
-       System.out.println("THis");
+        final var otherString = "clashing?";
+       System.out.println(otherString);
     }
 }

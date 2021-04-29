@@ -1,4 +1,6 @@
-package net.yakclient.mixin.base.internal.instruction;
+package net.yakclient.mixin.base.internal.instruction.adapter;
+
+import net.yakclient.mixin.base.internal.instruction.Instruction;
 
 public class InsnAdapter {
     private final InsnAdapter adapter;

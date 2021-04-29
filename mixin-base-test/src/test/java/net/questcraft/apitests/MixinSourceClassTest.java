@@ -13,8 +13,8 @@ public class MixinSourceClassTest {
 
 
     public void printTheString(int integer, float otherNum) {
-
-        System.out.println("ok");
+        final var testString = "Bob?";
+        System.out.println(testString);
 //        if (integer < 10) System.out.println("THis");
 //        System.out.println("Other this");
 //        System.out.println(this.testString);

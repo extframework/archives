@@ -2,6 +2,7 @@ package net.yakclient.mixin.base.internal.bytecode;
 
 import net.yakclient.mixin.base.internal.instruction.*;
 import net.yakclient.mixin.base.internal.instruction.adapter.FieldSelfInsnAdapter;
+import net.yakclient.mixin.base.internal.instruction.adapter.InsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.adapter.MethodSelfInsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.adapter.ReturnRemoverInsnAdapter;
 import org.jetbrains.annotations.Contract;
@@ -44,8 +45,8 @@ public class BytecodeMethodModifier {
         final var sourceReader = new ClassReader(cls);
 
         final var cv = new InstructionClassVisitor(source instanceof MixinSource.MixinProxySource ?
-                new ProxyASMInsnInterceptor(((MixinSource.MixinProxySource) source).getPointer()) :
-                new ASMInsnInterceptor(), source.getLocation().getMethod());
+                new ProxyInsnInterceptor(((MixinSource.MixinProxySource) source).getPointer()) :
+                new DirectInsnInterceptor(), source.getLocation().getMethod());
 
         sourceReader.accept(cv, 0);
         return cv.getInstructions();

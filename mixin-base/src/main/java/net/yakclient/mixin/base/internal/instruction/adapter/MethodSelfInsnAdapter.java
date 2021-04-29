@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.internal.instruction.adapter;
 
-import net.yakclient.mixin.base.internal.instruction.InsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.Instruction;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
