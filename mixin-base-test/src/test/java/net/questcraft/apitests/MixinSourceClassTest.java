@@ -12,7 +12,8 @@ public class MixinSourceClassTest {
     }
 
 
-    public void printTheString(int integer) {
+    public void printTheString(int integer, float otherNum) {
+
         System.out.println("ok");
 //        if (integer < 10) System.out.println("THis");
 //        System.out.println("Other this");

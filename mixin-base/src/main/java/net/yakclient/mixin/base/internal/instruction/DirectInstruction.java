@@ -2,10 +2,10 @@ package net.yakclient.mixin.base.internal.instruction;
 
 import org.objectweb.asm.tree.InsnList;
 
-public class ASMInstruction implements Instruction {
+public class DirectInstruction implements Instruction {
     private final InsnList instructions;
 
-    public ASMInstruction(InsnList instructions) {
+    public DirectInstruction(InsnList instructions) {
 
         this.instructions = instructions;
     }

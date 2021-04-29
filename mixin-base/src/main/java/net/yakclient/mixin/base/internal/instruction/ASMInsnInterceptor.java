@@ -10,6 +10,6 @@ public class ASMInsnInterceptor extends MethodNode implements InstructionInterce
 
     @Override
     public Instruction intercept() {
-        return new ASMInstruction(this.instructions);
+        return new DirectInstruction(this.instructions);
     }
 }

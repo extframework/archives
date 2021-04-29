@@ -20,7 +20,7 @@ public class MixinTestCase {
 //    }
 
     @Injection(type = InjectionType.BEFORE_RETURN)
-    public void printTheString(int test) {
-        if (test > 10) System.out.println("THis");
+    public void printTheString(int test, float other) {
+       System.out.println("THis");
     }
 }

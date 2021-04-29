@@ -39,6 +39,13 @@ public class MixinProxyManager {
     public static UUID register() {
         final var key = UUID.randomUUID();
         getInstance().proxys.put(key, null);
+
         return key;
+    }
+
+    public static void test() {
+        if (!MixinProxyManager.proxy(new UUID(10,10)).cancel) {
+            System.out.println("Then test");
+        }
     }
 }

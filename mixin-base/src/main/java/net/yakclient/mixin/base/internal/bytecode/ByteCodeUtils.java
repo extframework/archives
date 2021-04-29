@@ -434,4 +434,16 @@ public class ByteCodeUtils {
         }
         return false;
     }
+
+    public static boolean isLocalsStore(int opcode) {
+        switch (opcode) {
+            case Opcodes.ASTORE:
+            case Opcodes.DSTORE:
+            case Opcodes.FSTORE:
+            case Opcodes.ISTORE:
+            case Opcodes.LSTORE:
+                return true;
+        }
+        return false;
+    }
 }

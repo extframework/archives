@@ -19,17 +19,17 @@ public class RegistryTest {
         final RegistryConfigurator configure = RegistryConfigurator.configure().addSafePackage("net.questcraft").addTarget("net.questcraft");
         final MixinRegistry mixinRegistry = configure.create();
         {
-            mixinRegistry.registerMixin(MixinTestCase.class).dumpAll();
+            mixinRegistry.registerMixin(MixinTestCase.class, Runnable::run).dumpAll();
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
             final Constructor<?> constructor = aClass.getConstructor(String.class);
             final Object obj = constructor.newInstance("YAY");
-            obj.getClass().getMethod("printTheString", int.class).invoke(obj,11);
+//            obj.getClass().getMethod("printTheString", int.class).invoke(obj,11);
 //            new Label().toString();
         }
 
         {
-            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class).dumpAll();
+            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class, Runnable::run).dumpAll();
 
 
 
@@ -37,7 +37,7 @@ public class RegistryTest {
 
             final Constructor<?> constructor = aClass.getConstructor(String.class);
             final Object obj = constructor.newInstance("YAY");
-            aClass.getMethod("printTheString", int.class).invoke(obj, 10);
+            aClass.getMethod("printTheString", int.class, float.class).invoke(obj, 10, 10f);
         }
 
     }
