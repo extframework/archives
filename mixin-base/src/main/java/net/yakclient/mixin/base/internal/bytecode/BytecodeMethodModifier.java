@@ -1,14 +1,17 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
-import net.yakclient.mixin.base.internal.instruction.*;
+import net.yakclient.mixin.base.internal.instruction.DirectInsnInterceptor;
+import net.yakclient.mixin.base.internal.instruction.Instruction;
+import net.yakclient.mixin.base.internal.instruction.InstructionClassVisitor;
+import net.yakclient.mixin.base.internal.instruction.ProxyInsnInterceptor;
 import net.yakclient.mixin.base.internal.instruction.adapter.FieldSelfInsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.adapter.InsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.adapter.MethodSelfInsnAdapter;
 import net.yakclient.mixin.base.internal.instruction.adapter.ReturnRemoverInsnAdapter;
+import net.yakclient.mixin.mixin.base.internal.ASMType;
 import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -67,7 +70,7 @@ public class BytecodeMethodModifier {
     private byte[] apply(Map<String, Queue<QualifiedInstruction>> injectors, String mixin) throws IOException {
         var writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
-        var adapter = new CoreMixinCV(writer, injectors);
+        var adapter = ByteCodeUtils.DEFAULT_ASM_MODE == ASMType.TREE ? new TreeMixinCV(writer, injectors) : new CoreMixinCV(writer, injectors);
 
         var reader = new ClassReader(mixin);
         reader.accept(adapter, 0);

@@ -6,7 +6,7 @@ import net.yakclient.mixin.api.Mixer;
 @Mixer("net.questcraft.apitests.MixinSourceClassTest")
 public abstract class SecondMixinTestCase {
     @Injection
-    public void printTheString(int integer, float other) {
+    public void printTheString() {
         System.out.println("I also wanna print this");
     }
 }

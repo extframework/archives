@@ -2,7 +2,6 @@ package net.questcraft.apitests;
 
 
 import net.yakclient.mixin.api.Injection;
-import net.yakclient.mixin.api.InjectionType;
 import net.yakclient.mixin.api.Mixer;
 
 @Mixer("net.questcraft.apitests.MixinSourceClassTest")
@@ -19,9 +18,9 @@ public class MixinTestCase {
 //        System.out.println("The current class is this");
 //    }
 
-    @Injection(type = InjectionType.BEFORE_INVOKE)
-    public void printTheString(int test, float other) {
+    @Injection
+    public void printTheString() {
         final var otherString = "clashing?";
-       System.out.println(otherString);
+       System.out.println("otherString");
     }
 }

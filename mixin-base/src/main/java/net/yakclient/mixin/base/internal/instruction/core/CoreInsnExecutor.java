@@ -3,7 +3,6 @@ package net.yakclient.mixin.base.internal.instruction.core;
 import net.yakclient.mixin.base.internal.instruction.Instruction;
 import net.yakclient.mixin.base.internal.instruction.InstructionExecutor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class CoreInsnExecutor implements InstructionExecutor {
     private final Instruction instruction;
@@ -16,9 +15,10 @@ public class CoreInsnExecutor implements InstructionExecutor {
 
     @Override
     public void execute() {
-        for (AbstractInsnNode insn : instruction.getInstructions()) {
-            insn.accept(visitor);
-        }
+        instruction.getInstructions().accept(visitor);
+//        for (AbstractInsnNode insn : instruction.getInstructions()) {
+//            insn.accept(visitor);
+//        }
     }
 
 }

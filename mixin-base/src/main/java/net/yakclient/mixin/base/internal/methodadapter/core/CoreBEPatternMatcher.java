@@ -52,7 +52,7 @@ public class CoreBEPatternMatcher extends CoreMixinPatternMatcher {
 
     @Override
     public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String descriptor, boolean visible) {
-        return null; /* We dont need annotations to none-existent references */
+        return null; /* We dont need annotations to non-existent references */
     }
 
     @Override

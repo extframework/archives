@@ -19,8 +19,8 @@ public class RegistryTest {
             mixinRegistry.registerMixin(MixinTestCase.class).dumpAll();
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName()); //target.retrieveClass(MixinSourceClassTest.class.getName());
-            final Constructor<?> constructor = aClass.getConstructor(String.class);
-            final Object obj = constructor.newInstance("YAY");
+//            final Constructor<?> constructor = aClass.getConstructor(String.class);
+//            final Object obj = constructor.newInstance("YAY");
 //            obj.getClass().getMethod("printTheString", int.class).invoke(obj,11);
 //            new Label().toString();
         }
@@ -29,12 +29,11 @@ public class RegistryTest {
             mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class).dumpAll();
 
 
-
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());
 
             final Constructor<?> constructor = aClass.getConstructor(String.class);
             final Object obj = constructor.newInstance("YAY");
-            aClass.getMethod("printTheString", int.class, float.class).invoke(obj, 10, 10f);
+            aClass.getMethod("printTheString").invoke(obj);
         }
 
     }

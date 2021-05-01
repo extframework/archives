@@ -7,10 +7,9 @@ public class TreeABPatternMatcher extends TreeMixinPatternMatcher {
     public TreeABPatternMatcher(Instruction instructions) {
         super(instructions);
     }
-
-
+    
     @Override
     public void transform(InsnList instructions) {
-
+        this.insertInsn(instructions);
     }
 }

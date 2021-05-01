@@ -1,6 +1,6 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
-import net.yakclient.mixin.base.internal.YakMixinsInternal;
+import net.yakclient.mixin.base.internal.methodadapter.MixinPatternMatcher;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.ClassNode;
@@ -23,7 +23,7 @@ public class TreeMixinCV extends MixinCV {
         final var qualifiedName = name + desc;
         if (this.hasInjection(qualifiedName)) {
             final Queue<QualifiedInstruction> instructions = this.getInjection(qualifiedName);
-            final YakMixinsInternal.TreeMixinPatternMatcherBuilder builder = YakMixinsInternal.treePatternMatcher();
+            final MixinPatternMatcher.TreeMixinPatternMatcherBuilder builder = MixinPatternMatcher.treePatternMatcher();
             for (var insn : instructions) {
                 builder.addNode(insn.getInjectionType(), insn.getInsn(), insn.getPriority());
             }

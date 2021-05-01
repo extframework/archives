@@ -12,9 +12,16 @@ public class MixinSourceClassTest {
     }
 
 
-    public void printTheString(int integer, float otherNum) {
+    public void printTheString() {
+        final String testString = this.testString;
         System.out.println(testString);
     }
+
+    //var insn = this.getInsn(classTo, new MixinSource(new QualifiedMethodLocation(classTo, "printTheString(IF)V", InjectionType.AFTER_BEGIN, 2)));
+    //
+    //var nodes = new ArrayList<AbstractInsnNode>();
+    //insn.getInstructions().forEach(nodes::add);
+    //nodes
 
 
 }

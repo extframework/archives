@@ -9,10 +9,10 @@ import org.objectweb.asm.tree.MethodNode;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class ASMMethodProxy extends MethodNode implements MixinPatternMatcher {
+public class TreeMethodProxy extends MethodNode implements MixinPatternMatcher {
     private final Queue<PriorityMatcher<TreeMixinPatternMatcher>> matchers;
 
-    public ASMMethodProxy(Queue<PriorityMatcher<TreeMixinPatternMatcher>> matchers) {
+    public TreeMethodProxy(Queue<PriorityMatcher<TreeMixinPatternMatcher>> matchers) {
         super(ByteCodeUtils.ASM_VERSION);
         this.matchers = matchers;
     }
@@ -47,7 +47,7 @@ public class ASMMethodProxy extends MethodNode implements MixinPatternMatcher {
         }
 
         public MethodVisitor build(MethodVisitor parent) {
-            return new MethodProxyAdapter(new ASMMethodProxy(this.matchers), parent);
+            return new MethodProxyAdapter(new TreeMethodProxy(this.matchers), parent);
         }
     }
 }

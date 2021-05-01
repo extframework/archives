@@ -1,11 +1,17 @@
 package net.yakclient.mixin.base.internal.bytecode;
 
+import net.yakclient.mixin.base.internal.instruction.Instruction;
 import net.yakclient.mixin.mixin.base.internal.ASMType;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnList;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ByteCodeUtils {
     public static final ASMType DEFAULT_ASM_MODE = ASMType.TREE;
@@ -447,5 +453,18 @@ public class ByteCodeUtils {
                 return true;
         }
         return false;
+    }
+
+
+    @TestOnly
+    public static List<AbstractInsnNode> toNodes(Instruction instruction) {
+        return toNodes(instruction.getInstructions());
+    }
+
+    @TestOnly
+    public static List<AbstractInsnNode> toNodes(InsnList instruction) {
+        var nodes = new ArrayList<AbstractInsnNode>();
+        instruction.forEach(nodes::add);
+        return nodes;
     }
 }

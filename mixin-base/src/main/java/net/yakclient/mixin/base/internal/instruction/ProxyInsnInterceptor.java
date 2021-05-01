@@ -34,7 +34,7 @@ public class ProxyInsnInterceptor extends DirectInsnInterceptor {
         insn.add(new LdcInsnNode(this.pointer.getMostSignificantBits()));
         insn.add(new LdcInsnNode(this.pointer.getLeastSignificantBits()));
         insn.add(new MethodInsnNode(INVOKESPECIAL, "java/util/UUID", "<init>", "(JJ)V", false));
-//
+
         final String proxyResName = this.getRuntimeName(FunctionalProxy.ProxyResponseData.class);
 
         insn.add(l1);
