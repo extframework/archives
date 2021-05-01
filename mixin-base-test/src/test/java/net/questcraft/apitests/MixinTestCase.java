@@ -3,6 +3,7 @@ package net.questcraft.apitests;
 
 import net.yakclient.mixin.api.Injection;
 import net.yakclient.mixin.api.Mixer;
+import org.objectweb.asm.Opcodes;
 
 @Mixer("net.questcraft.apitests.MixinSourceClassTest")
 public class MixinTestCase {
@@ -18,9 +19,9 @@ public class MixinTestCase {
 //        System.out.println("The current class is this");
 //    }
 
-    @Injection
+    @Injection(type = Opcodes.GETSTATIC)
     public void printTheString() {
         final var otherString = "clashing?";
-       System.out.println("otherString");
+       System.out.println(otherString);
     }
 }

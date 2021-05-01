@@ -18,7 +18,7 @@ public class PlacedTreeInsnExecutor implements InstructionExecutor {
 
     @Override
     public void execute() {
-        this.insnList.insert(this.index, this.insn.getInstructions());
+        this.insnList.insertBefore(this.index, this.insn.getInstructions());
     }
 
 

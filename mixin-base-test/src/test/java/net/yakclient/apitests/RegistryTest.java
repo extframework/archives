@@ -26,7 +26,7 @@ public class RegistryTest {
         }
 
         {
-            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class).dumpAll();
+//            mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase.class).dumpAll();
 
 
             final Class<?> aClass = mixinRegistry.retrieveClass(net.questcraft.apitests.MixinSourceClassTest.class.getName());

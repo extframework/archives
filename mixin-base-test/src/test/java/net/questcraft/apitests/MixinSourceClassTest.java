@@ -13,8 +13,7 @@ public class MixinSourceClassTest {
 
 
     public void printTheString() {
-        final String testString = this.testString;
-        System.out.println(testString);
+        System.out.println(this.testString);
     }
 
     //var insn = this.getInsn(classTo, new MixinSource(new QualifiedMethodLocation(classTo, "printTheString(IF)V", InjectionType.AFTER_BEGIN, 2)));
