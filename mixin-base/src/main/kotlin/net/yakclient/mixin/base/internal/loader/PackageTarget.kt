@@ -36,6 +36,12 @@ open class PackageTarget(protected val path: List<String>) {
         return joiner.toString()
     }
 
+    open fun name(): String {
+        val joiner = StringJoiner(".")
+        for (s in path) joiner.add(s)
+        return joiner.toString()
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

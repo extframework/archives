@@ -6,7 +6,7 @@ open class ProxyClassLoader(parent: ClassLoader) : ClassLoader(parent) {
 //        null, this, null
 //    )
 
-    open fun defineClass(name: String, b: ByteArray): Class<*>? {
+    open fun defineClass(name: String, b: ByteArray): Class<*> {
         return super.defineClass(name, b, 0, b.size)
     }
 

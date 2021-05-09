@@ -1,96 +1,96 @@
-package net.yakclient.mixin.base.internal.loader;
+package net.yakclient.mixin.base.internal.loader
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
+import net.yakclient.mixin.base.internal.loader.ContextPoolManager.createLoader
+import org.jetbrains.annotations.Contract
 
-import java.util.HashMap;
-import java.util.Map;
+abstract class ContextPool {
+    private val targets: MutableMap<PackageTarget, Context>
+    private val loader: ClassLoader
 
-public abstract class ContextPool {
-    private final Map<PackageTarget, Context> targets;
-
-    private final ClassLoader loader;
-
-    public ContextPool() {
-        this.targets = new HashMap<>();
-        this.loader = ClassLoader.getSystemClassLoader();
-//        ContextPoolManager.
+    init {
+        targets = HashMap()
+        loader = ClassLoader.getSystemClassLoader()
     }
 
-    private boolean encapsulatedTargetExists(PackageTarget target) {
-        for (PackageTarget packageTarget : this.targets.keySet()) {
-            if (packageTarget.isTargetOf(target)) return true;
+    private fun encapsulatedTargetExists(target: PackageTarget): Boolean {
+        for (packageTarget in targets.keys) {
+            if (packageTarget.isTargetOf(target)) return true
         }
-        return false;
+        return false
     }
 
-    public PackageTarget encapsulatedTarget(PackageTarget target) {
-        if (!this.encapsulatedTargetExists(target)) throw new IllegalStateException("Target MUST be encapsulated!");
-        for (PackageTarget packageTarget : this.targets.keySet()) {
-            if (packageTarget.isTargetOf(target)) return packageTarget;
+    private fun encapsulatedTarget(target: PackageTarget): PackageTarget {
+        check(encapsulatedTargetExists(target)) { "Target MUST be encapsulated!" }
+        for (packageTarget in targets.keys) {
+            if (packageTarget.isTargetOf(target)) return packageTarget
         }
-        throw new IllegalStateException("Target MUST be encapsulated!");
+        throw IllegalStateException("Target MUST be encapsulated!")
     }
 
-    public Context addTarget(PackageTarget target, ClassLoader loader) {
-        final PackageTarget realTarget = this.getTarget(target);
-        return this.targets.put(realTarget, this.createContext(loader, realTarget));
+    fun addTarget(target: PackageTarget, loader: ClassLoader): Context? {
+        val realTarget = getTarget(target)
+        return targets.put(realTarget, createContext(loader, realTarget))
     }
 
-    public Context addTarget(PackageTarget target) {
-        final PackageTarget realTarget = this.getTarget(target);
-        final ClassLoader loader = this.targets.containsKey(realTarget) ? this.targets.get(realTarget).getLoader() : ContextPoolManager.createLoader(realTarget);
-
-        final Context context = this.createContext(loader, target);
-        this.targets.putIfAbsent(this.getTarget(target), context);
-        return context;
+    fun addTarget(target: PackageTarget): Context {
+        val realTarget = getTarget(target)
+        val loader: ClassLoader =
+            if (targets.containsKey(realTarget)) targets[realTarget]!!.getLoader() else createLoader(realTarget)
+        val context = createContext(loader, target)
+        if (!targets.containsKey(realTarget)) targets[realTarget] = context
+        return context
     }
 
     @Contract(pure = true)
-    public PackageTarget getTarget(PackageTarget target) {
-        return this.encapsulatedTargetExists(target) ? this.encapsulatedTarget(target) : target;
+    fun getTarget(target: PackageTarget): PackageTarget {
+        return if (encapsulatedTargetExists(target)) encapsulatedTarget(target) else target
     }
 
-    public boolean isTargeted(String target) {
-        final PackageTarget packageTarget = this.createTarget(target);
-        return this.isTargeted(packageTarget);
+    fun isTargeted(target: String): Boolean {
+        val packageTarget = createTarget(target)
+        return this.isTargeted(packageTarget)
     }
 
-    public boolean isTargeted(PackageTarget target) {
-        for (final PackageTarget pT : this.targets.keySet()) {
-            if (pT.isTargetOf(target)) return true;
+    fun isTargeted(target: PackageTarget?): Boolean {
+        for (pT in targets.keys) {
+            if (pT.isTargetOf(target!!)) return true
         }
-        return false;
+        return false
     }
 
-    @Nullable
-    public Class<?> loadClassOrNull(String name) {
-        final PackageTarget target = this.getTarget(this.createTarget(name));
-        return this.targets.get(target).findClass(name);
+    fun loadClassOrNull(name: String): Class<*>? {
+        val target = getTarget(createTarget(name))
+        return targets[target]!!.findClass(name)
     }
 
-    private Context createContext(ClassLoader loader, PackageTarget target) {
-        return new Context(loader, target, this);
+    private fun createContext(loader: ClassLoader, target: PackageTarget): Context {
+        return Context(loader, target, this)
     }
 
-    PackageTarget createTarget(String path) {
-        try {
-            if (this.loader.loadClass(path) != null) return ClassTarget.of(path);
-            return PackageTarget.of(path);
-        } catch (ClassNotFoundException e) {
-            return PackageTarget.of(path);
+    private fun createTarget(path: String): PackageTarget {
+        return try {
+            if (loader.loadClass(path) != null) ClassTarget.of(path) else PackageTarget.of(path)
+        } catch (e: ClassNotFoundException) {
+            PackageTarget.of(path)
         }
     }
 
-    public Class<?> defineClass(ClassTarget target, byte[] bytes) {
-        final PackageTarget finalTarget = this.getTarget(target);
-        final Context context = this.targets.get(finalTarget);
-        final String name = target.toString();
+    fun defineClass(target: ClassTarget, bytes: ByteArray): Class<*> {
+        val finalTarget = getTarget(target)
+        val name = target.name()
+        val oldContext = targets[finalTarget]
+        require(oldContext != null) { "Failed to find appropriate context to define class in" }
 
-        if (!context.getLoader().isDefined(name)) return context.getLoader().defineClass(name, bytes);
-        else
-            this.targets.put(finalTarget, this.createContext(ContextPoolManager.createLoader(finalTarget), finalTarget));
+        val context = if (oldContext.getLoader().isDefined(name)) this.setContext(
+            finalTarget,
+            createContext(createLoader(finalTarget), finalTarget)
+        ) else oldContext
 
-        return this.targets.get(finalTarget).getLoader().defineClass(name, bytes);
+        return context.getLoader().defineClass(name, bytes)
+    }
+
+    private fun setContext(target: PackageTarget, context: Context): Context {
+        targets[target] = context
+        return context
     }
 }

@@ -4,17 +4,15 @@ object ContextPoolManager {
     private val pool: ContextPool
     private val loader: ClassLoader
 
-//        var instance: ContextPoolManager? = null
-//            get() = if (field == null) ContextPoolManager().also { field = it } else field
-//            private set
+    init {
+        pool = DynamicContextPool()
+        loader = Thread.currentThread().contextClassLoader
+    }
 
     private fun isTargeted(target: String): Boolean {
         return this.pool.isTargeted(target)
     }
 
-//    fun isTargeted(target: PackageTarget?): Boolean {
-//        return this.pool.isTargeted(target)
-//    }
 
     /**
      * Targets a specific package or class as the reciprocal of reloading.
@@ -94,8 +92,5 @@ object ContextPoolManager {
         return TargetClassLoader(this.loader, this.pool.getTarget(target))
     }
 
-    init {
-        pool = DynamicContextPool()
-        loader = Thread.currentThread().contextClassLoader
-    }
+
 }

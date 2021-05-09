@@ -14,8 +14,9 @@ import java.lang.reflect.Method
 import java.net.URL
 
 class MixinRegistry private constructor(private val configuration: RegistryConfigurator.Configuration) {
-    private val libRegistry: ExternalLibRegistryPool
-    private val mixinRegistry: MixinRegistryPool
+    private val libRegistry: ExternalLibRegistryPool = ExternalLibRegistryPool()
+    private val mixinRegistry: MixinRegistryPool = MixinRegistryPool()
+
     //TODO there needs to be a better way to have the mixin pool get dumped. Currently nothing will happen if one of our calls is not invoked. A solution could be spawning off another thread and then having a callback? For external libs its very simple and will just go when its needed.
     //TODO there are alot of issues with class reloading for example if a mixin class gets loaded(which it by definition has to) then it loads all of the classes it might reference in parameters etc. so we could fix this by not allowing the loading of mixin classes? that might be an option.
     /**
@@ -49,7 +50,7 @@ class MixinRegistry private constructor(private val configuration: RegistryConfi
     }
 
     private fun validateMixin(cls: String) {
-        RegistryConfigurator.Companion.safeTarget(configuration, ClassTarget.of(cls).toPackage())
+        RegistryConfigurator.safeTarget(configuration, ClassTarget.of(cls).toPackage())
     }
 
     private fun data(cls: Class<*>): Set<MixinMetaData> {
@@ -128,8 +129,5 @@ class MixinRegistry private constructor(private val configuration: RegistryConfi
         }
     }
 
-    init {
-        libRegistry = ExternalLibRegistryPool()
-        mixinRegistry = MixinRegistryPool()
-    }
+
 }

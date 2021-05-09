@@ -24,6 +24,10 @@ class ClassTarget(path: List<String>, private val cls: String) : PackageTarget(p
         return super.toString() + "." + cls
     }
 
+    override fun name() : String {
+        return super.name() + "." + cls
+    }
+
     companion object {
         @JvmStatic
        fun of(path: String): ClassTarget {
