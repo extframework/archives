@@ -1,4 +1,4 @@
-package net.yakclient.mixin.base.internal.loader
+package net.yakclient.mixin.base.target
 
 import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils.classExists
 import java.util.*
@@ -20,12 +20,14 @@ class ClassTarget(path: List<String>, private val cls: String) : PackageTarget(p
         return Objects.hash(super.hashCode(), cls)
     }
 
-    override fun toString(): String {
-        return super.toString() + "." + cls
-    }
-
     override fun name() : String {
         return super.name() + "." + cls
+    }
+
+
+
+    override fun isTargetOf(target: Target): Boolean {
+        return this.equals(target)
     }
 
     companion object {

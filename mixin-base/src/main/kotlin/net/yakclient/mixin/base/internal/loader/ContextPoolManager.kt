@@ -1,25 +1,24 @@
 package net.yakclient.mixin.base.internal.loader
 
+import net.yakclient.mixin.base.target.Target
+
 object ContextPoolManager {
     private val pool: ContextPool
     private val loader: ClassLoader
-
     init {
         pool = DynamicContextPool()
         loader = Thread.currentThread().contextClassLoader
     }
 
-    private fun isTargeted(target: String): Boolean {
+    private fun isTargeted(target: Target): Boolean {
         return this.pool.isTargeted(target)
     }
-
 
     /**
      * Targets a specific package or class as the reciprocal of reloading.
      * From now on this target will no longer be able to be loaded by a
      * `ProxyClassLoader` and everything will be delegated to the
      * context.
-     *
      *
      * In this case what is happening is that a target is merely being
      * held in place. Later this can be overridden
@@ -33,24 +32,8 @@ object ContextPoolManager {
      * @see ContextPool
      */
     @JvmStatic
-    fun applyTarget(target: PackageTarget): Context {
+    fun applyTarget(target: Target): Context {
         return this.pool.addTarget(target)
-    }
-
-    /**
-     * Used to overload either a null context, override a existing one
-     * or provide a totally new implementation of the target.
-     *
-     * @param target The target to be overridden/added.
-     * @param loader The loader holding the implementation and target.
-     * @return Context to the given target.
-     * @see Context
-     *
-     * @see ContextPool
-     */
-    fun applyTarget(target: PackageTarget, loader: ClassLoader): PackageTarget {
-        this.pool.addTarget(target, loader)
-        return target
     }
 
     /**
@@ -64,15 +47,20 @@ object ContextPoolManager {
      */
     @JvmStatic
     @Throws(ClassNotFoundException::class)
-    fun loadClass(name: String): Class<*> {
-        if (!isTargeted(name)) this.loader.loadClass(name)
-        return this.pool.loadClassOrNull(name)
+    fun loadClass(target: Target, name: String): Class<*> {
+        if (!isTargeted(target)) this.loader.loadClass(name)
+        return this.pool.loadClassOrNull(target, name)
             ?: throw ClassNotFoundException("Failed to find class: $name")
     }
 
     @JvmStatic
-    fun defineClass(name: String, bytes: ByteArray): Class<*> {
-        return this.pool.defineClass(ClassTarget.of(name), bytes)
+    fun defineClass(target: Target, name: String, bytes: ByteArray): Class<*> {
+        return this.pool.defineClass(target, name, bytes)
+    }
+
+    @JvmStatic
+    fun isDefined(target: Target, name: String): Boolean {
+        return this.pool.isClassDefined(target, name)
     }
 
     /**
@@ -88,9 +76,7 @@ object ContextPoolManager {
      * @return The classloader produced.
      */
     @JvmStatic
-    fun createLoader(target: PackageTarget): TargetClassLoader {
-        return TargetClassLoader(this.loader, this.pool.getTarget(target))
+    fun createLoader(target: Target): ProxyClassLoader {
+        return target.createLoader(this.loader)
     }
-
-
 }

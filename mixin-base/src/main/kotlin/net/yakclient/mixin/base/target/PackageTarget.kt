@@ -1,27 +1,12 @@
-package net.yakclient.mixin.base.internal.loader
+package net.yakclient.mixin.base.target
 
+import net.yakclient.mixin.base.internal.loader.ProxyClassLoader
+import net.yakclient.mixin.base.internal.loader.TargetClassLoader
 import java.util.*
 
-open class PackageTarget(protected val path: List<String>) {
-//    @JvmField
-//    protected val path: Array<String>
-
-//    constructor(path: String) {
-//        this.path = fromPath(path)
-//    }
-//
-//    constructor(path: Array<String>) {
-//        this.path = path
-//    }
-
-    /**
-     * Decides if the current path is equally or less
-     * specific than then one given.
-     *
-     * @param target The path to compare against.
-     * @return if the given path could be a child of the current target.
-     */
-    fun isTargetOf(target: PackageTarget): Boolean {
+open class PackageTarget(protected val path: List<String>): Target {
+   override fun isTargetOf(target: Target): Boolean {
+        if (!(target is PackageTarget)) return false;
         if (this == target) return true
         var isTarget = false
         for (i in path.indices) {
@@ -30,16 +15,14 @@ open class PackageTarget(protected val path: List<String>) {
         return isTarget
     }
 
-    override fun toString(): String {
+    override fun name(): String {
         val joiner = StringJoiner(".")
         for (s in path) joiner.add(s)
         return joiner.toString()
     }
 
-    open fun name(): String {
-        val joiner = StringJoiner(".")
-        for (s in path) joiner.add(s)
-        return joiner.toString()
+    override fun createLoader(parent: ClassLoader): ProxyClassLoader {
+        return TargetClassLoader(parent, this)
     }
 
     override fun equals(other: Any?): Boolean {

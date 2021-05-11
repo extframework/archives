@@ -4,16 +4,19 @@ import net.yakclient.mixin.api.Injection
 import net.yakclient.mixin.api.METHOD_SELF
 import net.yakclient.mixin.api.Mixer
 import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils.primitiveType
-import net.yakclient.mixin.base.internal.loader.ClassTarget
+import net.yakclient.mixin.base.internal.loader.ContextPoolManager
+import net.yakclient.mixin.base.target.ClassTarget
 import net.yakclient.mixin.base.internal.loader.ContextPoolManager.applyTarget
 import net.yakclient.mixin.base.internal.loader.ContextPoolManager.loadClass
 import net.yakclient.mixin.base.registry.pool.ExternalLibRegistryPool
 import net.yakclient.mixin.base.registry.pool.MixinMetaData
 import net.yakclient.mixin.base.registry.pool.MixinRegistryPool
+import net.yakclient.mixin.base.target.JarTarget
+import net.yakclient.mixin.base.target.Target
 import java.lang.reflect.Method
 import java.net.URL
 
-class MixinRegistry private constructor(private val configuration: RegistryConfigurator.Configuration) {
+class MixinRegistry {
     private val libRegistry: ExternalLibRegistryPool = ExternalLibRegistryPool()
     private val mixinRegistry: MixinRegistryPool = MixinRegistryPool()
 
@@ -35,6 +38,7 @@ class MixinRegistry private constructor(private val configuration: RegistryConfi
         val data = data(cls)
         for (datum in data) mixinRegistry.pool(datum)
         return this
+
     }
 
     @Throws(ClassNotFoundException::class)
@@ -45,18 +49,19 @@ class MixinRegistry private constructor(private val configuration: RegistryConfi
     }
 
     @Throws(ClassNotFoundException::class)
-    fun registerLib(url: URL) {
+    fun registerLib(url: URL): ContextHandle {
         this.libRegistry.pool(url)
+        return ContextHandle(JarTarget(url))
     }
 
-    private fun validateMixin(cls: String) {
-        RegistryConfigurator.safeTarget(configuration, ClassTarget.of(cls).toPackage())
+    fun applyTarget(target: Target): ContextHandle {
+        ContextPoolManager.applyTarget(target)
+        return ContextHandle(target)
     }
 
     private fun data(cls: Class<*>): Set<MixinMetaData> {
         require(cls.isAnnotationPresent(Mixer::class.java)) { "Mixins must be annotated with @Mixer" }
         val type = cls.getAnnotation(Mixer::class.java).value
-        validateMixin(type)
         val mixins = HashSet<MixinMetaData>()
         for (method in cls.declaredMethods) {
             if (method.isAnnotationPresent(Injection::class.java)) {
@@ -112,22 +117,8 @@ class MixinRegistry private constructor(private val configuration: RegistryConfi
         return true
     }
 
-    fun dumpAll() {
+    fun registerAll() {
         libRegistry.registerAll()
         mixinRegistry.registerAll()
     }
-
-    @Throws(ClassNotFoundException::class)
-    fun retrieveClass(cls: String): Class<*> {
-        return loadClass(cls)
-    }
-
-    companion object {
-        fun create(configuration: RegistryConfigurator.Configuration): MixinRegistry {
-            for (target in configuration.targets) applyTarget(target)
-            return MixinRegistry(configuration)
-        }
-    }
-
-
 }
