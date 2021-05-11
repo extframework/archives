@@ -13,9 +13,8 @@ class RegistryTest {
         val mixinRegistry = MixinRegistry()
         val context = mixinRegistry.applyTarget(PackageTarget.of("net.questcraft"))
         val lib = mixinRegistry.registerLib(
-            File("/Users/durgan/IdeaProjects/YakClient/mixin-utils/lib/guava-17.0.jar").toURI().toURL()
+            File("${File(System.getProperty("user.dir")).parent}/lib/guava-17.0-TESTJAR.jar").toURI().toURL()
         )
-//        mixinRegistry.registerLib()
 
         mixinRegistry.registerMixin(net.questcraft.apitests.SecondMixinTestCase::class.java).registerMixin(MixinTestCase::class.java).registerAll()
 
