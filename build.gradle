@@ -15,6 +15,10 @@ dependencies {
     implementation project(":base")
 }
 
+tasks.named('wrapper') {
+    gradleVersion = '7.0.2'
+}
+
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.jetbrains.kotlin.jvm'
