@@ -3,18 +3,16 @@ package net.yakclient.mixin.base.registry
 import net.yakclient.mixin.api.Injection
 import net.yakclient.mixin.api.METHOD_SELF
 import net.yakclient.mixin.api.Mixer
+import net.yakclient.mixin.api.RESOLVE_MODULE
 import net.yakclient.mixin.base.internal.bytecode.ByteCodeUtils.primitiveType
-import net.yakclient.mixin.base.internal.loader.ContextPoolManager
-import net.yakclient.mixin.base.target.ClassTarget
-import net.yakclient.mixin.base.internal.loader.ContextPoolManager.applyTarget
-import net.yakclient.mixin.base.internal.loader.ContextPoolManager.loadClass
 import net.yakclient.mixin.base.registry.pool.ExternalLibRegistryPool
 import net.yakclient.mixin.base.registry.pool.MixinMetaData
 import net.yakclient.mixin.base.registry.pool.MixinRegistryPool
-import net.yakclient.mixin.base.target.JarTarget
-import net.yakclient.mixin.base.target.Target
 import java.lang.reflect.Method
 import java.net.URL
+import net.yakclient.mixin.base.internal.loader.ContextPoolManager
+import net.yakclient.mixin.base.target.JarTarget
+import net.yakclient.mixin.base.target.ModuleTarget
 
 class MixinRegistry {
     private val libRegistry: ExternalLibRegistryPool = ExternalLibRegistryPool()
@@ -33,34 +31,38 @@ class MixinRegistry {
      * @return MixinRegistry for easy access.
      */
     @Throws(ClassNotFoundException::class)
-    fun registerMixin(cls: Class<*>): MixinRegistry {
+    fun registerMixin(cls: Class<*>): ContextHandle {
         val data = data(cls)
         for (datum in data) mixinRegistry.pool(datum)
-        return this
-
+        return ModuleContextHandle(moduleTarget(cls))
     }
 
     @Throws(ClassNotFoundException::class)
-    fun registerMixin(cls: Class<*>, proxy: FunctionalProxy): MixinRegistry {
+    fun registerMixin(cls: Class<*>, proxy: FunctionalProxy): ContextHandle {
         val data = data(cls)
         for (datum in data) mixinRegistry.pool(datum, proxy)
-        return this
+        return ModuleContextHandle(moduleTarget(cls))
     }
 
     @Throws(ClassNotFoundException::class)
     fun registerLib(url: URL): ContextHandle {
         this.libRegistry.pool(url)
-        return ContextHandle(JarTarget(url))
+        return JarContextHandle(JarTarget(url))
     }
 
-    fun applyTarget(target: Target): ContextHandle {
-        ContextPoolManager.applyTarget(target)
-        return ContextHandle(target)
+    private fun moduleTarget(cls: Class<*>): ModuleTarget {
+        require(cls.isAnnotationPresent(Mixer::class.java)) { "Mixins must be annotated with @Mixer" }
+        return resolveModule(cls.getAnnotation(Mixer::class.java))
+    }
+
+    private fun resolveModule(it: Mixer) = when (it.module) { //TODO Take out method and replace with inline
+        RESOLVE_MODULE -> requireNotNull(ContextPoolManager.resolveModuleByClass(it.value)) { "Failed to find module by class: ${it.value}" }
+        else -> requireNotNull(ContextPoolManager.resolveModuleByModule(it.module)) { "Failed to find target for module by name: ${it.module}" }
     }
 
     private fun data(cls: Class<*>): Set<MixinMetaData> {
         require(cls.isAnnotationPresent(Mixer::class.java)) { "Mixins must be annotated with @Mixer" }
-        val type = cls.getAnnotation(Mixer::class.java).value
+        val mixer = cls.getAnnotation(Mixer::class.java)
         val mixins = HashSet<MixinMetaData>()
         for (method in cls.declaredMethods) {
             if (method.isAnnotationPresent(Injection::class.java)) {
@@ -68,20 +70,18 @@ class MixinRegistry {
                 val methodTo = mixinToMethodName(method)
                 require(
                     declaredMethod(
-                        type,
+                        mixer.value,
                         methodTo,
                         *method.parameterTypes
                     )
                 ) { "Failed to find a appropriate method to mix to" }
-                mixins.add(
-                    MixinMetaData(
-                        cls.name,
-                        byteCodeSignature(method),
-                        type,
-                        if (injection.to == METHOD_SELF) byteCodeSignature(method) else methodTo,
-                        injection.type,
-                        injection.priority
-                    )
+                mixins += MixinMetaData(
+                    cls.name,
+                    byteCodeSignature(method),
+                    mixer.value,
+                    if (injection.to == METHOD_SELF) byteCodeSignature(method) else methodTo,
+                    injection.type,
+                    injection.priority
                 )
             }
         }
@@ -94,10 +94,14 @@ class MixinRegistry {
         builder.append('(')
         for (type in method.parameterTypes) {
             builder.append(
-                if (type.isPrimitive) primitiveType(type) else if (type.isArray) type.name else "L" + type.name.replace(
-                    '.',
-                    '/'
-                ) + ";"
+                when {
+                    type.isPrimitive -> primitiveType(type)
+                    type.isArray -> type.name
+                    else -> "L" + type.name.replace(
+                        '.',
+                        '/'
+                    ) + ";"
+                }
             )
         }
         builder.append(')')

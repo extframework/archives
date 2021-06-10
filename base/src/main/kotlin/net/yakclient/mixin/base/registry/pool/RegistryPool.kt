@@ -1,6 +1,5 @@
 package net.yakclient.mixin.base.registry.pool
 
-import net.yakclient.mixin.base.target.Target
 import java.util.*
 
 abstract class RegistryPool<T> {
@@ -12,7 +11,7 @@ abstract class RegistryPool<T> {
     @Throws(ClassNotFoundException::class)
     abstract fun pool(type: T): Location
 
-    abstract fun register(location: Location): Target
+    abstract fun register(location: Location)
 
     fun registerAll(location: Location) {
         if (pool.containsKey(location)) register(location)

@@ -1,40 +1,26 @@
 package net.yakclient.mixin.base.internal.loader
 
+import net.yakclient.mixin.base.target.ModuleTarget
 import net.yakclient.mixin.base.target.Target
 
 object ContextPoolManager {
-    private val pool: ContextPool
-    private val loader: ClassLoader
-    init {
-        pool = DynamicContextPool()
-        loader = Thread.currentThread().contextClassLoader
+    val modulePool: ModuleContextPool = ModuleContextPool()
+    val libPool: LibContextPool = LibContextPool()
+
+    fun resolveModuleByClass(clsName: String): ModuleTarget? {
+        for (target in modulePool.targets()) {
+            if (target.hasClass(clsName)) return target
+        }
+        return null
     }
 
-    private fun isTargeted(target: Target): Boolean {
-        return this.pool.isTargeted(target)
+    fun resolveModuleByModule(module: String): ModuleTarget? {
+        for (target in modulePool.targets()) {
+            if (target.moduleName == module) return target
+        }
+        return null
     }
 
-    /**
-     * Targets a specific package or class as the reciprocal of reloading.
-     * From now on this target will no longer be able to be loaded by a
-     * `ProxyClassLoader` and everything will be delegated to the
-     * context.
-     *
-     * In this case what is happening is that a target is merely being
-     * held in place. Later this can be overridden
-     *
-     * @param target The target to apply.
-     * @return The context associated with the new target. Note, This
-     * should NOT BE STORED, to avoid all possible class loader leaks
-     * this should not be saved.
-     * @see Context
-     *
-     * @see ContextPool
-     */
-    @JvmStatic
-    fun applyTarget(target: Target): Context {
-        return this.pool.addTarget(target)
-    }
 
     /**
      * Loads a class or throws a ClassNotFound. If the given class isn't targeted
@@ -47,36 +33,8 @@ object ContextPoolManager {
      */
     @JvmStatic
     @Throws(ClassNotFoundException::class)
-    fun loadClass(target: Target, name: String): Class<*> {
-        if (!isTargeted(target)) this.loader.loadClass(name)
-        return this.pool.loadClassOrNull(target, name)
-            ?: throw ClassNotFoundException("Failed to find class: $name")
-    }
-
-    @JvmStatic
-    fun defineClass(target: Target, name: String, bytes: ByteArray): Class<*> {
-        return this.pool.defineClass(target, name, bytes)
-    }
-
-    @JvmStatic
-    fun isDefined(target: Target, name: String): Boolean {
-        return this.pool.isClassDefined(target, name)
-    }
-
-    /**
-     * Creates a new TargetClassLoader targeted with the location given. For any
-     * operation with MixinUtils the ProxyClassLoader must be the default but an
-     * exception can be throw here if that is not the case.
-     *
-     *
-     * A side note; The return of this method SHOULD NOT BE STORED! This could
-     * very well cause massive leaks in class reloading through memory.
-     *
-     * @param target The String to target for.
-     * @return The classloader produced.
-     */
-    @JvmStatic
-    fun createLoader(target: Target): ProxyClassLoader {
-        return target.createLoader(this.loader)
+    fun <T : Target> loadClass(pool: ContextPool<T>, target: T, name: String): Class<*> {
+        return pool.loadClassOrNull(target, name)
+            ?: ClassLoader.getSystemClassLoader().loadClass(name)
     }
 }

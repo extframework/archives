@@ -1,71 +1,133 @@
 package net.yakclient.mixin.base.internal.loader
 
-import net.yakclient.mixin.base.internal.loader.ContextPoolManager.createLoader
-import net.yakclient.mixin.base.target.ClassTarget
-import net.yakclient.mixin.base.target.PackageTarget
+import net.yakclient.mixin.base.target.JarTarget
+import net.yakclient.mixin.base.target.ModuleTarget
 import net.yakclient.mixin.base.target.Target
-import org.jetbrains.annotations.Contract
+import java.lang.module.FindException
 
-abstract class ContextPool {
-    private val targets: MutableMap<Target, Context>
-    private val loader: ClassLoader
+const val JAVA_TARGET_PROPS = "yakclient.mixins.targets"
+const val JAVA_PROPS_DELIMITER = ","
 
-    init {
-        targets = HashMap()
-        loader = ClassLoader.getSystemClassLoader()
+private fun <K, V> Map<K, V>.checkPresent(key: K, message: String): V {
+    return checkNotNull(get(key)) { message }
+}
+
+abstract class ContextPool<T: Target> {
+    protected val targets: MutableMap<T, Context> = HashMap()
+
+    fun targets(): List<T> {
+        return targets.keys.toList()
     }
 
-    private fun safelyEncapsulate(target: Target): Target {
-        for (encapsulated in targets.keys) {
-            if (encapsulated.isTargetOf(target)) return encapsulated
-        }
-        return target
+    abstract fun addTarget(target: T)
+
+    protected abstract fun defaultLoader(target: T): ProxyClassLoader
+
+    fun isTargeted(target: T): Boolean {
+        return targets.containsKey(target)
     }
 
-    fun addTarget(target: Target): Context {
-        val realTarget = safelyEncapsulate(target)
-        val loader: ProxyClassLoader =
-            if (targets.containsKey(realTarget)) targets[realTarget]!!.loader else createLoader(realTarget)
-        val context = createContext(loader, target)
-        if (!targets.containsKey(realTarget)) targets[realTarget] = context
-        return context
+    fun defineClass(target: T, name: String, bytes: ByteArray): Class<*> {
+        return targets.checkPresent(target, "Failed to find appropriate context to define class in")
+            .let {
+                if (it.isDefined(name)) Context(defaultLoader(target)).also { context -> targets[target] = context }
+                else it
+            }.defineClass(name, bytes)
     }
 
-    fun isTargeted(target: Target): Boolean {
-        for (pT in targets.keys) {
-            if (pT.isTargetOf(target)) return true
-        }
-        return false
-    }
-
-    fun loadClassOrNull(target: Target, name: String): Class<*>? {
-        val context = checkNotNull(targets[target]) { "Failed to find context from given target: ${target.name()}" }
-        return context.findClass(name)
-    }
-
-    fun isClassDefined(target: Target, name: String): Boolean {
-        val context = checkNotNull(targets[target]) { "Failed to find context from given target: ${target.name()}" }
-        return context.loader.isDefined(name)
-    }
-
-    fun defineClass(target: Target, name: String, bytes: ByteArray): Class<*> {
-        val finalTarget = safelyEncapsulate(target)
-        val oldContext = checkNotNull(targets[finalTarget]) { "Failed to find appropriate context to define class in" }
-
-        val context = if (oldContext.loader.isDefined(name)) this.setContext(
-            finalTarget,
-            createContext(createLoader(finalTarget), finalTarget)
-        ) else oldContext
-
-        return context.loader.defineClass(name, bytes)
-    }
-
-    private fun setContext(target: Target, context: Context): Context {
-        targets[target] = context
-        return context
-    }
-
-    private fun createContext(loader: ProxyClassLoader, target: Target): Context {
-        return Context(loader, target, this)
+    fun loadClassOrNull(target: T, name: String): Class<*>? {
+        return targets.checkPresent(target, "Failed to find context from given target: ${target.name()}")
+            .findClass(name)
     }
 }
+
+class ModuleContextPool : ContextPool<ModuleTarget>() {
+    init {
+        System.getProperty(JAVA_TARGET_PROPS).split(JAVA_PROPS_DELIMITER).map { name ->
+            ModuleLayer.boot().findModule(name)
+                .orElseThrow { FindException("Failed to fine module: $name") }
+                .let { module ->
+                    ModuleTarget(module!!).also {
+                        targets[it] = Context(ModuleTargetLoader(it))
+                    }
+                }
+        }
+    }
+
+    override fun addTarget(target: ModuleTarget) {
+        throw IllegalAccessError("Targets must have been added via command arguments on startup.")
+    }
+
+    override fun defaultLoader(target: ModuleTarget): ProxyClassLoader {
+        return ModuleTargetLoader(target)
+    }
+}
+
+class LibContextPool: ContextPool<JarTarget>() {
+    override fun addTarget(target: JarTarget) {
+        targets[target] = Context(ExternalJarLoader(target.url))
+    }
+
+    override fun defaultLoader(target: JarTarget): ProxyClassLoader {
+        return ExternalJarLoader(target.url)
+    }
+}
+//
+//abstract class `1ModuleContextPool` {
+//    private val targets: MutableMap<Target, Context> =
+//        mutableMapOf(*System.getProperty(JAVA_TARGET_PROPS).split(JAVA_PROPS_DELIMITER).map { name ->
+//            ModuleLayer.boot().findModule(name)
+//                .orElseThrow { FindException("Failed to fine module: $name") }
+//                .let { module ->
+//                    val target = ModuleTarget(module!!)
+//                    Pair(target, Context(ModuleTargetLoader(target = target)))
+//                }
+//        }.toTypedArray())
+//
+////    private fun findModule(name: String): ResolvedModule? {
+////        for (target in targets) {
+////            if (LoaderUtils.packages(target.key).contains(LoaderUtils asClassPackage name)) return target.key
+////        }
+////        return null
+////    }
+////
+////    private fun findContext(name: String): Context? {
+////        for (target in targets) {
+////            if (LoaderUtils.packages(target.key).contains(LoaderUtils asClassPackage name)) return target.value
+////        }
+////        return null
+////    }
+//
+//    fun targets(): List<Target> {
+//        return targets.keys.toList()
+//    }
+//
+//    fun loadClassOrNull(target: Target, name: String): Class<*>? {
+//        return targets.checkPresent(target, "Failed to find context from given target: ${target.name()}")
+//            .findClass(name)
+//    }
+//
+//    fun isTargeted(target: Target): Boolean {
+//        return targets.containsKey(target)
+//    }
+//
+//    fun isClassDefined(target: Target, name: String): Boolean {
+//        return targets.checkPresent(target, "Failed to find context from given target: ${target.name()}")
+//            .isDefined(name)
+//    }
+//
+//    fun defineClass(target: Target, name: String, bytes: ByteArray): Class<*> {
+//        return targets.checkPresent(target, "Failed to find appropriate context to define class in")
+//            .let {
+//                if (it.isDefined(name)) this.setContext(
+//                    target,
+//                    Context(target.createLoader())
+//                ) else it
+//            }.defineClass(name, bytes)
+//    }
+//
+//    private fun setContext(target: Target, context: Context): Context {
+//        targets[target] = context
+//        return context
+//    }
+//}

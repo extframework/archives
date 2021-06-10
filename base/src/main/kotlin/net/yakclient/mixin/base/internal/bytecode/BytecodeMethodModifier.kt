@@ -18,9 +18,9 @@ import java.util.*
 
 class BytecodeMethodModifier {
     @Throws(IOException::class)
-    fun <T : Instruction?> combine(classTo: String, vararg destinations: MixinDestination): ByteArray {
+    fun combine(classTo: String, vararg destinations: MixinDestination): ByteArray {
         val instructions = HashMap<String, Queue<QualifiedInstruction>>(destinations.size)
-        require(destinations.size != 0) { "Must provide destinations to mixin!" }
+        require(destinations.isNotEmpty()) { "Must provide destinations to mixin!" }
         for (destination in destinations) {
             val current = PriorityQueue<QualifiedInstruction>()
             for (source in destination.sources) {

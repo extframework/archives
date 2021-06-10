@@ -1,8 +1,6 @@
 package net.yakclient.mixin.base.internal.loader
 
-import net.yakclient.mixin.base.target.Target
-
-data class Context(val loader: ProxyClassLoader, private val target: Target, private val pool: ContextPool) {
+data class Context(private val loader: ProxyClassLoader) {
     fun findClass(name: String): Class<*>? {
         return try {
             loader.loadClass(name)
@@ -10,4 +8,13 @@ data class Context(val loader: ProxyClassLoader, private val target: Target, pri
            null
         }
     }
+
+    fun isDefined(name: String): Boolean {
+        return loader.isDefined(name)
+    }
+
+    fun defineClass(name: String, b: ByteArray): Class<*> {
+        return loader.defineClass(name, b)
+    }
+
 }

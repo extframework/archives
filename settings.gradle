@@ -1,3 +1,4 @@
 rootProject.name = 'mixin-utils'
 
-include ':api', ':base'
+include ':api', ':base', 'base.test', 'base.test.example'
+

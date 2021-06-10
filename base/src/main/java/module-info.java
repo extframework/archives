@@ -1,8 +1,7 @@
 module mixins.base {
-//    exports net.yakclient.mixin.base.registry;
-//    exports net.yakclient.mixin.base.registry.pool;
-//    exports net.yakclient.mixin.base.registry.proxy;
-//    exports net.yakclient.mixin.base.target;
+    exports net.yakclient.mixin.base.registry;
+    exports net.yakclient.mixin.base.registry.pool;
+    exports net.yakclient.mixin.base.registry.proxy;
 
     requires transitive mixins.api;
 

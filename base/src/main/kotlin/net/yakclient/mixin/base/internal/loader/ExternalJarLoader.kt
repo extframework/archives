@@ -5,7 +5,7 @@ import java.net.URLClassLoader
 
 class ExternalJarLoader(
     url: URL,
-    parent: ClassLoader,
+    parent: ClassLoader = getSystemClassLoader(),
 ) : URLClassLoader(arrayOf(url), parent), ProxyClassLoader {
 
     override fun defineClass(name: String, b: ByteArray): Class<*> {

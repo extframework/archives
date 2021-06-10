@@ -13,6 +13,8 @@ package net.yakclient.mixin.api
  *
  * @author Durgan McBroom
  */
+const val RESOLVE_MODULE = "<RESOLVE_MODULE>"
+
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
 annotation class Mixer(
@@ -22,5 +24,7 @@ annotation class Mixer(
      *
      * @return returns the class that will be mixed into.
      */
-    val value: String
+    val value: String,
+
+    val module: String = RESOLVE_MODULE
 )
