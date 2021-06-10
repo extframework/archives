@@ -9,7 +9,6 @@ import net.yakclient.mixin.base.registry.FunctionalProxy
 import net.yakclient.mixin.base.registry.pool.RegistryPool.PoolQueue.PoolNode
 import net.yakclient.mixin.base.registry.pool.RegistryPool.PoolQueue.ProxiedPoolNode
 import net.yakclient.mixin.base.registry.proxy.MixinProxyManager
-import net.yakclient.mixin.base.target.ModuleTarget
 import java.io.IOException
 
 class MixinRegistryPool : RegistryPool<MixinMetaData>() {
@@ -34,7 +33,10 @@ class MixinRegistryPool : RegistryPool<MixinMetaData>() {
     @Throws(ClassNotFoundException::class)
     fun pool(type: MixinMetaData, proxy: FunctionalProxy): Location {
         return ClassLocation(type.classTo).also { loc ->
-            (if (!pool.containsKey(loc)) PoolQueue<MixinMetaData>().also { pool[loc] = it } else pool[loc]!!).add(type, MixinProxyManager.registerProxy(proxy))
+            (if (!pool.containsKey(loc)) PoolQueue<MixinMetaData>().also { pool[loc] = it } else pool[loc]!!).add(
+                type,
+                MixinProxyManager.registerProxy(proxy)
+            )
         }
     }
 
@@ -59,8 +61,9 @@ class MixinRegistryPool : RegistryPool<MixinMetaData>() {
 
             val b = methodModifier.combine(location.cls, *mixins)
             ContextPoolManager.modulePool.defineClass(
-                ModuleTarget(ClassLoader.getSystemClassLoader().loadClass(location.cls).module //TODO This is a pretty terrible solution, right now we will keep it until something better can be worked out
-                ), location.cls, b)
+                requireNotNull(ContextPoolManager.resolveModuleByClass(location.cls)) { "Failed to find appropriate target for class: ${location.cls}" },
+                location.cls, b
+            )
         } catch (e: IOException) {
             throw IllegalArgumentException("Given class has failed ASM reading. Ex: " + e.message)
         }
