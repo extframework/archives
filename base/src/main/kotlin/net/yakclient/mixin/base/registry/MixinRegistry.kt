@@ -30,21 +30,18 @@ class MixinRegistry {
      * @param cls The class to take mixins from
      * @return MixinRegistry for easy access.
      */
-    @Throws(ClassNotFoundException::class)
     fun registerMixin(cls: Class<*>): ContextHandle {
         val data = data(cls)
         for (datum in data) mixinRegistry.pool(datum)
         return ModuleContextHandle(moduleTarget(cls))
     }
 
-    @Throws(ClassNotFoundException::class)
     fun registerMixin(cls: Class<*>, proxy: FunctionalProxy): ContextHandle {
         val data = data(cls)
         for (datum in data) mixinRegistry.pool(datum, proxy)
         return ModuleContextHandle(moduleTarget(cls))
     }
 
-    @Throws(ClassNotFoundException::class)
     fun registerLib(url: URL): ContextHandle {
         this.libRegistry.pool(url)
         return JarContextHandle(JarTarget(url))
@@ -120,8 +117,16 @@ class MixinRegistry {
         return true
     }
 
-    fun registerAll() {
-        libRegistry.registerAll()
-        mixinRegistry.registerAll()
+    fun mixAll() {
+        libRegistry.mixAll()
+        mixinRegistry.mixAll()
+    }
+
+    fun mixLibs() {
+        libRegistry.mixAll()
+    }
+
+    fun mixMixins() {
+        mixinRegistry.mixAll()
     }
 }

@@ -70,8 +70,4 @@ annotation class Injection(
      * @return the priority of this injection.
      */
     val priority: Int = Priority.MEDIUM
-) {
-    companion object {
-//        const val METHOD_SELF = "<SELF>"
-    }
-}
+)

@@ -44,7 +44,7 @@ class MixinRegistryPool : RegistryPool<MixinMetaData>() {
         The registry combiner will take a QualifiedMethodLocation as the source and then a MethodLocation as the destination.
         It wont take a collection because in the end that doest make sense and makes it way more complicated
      */
-    override fun register(location: Location) {
+    override fun mix(location: Location) {
         try {
             val pool: PoolQueue<MixinMetaData> = pool[location]!!
 

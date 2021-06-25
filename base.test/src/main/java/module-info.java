@@ -1,3 +1,3 @@
-module mixins.base.test {
+module yakclient.mixins.base.test {
     requires kotlin.stdlib;
 }

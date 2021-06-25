@@ -1,4 +1,4 @@
-module mixins.base.test.example {
+module yakclient.mixins.base.test.example {
     requires kotlin.stdlib;
     exports net.yakclient.test.example;
 }

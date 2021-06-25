@@ -9,17 +9,17 @@ abstract class RegistryPool<T> {
     }
 
     @Throws(ClassNotFoundException::class)
-    abstract fun pool(type: T): Location
+   abstract fun pool(type: T): Location
 
-    abstract fun register(location: Location)
+    abstract fun mix(location: Location)
 
-    fun registerAll(location: Location) {
-        if (pool.containsKey(location)) register(location)
+    fun mixAll(location: Location) {
+        if (pool.containsKey(location)) mix(location)
     }
 
-    fun registerAll() {
+    fun mixAll() {
         for (location in pool.keys) {
-            register(location)
+            mix(location)
         }
     }
 

@@ -14,7 +14,7 @@ class ExternalLibRegistryPool : RegistryPool<URL>() {
         }
     }
 
-    override fun register(location: Location) {
+    override fun mix(location: Location) {
         require(location is ExternalLibLocation) { "Given location must be a external library to register with the lib registry pool!" }
         ContextPoolManager.libPool.addTarget(JarTarget(location.url))
     }
