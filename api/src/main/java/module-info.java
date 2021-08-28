@@ -1,4 +1,4 @@
 module yakclient.mixins.api {
     requires kotlin.stdlib;
-    exports net.yakclient.mixin.api;
+    exports net.yakclient.mixins.api;
 }
