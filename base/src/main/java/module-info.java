@@ -14,5 +14,6 @@ module yakclient.mixins.base {
     requires kotlin.reflect;
     requires kotlinx.coroutines.core.jvm;
     requires java.instrument;
+    requires org.objectweb.asm.util;
 //    requires reflections;
 }

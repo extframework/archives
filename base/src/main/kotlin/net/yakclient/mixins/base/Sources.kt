@@ -1,7 +1,6 @@
 package net.yakclient.mixins.base
 
 import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
-import net.yakclient.mixins.base.internal.bytecode.TreeMixinCV
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -37,7 +36,6 @@ object Sources {
         }
         classReader.accept(node, 0)
 
-        sourceOf(TreeMixinCV::visitSource)
         return node.insn
     }
 

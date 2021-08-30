@@ -4,7 +4,9 @@ package net.yakclient.mixins.base.extension
 
 import net.yakclient.mixins.base.extension.SearchType.*
 import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
+import org.objectweb.asm.signature.SignatureReader
 import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.util.TraceSignatureVisitor
 
 
 fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
@@ -44,6 +46,10 @@ fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add ->
     }
 }
 
+//TODO Improve this maybe using the trace signature visitor or something along those lines
+fun MethodNode.sameSignature(signature: String) : Boolean =
+    (name + ByteCodeUtils.removeReturnType(desc)) == signature
+
 private fun <T> listOf(creator: ((T) -> Unit) -> Unit): List<T> = ArrayList<T>().apply { creator { this.add(it) } }
 
 private enum class SearchType {
@@ -51,4 +57,16 @@ private enum class SearchType {
     ARRAY_OBJECT,
     ARRAY_NOT_DETERMINED,
     NONE
+}
+
+class MethodSignature(
+    val name: String,
+    val parameters: String,
+    val returnType: String
+) {
+    companion object {
+        fun of(signature: String) : MethodSignature {
+
+        }
+    }
 }
