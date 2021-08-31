@@ -27,7 +27,7 @@ object Sources {
             ): MethodVisitor {
                 val mv = super.visitMethod(access, name, descriptor, signature, exceptions)
 
-                if ((name + descriptor) == ByteCodeUtils.jvmName(method))
+                if (ByteCodeUtils.sameSignature(name + descriptor, ByteCodeUtils.jvmName(method)))
                     insn = (mv as? MethodNode)?.instructions
                         ?: throw IllegalStateException("Given class visitor must be a class node!")
 

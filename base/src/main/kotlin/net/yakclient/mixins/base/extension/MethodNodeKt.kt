@@ -58,15 +58,3 @@ private enum class SearchType {
     ARRAY_NOT_DETERMINED,
     NONE
 }
-
-class MethodSignature(
-    val name: String,
-    val parameters: String,
-    val returnType: String
-) {
-    companion object {
-        fun of(signature: String) : MethodSignature {
-
-        }
-    }
-}

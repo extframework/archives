@@ -2,7 +2,6 @@ package net.yakclient.mixins.base.internal.bytecode
 
 import net.yakclient.mixins.base.internal.ASMType
 import net.yakclient.mixins.base.internal.instruction.Instruction
-import org.jetbrains.annotations.TestOnly
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
@@ -20,7 +19,12 @@ object ByteCodeUtils {
         return type!!.substring(0, type.indexOf(')') + 1)
     }
 
-    fun jvmName(method: Method) : String = "${method.name}${method.parameterTypes.joinToString(prefix = "(", postfix = ")") { primitiveType(it).toString()}}"
+    fun jvmName(method: Method): String = "${method.name}${
+        method.parameterTypes.joinToString(
+            prefix = "(",
+            postfix = ")"
+        ) { primitiveType(it).toString() }
+    }"
 
     fun descriptorsSame(method1: String?, method2: String?): Boolean {
         return removeReturnType(method1) == removeReturnType(method2)
@@ -277,12 +281,10 @@ object ByteCodeUtils {
         return false
     }
 
-    @TestOnly
     fun toNodes(instruction: Instruction): List<AbstractInsnNode> {
         return toNodes(instruction.insn)
     }
 
-    @TestOnly
     fun toNodes(instruction: InsnList): List<AbstractInsnNode> {
         val nodes = ArrayList<AbstractInsnNode>()
         instruction.forEach(Consumer { e: AbstractInsnNode -> nodes.add(e) })
@@ -291,5 +293,51 @@ object ByteCodeUtils {
 
     fun getRuntimeName(cls: Class<*>): String {
         return cls.name.replace("\\.".toRegex(), "/")
+    }
+
+    fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first).matches(MethodSignature.of(second))
+
+    data class MethodSignature(
+        val name: String,
+        val desc: String,
+        val returnType: String
+    ) {
+        fun matches(other: MethodSignature) : Boolean = other.name == name && other.desc == desc
+
+        companion object {
+            const val NON_ARRAY_PATTERN = "[ZCBSIFJD]|(?:L.+;)"
+
+            const val ANY_VALUE_PATTERN = "${NON_ARRAY_PATTERN}|(?:\\[+(?:${NON_ARRAY_PATTERN}))"
+
+            const val SIGNATURE_PATTERN = "^(.+)\\(((?:${ANY_VALUE_PATTERN})*)\\)(${ANY_VALUE_PATTERN}|V)?$"
+
+            fun of(signature: String): MethodSignature {
+                val regex = Regex(SIGNATURE_PATTERN)
+                check(regex.matches(signature)) { "Invalid method signature: $signature" }
+
+                return regex.find(signature)!!.groupValues.let { MethodSignature(it[1], it[2], if (it.size == 4) it[3] else "UNKNOWN") }
+            }
+        }
+    }
+
+    fun byteCodeSignature(method: Method, name: String = method.name): String {
+        val methodReturn = method.returnType
+        val builder = StringBuilder(name)
+        builder.append('(')
+        for (type in method.parameterTypes) {
+            builder.append(
+                when {
+                    type.isPrimitive -> primitiveType(type)
+                    type.isArray -> type.name
+                    else -> "L" + type.name.replace(
+                        '.',
+                        '/'
+                    ) + ";"
+                }
+            )
+        }
+        builder.append(')')
+        builder.append(if (methodReturn.isPrimitive) primitiveType(methodReturn) else methodReturn.name)
+        return builder.toString()
     }
 }

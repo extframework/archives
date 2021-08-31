@@ -18,15 +18,17 @@ object Injectors {
 
     val OPCODE_MATCHER = OpcodeInjectionPoint()
 
-//        object : MixinInjectionPoint {
-//        override fun find(insn: InsnList): List<AbstractInsnNode> = find(insn, -1)
-//
-//        fun find(insn: InsnList, opcode: Int): List<AbstractInsnNode> = insn.filter { it.opcode == opcode }
-//    }
-
     class OpcodeInjectionPoint : MixinInjectionPoint {
         override fun find(insn: InsnList): List<AbstractInsnNode> = find(insn, -1)
 
         fun find(insn: InsnList, opcode: Int): List<AbstractInsnNode> = insn.filter { it.opcode == opcode }
+    }
+
+    fun of(id: Int) = when (id) {
+        200 -> BEFORE_END
+        201 -> AFTER_BEGIN
+        202 -> BEFORE_INVOKE
+        203 -> BEFORE_RETURN
+        else -> OPCODE_MATCHER
     }
 }

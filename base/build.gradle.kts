@@ -10,9 +10,8 @@ dependencies {
     implementation("org.reflections:reflections:0.9.12")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
 
-    implementation("org.ow2.asm:asm:9.1")
-    implementation("org.ow2.asm:asm-util:9.1")
-    implementation("org.jetbrains:annotations:20.1.0")
+    api("org.ow2.asm:asm:9.1")
+    api("org.ow2.asm:asm-util:9.1")
     api(project(":api"))
     implementation(project(":base.agent"))
 

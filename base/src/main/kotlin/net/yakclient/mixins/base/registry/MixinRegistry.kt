@@ -4,6 +4,7 @@ import net.yakclient.mixins.api.Injection
 import net.yakclient.mixins.api.METHOD_SELF
 import net.yakclient.mixins.api.Mixer
 import net.yakclient.mixins.api.RESOLVE_MODULE
+import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
 import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils.primitiveType
 import net.yakclient.mixins.base.registry.pool.ExternalLibRegistryPool
 import net.yakclient.mixins.base.registry.pool.MixinMetaData
@@ -75,9 +76,9 @@ class MixinRegistry {
                 ) { "Failed to find a appropriate method to mix to" }
                 mixins += MixinMetaData(
                     cls.name,
-                    byteCodeSignature(method),
+                    ByteCodeUtils.byteCodeSignature(method),
                     mixer.value,
-                    if (injection.to == METHOD_SELF) byteCodeSignature(method) else methodTo,
+                    if (injection.to == METHOD_SELF) ByteCodeUtils.byteCodeSignature(method) else methodTo,
                     injection.type,
                     injection.priority
                 )
@@ -86,26 +87,26 @@ class MixinRegistry {
         return mixins
     }
 
-    private fun byteCodeSignature(method: Method, name: String = method.name): String {
-        val methodReturn = method.returnType
-        val builder = StringBuilder(name)
-        builder.append('(')
-        for (type in method.parameterTypes) {
-            builder.append(
-                when {
-                    type.isPrimitive -> primitiveType(type)
-                    type.isArray -> type.name
-                    else -> "L" + type.name.replace(
-                        '.',
-                        '/'
-                    ) + ";"
-                }
-            )
-        }
-        builder.append(')')
-        builder.append(if (methodReturn.isPrimitive) primitiveType(methodReturn) else methodReturn.name)
-        return builder.toString()
-    }
+//    private fun byteCodeSignature(method: Method, name: String = method.name): String {
+//        val methodReturn = method.returnType
+//        val builder = StringBuilder(name)
+//        builder.append('(')
+//        for (type in method.parameterTypes) {
+//            builder.append(
+//                when {
+//                    type.isPrimitive -> primitiveType(type)
+//                    type.isArray -> type.name
+//                    else -> "L" + type.name.replace(
+//                        '.',
+//                        '/'
+//                    ) + ";"
+//                }
+//            )
+//        }
+//        builder.append(')')
+//        builder.append(if (methodReturn.isPrimitive) primitiveType(methodReturn) else methodReturn.name)
+//        return builder.toString()
+//    }
 
     private fun mixinToMethodName(method: Method): String {
         if (!method.isAnnotationPresent(Injection::class.java)) return method.name

@@ -1,5 +1,6 @@
 package net.yakclient.mixins.base
 
+import org.jetbrains.annotations.NotNull
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
@@ -12,14 +13,14 @@ import org.objectweb.asm.tree.MethodNode
 //        else super.invoke(context)
 //}
 
-class MixinInjectionResolver(
+class MixinInjectionTransformer(
     private val point: MixinInjectionPoint,
     private val opcode : Int = -1,
     private val source: InsnList
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
         val insn = context.instructions
-       (if (opcode != -1) (point as Injectors.OpcodeInjectionPoint).find(insn, opcode) else point.find(insn)).forEach {
+       (if (point is Injectors.OpcodeInjectionPoint) point.find(insn, opcode) else point.find(insn)).forEach {
             insn.insert(it, source)
         }
     }
