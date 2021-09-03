@@ -46,9 +46,8 @@ fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add ->
     }
 }
 
-//TODO Improve this maybe using the trace signature visitor or something along those lines
 fun MethodNode.sameSignature(signature: String) : Boolean =
-    (name + ByteCodeUtils.removeReturnType(desc)) == signature
+    ByteCodeUtils.sameSignature(name + desc, signature)
 
 private fun <T> listOf(creator: ((T) -> Unit) -> Unit): List<T> = ArrayList<T>().apply { creator { this.add(it) } }
 

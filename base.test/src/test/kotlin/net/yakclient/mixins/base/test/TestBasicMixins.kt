@@ -1,8 +1,11 @@
 package net.yakclient.mixins.base.test
 
-import net.yakclient.mixins.base.Injectors
-import net.yakclient.mixins.base.Sources
+import net.yakclient.mixins.api.Injection
+import net.yakclient.mixins.api.Mixer
+import net.yakclient.mixins.base.*
 import org.junit.jupiter.api.Test
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 
 class TestBasicMixins {
@@ -22,8 +25,26 @@ class TestBasicMixins {
         println(Injectors.OPCODE_MATCHER.find(source, Opcodes.LDC))
     }
 
+    @Test
+    fun `Test basic configuration creation`() {
+        val mixinOf = TransformerConfigurations.mixinOf(`Mixin test case`::class)
+        println(mixinOf)
+    }
 
-    fun testMethod() : String {
+    @Test
+    fun `Test bytecode modification using ASM`() {
+        val config = TransformerConfigurations.mixinOf(`Mixin test case`::class)
+
+        val classReader = ClassReader(TestBasicMixins::class.java.name)
+
+        val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
+
+        val resolver = ClassResolver(writer, config)
+        classReader.accept(resolver, 0)
+    }
+
+
+    fun testMethod(): String {
         println("Hey, this is a ldc!")
 
         val integer = 5
@@ -33,5 +54,13 @@ class TestBasicMixins {
         if (integer == 3) return "Hmm, looks like the integer is 3"
 
         return "All finished here"
+    }
+}
+
+@Mixer("something cool")
+class `Mixin test case` {
+    @Injection
+    fun `Inject this!`() {
+        println("Get injected")
     }
 }

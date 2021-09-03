@@ -14,9 +14,6 @@ class ClassResolver(
     private val delegate: ClassVisitor,
 
     private val config: TransformerConfig,
-//    private val transformer: ClassTransformer,
-//    private val methodTransformers: Queue<MethodTransformer>,
-//    private val fieldTransformers: Queue<FieldTransformer>
 ) : ClassVisitor(Opcodes.ASM9, ClassNode()), InjectionResolver {
     override fun visitMethod(
         access: Int,
@@ -24,12 +21,8 @@ class ClassResolver(
         descriptor: String?,
         signature: String?,
         exceptions: Array<out String>?
-    ): MethodVisitor {
-        var last: MethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions) as MethodNode
-
-        config.methodTransformers.forEach { last = MethodResolver(last, it) }
-        return last
-    }
+    ): MethodVisitor =
+        MethodResolver(super.visitMethod(access, name, descriptor, signature, exceptions) as MethodNode, config.mt)
 
     override fun visitField(
         access: Int,
@@ -37,17 +30,13 @@ class ClassResolver(
         descriptor: String?,
         signature: String?,
         value: Any?
-    ): FieldVisitor {
-        var last: FieldVisitor = super.visitField(access, name, descriptor, signature, value)
-
-        config.fieldTransformers.forEach { last = FieldResolver(this, last as FieldNode, it) }
-        return last
-    }
+    ): FieldVisitor =
+        FieldResolver(this, super.visitField(access, name, descriptor, signature, value) as FieldNode, config.ft)
 
     override fun visitEnd() {
         val visitor = cv as ClassNode
 
-        config.classTransformers.forEach { it(visitor) }
+        config.ct(visitor)
 
         visitor.accept(delegate)
 
@@ -56,14 +45,14 @@ class ClassResolver(
 }
 
 class MethodResolver(
-    private val delegate: MethodVisitor,
+    parent: MethodNode,
     private val transformer: MethodTransformer
-) : MethodVisitor(Opcodes.ASM9, MethodNode()), InjectionResolver {
+) : MethodVisitor(Opcodes.ASM9, parent), InjectionResolver {
     override fun visitEnd() {
         val visitor = mv as MethodNode
         transformer(visitor)
 
-        visitor.accept(delegate)
+        visitor.accept(visitor)
         super.visitEnd()
     }
 }

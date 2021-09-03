@@ -1,6 +1,5 @@
 package net.yakclient.mixins.base
 
-import org.jetbrains.annotations.NotNull
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode

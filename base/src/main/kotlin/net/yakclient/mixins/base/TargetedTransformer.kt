@@ -17,10 +17,9 @@ class TargetedMethodTransformer(
     delegate: MethodTransformer,
     private val signature: String,
 ) : TargetedTransformer<MethodNode>(delegate), MethodTransformer {
+    override fun invoke(context: MethodNode): MethodNode = call(context)
 
     override fun matches(c: MethodNode): Boolean = c.sameSignature(signature)
-
-    override fun invoke(context: MethodNode): MethodNode = call(context)
 }
 
 class TargetedFieldTransformer(
