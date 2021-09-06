@@ -1,7 +1,5 @@
-package net.yakclient.mixins.base.internal.bytecode
+package net.yakclient.mixins.base
 
-import net.yakclient.mixins.base.internal.ASMType
-import net.yakclient.mixins.base.internal.instruction.Instruction
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
@@ -11,7 +9,6 @@ import java.lang.reflect.Method
 import java.util.function.Consumer
 
 object ByteCodeUtils {
-    val DEFAULT_ASM_MODE: ASMType = ASMType.TREE
     const val ASM_VERSION = Opcodes.ASM9
 
 
@@ -281,10 +278,6 @@ object ByteCodeUtils {
         return false
     }
 
-    fun toNodes(instruction: Instruction): List<AbstractInsnNode> {
-        return toNodes(instruction.insn)
-    }
-
     fun toNodes(instruction: InsnList): List<AbstractInsnNode> {
         val nodes = ArrayList<AbstractInsnNode>()
         instruction.forEach(Consumer { e: AbstractInsnNode -> nodes.add(e) })
@@ -295,7 +288,8 @@ object ByteCodeUtils {
         return cls.name.replace("\\.".toRegex(), "/")
     }
 
-    fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first).matches(MethodSignature.of(second))
+    fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first)
+        .matches(MethodSignature.of(second))
 
     data class MethodSignature(
         val name: String,
@@ -307,9 +301,9 @@ object ByteCodeUtils {
         companion object {
             const val NON_ARRAY_PATTERN = "[ZCBSIFJD]|(?:L.+;)"
 
-            const val ANY_VALUE_PATTERN = "${NON_ARRAY_PATTERN}|(?:\\[+(?:${NON_ARRAY_PATTERN}))"
+            const val ANY_VALUE_PATTERN = "$NON_ARRAY_PATTERN|(?:\\[+(?:$NON_ARRAY_PATTERN))"
 
-            const val SIGNATURE_PATTERN = "^(.+)\\(((?:${ANY_VALUE_PATTERN})*)\\)(${ANY_VALUE_PATTERN}|V)?$"
+            const val SIGNATURE_PATTERN = "^(.+)\\(((?:$ANY_VALUE_PATTERN)*)\\)($ANY_VALUE_PATTERN|V)?$"
 
             fun of(signature: String): MethodSignature {
                 val regex = Regex(SIGNATURE_PATTERN)

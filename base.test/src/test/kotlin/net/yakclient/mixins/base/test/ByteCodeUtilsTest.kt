@@ -1,6 +1,6 @@
 package net.yakclient.mixins.base.test
 
-import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
+import net.yakclient.mixins.base.ByteCodeUtils
 import org.junit.jupiter.api.Test
 
 class ByteCodeUtilsTest {

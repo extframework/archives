@@ -2,7 +2,7 @@
 
 package net.yakclient.mixins.base.extension
 
-import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
+import net.yakclient.mixins.base.ByteCodeUtils
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode

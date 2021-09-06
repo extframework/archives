@@ -1,6 +1,5 @@
 package net.yakclient.mixins.base
 
-import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -8,7 +7,6 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
 import java.lang.reflect.Method
-import kotlin.math.sign
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 

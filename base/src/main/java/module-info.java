@@ -1,5 +1,4 @@
 module yakclient.mixins.base {
-    exports net.yakclient.mixins.base.internal.bytecode;
 //    exports net.yakclient.mixins.base.registry;
 //    exports net.yakclient.mixins.base.registry.pool;
 //    exports net.yakclient.mixins.base.registry.proxy;

@@ -3,10 +3,8 @@
 package net.yakclient.mixins.base.extension
 
 import net.yakclient.mixins.base.extension.SearchType.*
-import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
-import org.objectweb.asm.signature.SignatureReader
+import net.yakclient.mixins.base.ByteCodeUtils
 import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.util.TraceSignatureVisitor
 
 
 fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)

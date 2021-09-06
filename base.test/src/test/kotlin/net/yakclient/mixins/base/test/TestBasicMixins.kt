@@ -101,7 +101,7 @@ class TestBasicMixins {
 
 @Mixer("something cool")
 class `Mixin test case` {
-    @Injection("testMethod()", type= InjectionType.OVERWRITE)
+    @Injection("testMethod()", type= InjectionType.BEFORE_END)
     fun `Inject this!`() {
         println("Get injected")
     }

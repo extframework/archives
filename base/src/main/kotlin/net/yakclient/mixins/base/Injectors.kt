@@ -1,6 +1,5 @@
 package net.yakclient.mixins.base
 
-import net.yakclient.mixins.base.internal.bytecode.ByteCodeUtils
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodInsnNode
