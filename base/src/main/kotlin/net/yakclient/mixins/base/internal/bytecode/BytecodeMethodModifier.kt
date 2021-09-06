@@ -1,5 +1,6 @@
 package net.yakclient.mixins.base.internal.bytecode
 
+import net.yakclient.mixins.base.internal.ASMType
 import net.yakclient.mixins.base.internal.bytecode.MixinSource.MixinProxySource
 import net.yakclient.mixins.base.internal.instruction.DirectInsnInterceptor
 import net.yakclient.mixins.base.internal.instruction.Instruction
@@ -9,8 +10,6 @@ import net.yakclient.mixins.base.internal.instruction.adapter.FieldSelfInsnAdapt
 import net.yakclient.mixins.base.internal.instruction.adapter.InsnAdapter
 import net.yakclient.mixins.base.internal.instruction.adapter.MethodSelfInsnAdapter
 import net.yakclient.mixins.base.internal.instruction.adapter.ReturnRemoverInsnAdapter
-import net.yakclient.mixins.base.internal.ASMType
-import org.jetbrains.annotations.Contract
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import java.io.IOException
@@ -60,7 +59,6 @@ class BytecodeMethodModifier {
         return methodAdapter.adapt(instruction)
     }
 
-    @Contract(pure = true)
     @Throws(IOException::class)
     private fun apply(injectors: Map<String, Queue<QualifiedInstruction>>, mixin: String): ByteArray {
         val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)

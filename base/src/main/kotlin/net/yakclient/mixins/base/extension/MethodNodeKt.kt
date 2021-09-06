@@ -11,7 +11,7 @@ import org.objectweb.asm.util.TraceSignatureVisitor
 
 fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
 
-fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add ->
+fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add, _ ->
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
     fun StringBuilder.containedClass(): Class<*> =
         Class.forName(this.toString().replace('/', '.')).also { this.clear() }
@@ -46,10 +46,11 @@ fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add ->
     }
 }
 
-fun MethodNode.sameSignature(signature: String) : Boolean =
+fun MethodNode.sameSignature(signature: String): Boolean =
     ByteCodeUtils.sameSignature(name + desc, signature)
 
-private fun <T> listOf(creator: ((T) -> Unit) -> Unit): List<T> = ArrayList<T>().apply { creator { this.add(it) } }
+fun <T> listOf(creator: ((T) -> Unit, (T?) -> Unit) -> Unit): List<T> =
+    ArrayList<T>().apply { creator({ this.add(it) }, { if (it != null) this.add(it) }) }
 
 private enum class SearchType {
     OBJECT,

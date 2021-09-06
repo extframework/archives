@@ -14,18 +14,23 @@ import org.objectweb.asm.tree.MethodNode
 
 class MixinInjectionTransformer(
     private val point: MixinInjectionPoint,
-    private val opcode : Int = -1,
-    private val source: InsnList
+    private val opcode: Int = -1,
+    private val source: InstructionResolver
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
         val insn = context.instructions
-       (if (point is Injectors.OpcodeInjectionPoint) point.find(insn, opcode) else point.find(insn)).forEach {
-            insn.insert(it, source)
+        (if (point is Injectors.OpcodeInjectionPoint) point.find(insn, opcode) else point.find(insn)).forEach {
+            it.inject(source.get())
         }
     }
 }
 
 fun interface MixinInjectionPoint {
-    fun find(insn: InsnList): List<AbstractInsnNode>
+    fun find(insn: InsnList): List<MixinInjector>
 }
 
+sealed class MixinInjector(
+    protected val insn: InsnList
+) {
+    abstract fun inject(toInject: InsnList)
+}

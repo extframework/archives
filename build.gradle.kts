@@ -37,7 +37,6 @@ subprojects {
 
     dependencies {
         implementation(kotlin("stdlib"))
-//        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
@@ -49,4 +48,10 @@ subprojects {
     tasks.test {
         useJUnitPlatform()
     }
+
+    tasks.compileJava {
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
+    }
+    
 }

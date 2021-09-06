@@ -15,6 +15,18 @@ class ClassResolver(
 
     private val config: TransformerConfig,
 ) : ClassVisitor(Opcodes.ASM9, ClassNode()), InjectionResolver {
+//    override fun visit(
+//        version: Int,
+//        access: Int,
+//        name: String?,
+//        signature: String?,
+//        superName: String?,
+//        interfaces: Array<out String>?
+//    ) {
+//        println(version)
+//        super.visit(version, access, name, signature, superName, interfaces)
+//    }
+
     override fun visitMethod(
         access: Int,
         name: String?,
@@ -24,14 +36,14 @@ class ClassResolver(
     ): MethodVisitor =
         MethodResolver(super.visitMethod(access, name, descriptor, signature, exceptions) as MethodNode, config.mt)
 
-    override fun visitField(
-        access: Int,
-        name: String?,
-        descriptor: String?,
-        signature: String?,
-        value: Any?
-    ): FieldVisitor =
-        FieldResolver(this, super.visitField(access, name, descriptor, signature, value) as FieldNode, config.ft)
+//    override fun visitField(
+//        access: Int,
+//        name: String?,
+//        descriptor: String?,
+//        signature: String?,
+//        value: Any?
+//    ): FieldVisitor =
+//        FieldResolver(super.visitField(access, name, descriptor, signature, value) as FieldNode, delegate, config.ft)
 
     override fun visitEnd() {
         val visitor = cv as ClassNode
@@ -45,28 +57,36 @@ class ClassResolver(
 }
 
 class MethodResolver(
-    parent: MethodNode,
+    private val delegate: MethodNode,
     private val transformer: MethodTransformer
-) : MethodVisitor(Opcodes.ASM9, parent), InjectionResolver {
+) : MethodVisitor(
+    Opcodes.ASM9, MethodNode(
+        delegate.access,
+        delegate.name,
+        delegate.desc,
+        delegate.signature,
+        delegate.exceptions.toTypedArray()
+    )
+), InjectionResolver {
     override fun visitEnd() {
-        val visitor = mv as MethodNode
-        transformer(visitor)
-
-        visitor.accept(visitor)
         super.visitEnd()
+
+        val parent = mv as MethodNode
+        transformer(parent)
+        parent.accept(delegate)
     }
 }
 
 class FieldResolver(
-    private val delegate: ClassVisitor,
     parent: FieldNode,
+    private val delegate: ClassVisitor,
     private val transformer: FieldTransformer
 ) : FieldVisitor(Opcodes.ASM9, parent), InjectionResolver {
     override fun visitEnd() {
-        val visitor = fv as FieldNode
-        transformer(visitor)
-
-        visitor.accept(delegate)
         super.visitEnd()
+
+        val parent = fv as FieldNode
+//        transformer(parent)
+        parent.accept(delegate)
     }
 }

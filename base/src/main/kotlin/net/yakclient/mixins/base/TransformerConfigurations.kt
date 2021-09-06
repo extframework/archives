@@ -13,7 +13,7 @@ object TransformerConfigurations {
                     if (method.isAnnotationPresent(Injection::class.java)) {
                         val injection = method.getAnnotation(Injection::class.java)
 
-                        val source = Sources.sourceOf(method)
+                        val source = InstructionAdapters.RemoveNonPositiveOpcodes(InstructionAdapters.RemoveLastReturn(Sources.sourceOf(method)))
 
                         val type = injection.type
                         val signature =
