@@ -1,9 +1,6 @@
 package net.yakclient.mixins.base
 
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.FieldVisitor
-import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes
+import org.objectweb.asm.*
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
@@ -36,14 +33,14 @@ class ClassResolver(
     ): MethodVisitor =
         MethodResolver(super.visitMethod(access, name, descriptor, signature, exceptions) as MethodNode, config.mt)
 
-//    override fun visitField(
-//        access: Int,
-//        name: String?,
-//        descriptor: String?,
-//        signature: String?,
-//        value: Any?
-//    ): FieldVisitor =
-//        FieldResolver(super.visitField(access, name, descriptor, signature, value) as FieldNode, delegate, config.ft)
+    override fun visitField(
+        access: Int,
+        name: String,
+        descriptor: String,
+        signature: String?,
+        value: Any?
+    ): FieldVisitor =
+        FieldResolver(access, name, descriptor, signature, value, delegate, config.ft)
 
     override fun visitEnd() {
         val visitor = cv as ClassNode
@@ -78,15 +75,16 @@ class MethodResolver(
 }
 
 class FieldResolver(
-    parent: FieldNode,
     private val delegate: ClassVisitor,
-    private val transformer: FieldTransformer
-) : FieldVisitor(Opcodes.ASM9, parent), InjectionResolver {
+    private val transformer: FieldTransformer,
+
+    access: Int, name: String, descriptor: String, signature: String?, value: Any?
+) : FieldVisitor(Opcodes.ASM9, FieldNode(access, name, descriptor, signature, value)), InjectionResolver {
     override fun visitEnd() {
         super.visitEnd()
 
         val parent = fv as FieldNode
-//        transformer(parent)
+        transformer(parent)
         parent.accept(delegate)
     }
 }

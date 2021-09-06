@@ -1,5 +1,8 @@
-package net.yakclient.mixins.base
+package net.yakclient.mixins.base.mixin
 
+import net.yakclient.mixins.base.ByteCodeUtils
+import net.yakclient.mixins.base.MixinInjectionPoint
+import net.yakclient.mixins.base.MixinInjector
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodInsnNode

@@ -6,10 +6,10 @@ import net.yakclient.mixins.api.InjectionType
 import net.yakclient.mixins.api.Mixer
 import net.yakclient.mixins.base.*
 import net.yakclient.mixins.base.agent.YakMixinsAgent
+import net.yakclient.mixins.base.mixin.Injectors
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import java.lang.instrument.ClassDefinition

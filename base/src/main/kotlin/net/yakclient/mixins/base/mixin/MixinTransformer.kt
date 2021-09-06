@@ -1,6 +1,6 @@
 package net.yakclient.mixins.base
 
-import org.objectweb.asm.tree.AbstractInsnNode
+import net.yakclient.mixins.base.mixin.Injectors
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
 
@@ -29,7 +29,7 @@ fun interface MixinInjectionPoint {
     fun find(insn: InsnList): List<MixinInjector>
 }
 
-sealed class MixinInjector(
+abstract class MixinInjector(
     protected val insn: InsnList
 ) {
     abstract fun inject(toInject: InsnList)

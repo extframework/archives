@@ -2,6 +2,7 @@ package net.yakclient.mixins.base
 
 import net.yakclient.mixins.api.Injection
 import net.yakclient.mixins.api.METHOD_SELF
+import net.yakclient.mixins.base.mixin.Injectors
 import kotlin.reflect.KClass
 
 object TransformerConfigurations {
