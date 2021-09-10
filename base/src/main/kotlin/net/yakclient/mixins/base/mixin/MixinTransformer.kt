@@ -1,16 +1,10 @@
-package net.yakclient.mixins.base
+package net.yakclient.mixins.base.mixin
 
-import net.yakclient.mixins.base.mixin.Injectors
+import net.yakclient.mixins.base.ByteCodeUtils
+import net.yakclient.mixins.base.InstructionResolver
+import net.yakclient.mixins.base.MethodTransformer
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
-
-//class MixerResolver(
-//    private val method: String
-//) : MethodTransformer {
-//    override fun invoke(context: MethodNode): MethodNode =
-//        if (context.name + context.desc != method) context
-//        else super.invoke(context)
-//}
 
 class MixinInjectionTransformer(
     private val point: MixinInjectionPoint,
@@ -18,19 +12,38 @@ class MixinInjectionTransformer(
     private val source: InstructionResolver
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
-        val insn = context.instructions
-        (if (point is Injectors.OpcodeInjectionPoint) point.find(insn, opcode) else point.find(insn)).forEach {
-            it.inject(source.get())
-        }
+
+        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
+        point.apply(context, opcode).forEach { it.inject(source) }
+
+        println("----------------------")
+
+        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
     }
 }
 
-fun interface MixinInjectionPoint {
-    fun find(insn: InsnList): List<MixinInjector>
-}
+typealias MixinInjectionPoint = MixinInjectionContext.(opcode: Int) -> List<MixinInjector>
 
-abstract class MixinInjector(
-    protected val insn: InsnList
+class MixinInjectionContext(
+    val node: MethodNode
 ) {
-    abstract fun inject(toInject: InsnList)
+    val insn : InsnList = node.instructions
+}
+private fun MixinInjectionPoint.apply(node: MethodNode, opcode: Int) : List<MixinInjector> = this(MixinInjectionContext(node), opcode)
+
+
+//private fun MixinInjectionPoint.apply(node: MethodNode) : List<MixinInjector> = this(MixinInjectionContext(node))
+//{
+//    protected val instructions = node.instructions
+//}
+//fun interface MixinInjectionPoint {
+//    fun find(context: MixinInjectionContext): List<MixinInjector>
+//
+////    fun find(node: MethodNode) = find(MixinInjectionContext(node))
+//
+//
+//}
+
+fun interface MixinInjector {
+    fun inject(toInject: InstructionResolver)
 }

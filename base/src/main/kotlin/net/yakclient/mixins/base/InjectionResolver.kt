@@ -40,16 +40,16 @@ class ClassResolver(
         signature: String?,
         value: Any?
     ): FieldVisitor =
-        FieldResolver(access, name, descriptor, signature, value, delegate, config.ft)
+        FieldResolver(delegate, config.ft, access, name, descriptor, signature, value)
 
     override fun visitEnd() {
+        super.visitEnd()
+
         val visitor = cv as ClassNode
 
         config.ct(visitor)
 
         visitor.accept(delegate)
-
-        super.visitEnd()
     }
 }
 

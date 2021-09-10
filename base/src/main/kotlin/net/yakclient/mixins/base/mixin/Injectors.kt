@@ -1,14 +1,13 @@
 package net.yakclient.mixins.base.mixin
 
 import net.yakclient.mixins.base.ByteCodeUtils
-import net.yakclient.mixins.base.MixinInjectionPoint
-import net.yakclient.mixins.base.MixinInjector
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.MethodInsnNode
+import net.yakclient.mixins.base.InstructionAdapters
+import net.yakclient.mixins.base.InstructionResolver
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.*
 
 object Injectors {
-    val BEFORE_END = MixinInjectionPoint { insn ->
+    val BEFORE_END: MixinInjectionPoint = {
         var lastReturn: AbstractInsnNode? = null
         for (node in insn) {
             if (ByteCodeUtils.isReturn(node.opcode)) lastReturn = node
@@ -16,40 +15,49 @@ object Injectors {
 
         checkNotNull(lastReturn) { "Failed to find last return in given instructions." }
 
-        listOf(BeforeInsnNodeInjector(lastReturn, insn))
+        listOf(BeforeInsnNodeInjector(insn, lastReturn))
     }
 
-    val AFTER_BEGIN = MixinInjectionPoint { insn -> listOf(BeginningInjector(insn)) }
+    val AFTER_BEGIN: MixinInjectionPoint = { listOf(BeginningInjector(insn)) }
 
-    val BEFORE_INVOKE = MixinInjectionPoint { insn -> insn.filterIsInstance<MethodInsnNode>().map { BeforeInsnNodeInjector(it, insn) } }
+    val BEFORE_INVOKE: MixinInjectionPoint =
+        { insn.filterIsInstance<MethodInsnNode>().map { BeforeInsnNodeInjector(insn, it) } }
 
-    val BEFORE_RETURN = MixinInjectionPoint { insn -> insn.filter { ByteCodeUtils.isReturn(it.opcode) }.map { BeforeInsnNodeInjector(it, insn) } }
+    val BEFORE_RETURN: MixinInjectionPoint = {
+        insn.filter { ByteCodeUtils.isReturn(it.opcode) }.map { BeforeInsnNodeInjector(insn, it) }
+    }
 
-    val OPCODE_MATCHER = OpcodeInjectionPoint()
+    val OPCODE_MATCHER : MixinInjectionPoint = { opcode ->
+        insn.filter { it.opcode == opcode }.map { BeforeInsnNodeInjector(insn, it) }
+    }
 
-    //Contract not pure
-    val OVERWRITE = MixinInjectionPoint { it.clear(); listOf(BeginningInjector(it)) }
+    val OVERWRITE: MixinInjectionPoint = {
+        listOf(MixinInjector { toInject -> node.instructions = toInject.get() })
+    }
 
-    class OpcodeInjectionPoint : MixinInjectionPoint {
-        override fun find(insn: InsnList) = find(insn, -1)
+    abstract class MixinAdaptedInjector(
+        protected val insn: InsnList
+    ) : MixinInjector {
+        override fun inject(toInject: InstructionResolver) =
+            inject(InstructionAdapters.RemoveLastReturn(toInject).get())
 
-        fun find(insn: InsnList, opcode: Int): List<MixinInjector> = insn.filter { it.opcode == opcode }.map { BeforeInsnNodeInjector(it, insn) }
+        abstract fun inject(toInject: InsnList)
     }
 
     class BeforeInsnNodeInjector(
+        insn: InsnList,
         private val node: AbstractInsnNode,
-        list: InsnList
-    ) : MixinInjector(list) {
+    ) : MixinAdaptedInjector(insn) {
         init {
-            require(list.contains(node)) { "Given InsnList does not contain the node provided to inject before." }
+            require(insn.contains(node)) { "Given InsnList does not contain the node provided to inject before." }
         }
 
         override fun inject(toInject: InsnList) = insn.insertBefore(node, toInject)
     }
 
     class BeginningInjector(
-        list: InsnList
-    ) : MixinInjector(list) {
+        insn: InsnList,
+    ) : MixinAdaptedInjector(insn) {
         override fun inject(toInject: InsnList) = insn.insert(toInject)
     }
 

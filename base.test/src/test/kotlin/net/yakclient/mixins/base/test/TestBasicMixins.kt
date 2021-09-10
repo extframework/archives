@@ -4,18 +4,23 @@ import net.bytebuddy.agent.ByteBuddyAgent
 import net.yakclient.mixins.api.Injection
 import net.yakclient.mixins.api.InjectionType
 import net.yakclient.mixins.api.Mixer
-import net.yakclient.mixins.base.*
+import net.yakclient.mixins.base.ClassResolver
+import net.yakclient.mixins.base.Mixins
+import net.yakclient.mixins.base.Sources
+import net.yakclient.mixins.base.TransformerConfigurations
 import net.yakclient.mixins.base.agent.YakMixinsAgent
-import net.yakclient.mixins.base.mixin.Injectors
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.FieldNode
 import java.lang.instrument.ClassDefinition
 
 class TestBasicMixins {
     companion object {
+        @JvmStatic
+        private val somethingOrOther = "Hey"
+
         @BeforeAll
         @JvmStatic
         fun attachAgent() {
@@ -29,17 +34,6 @@ class TestBasicMixins {
     }
 
     @Test
-    fun `Test injector matching`() {
-        val source = Sources.sourceOf(TestBasicMixins::testMethod)
-
-        println(Injectors.BEFORE_END.find(source.get()))
-        println(Injectors.AFTER_BEGIN.find(source.get()))
-        println(Injectors.BEFORE_INVOKE.find(source.get()))
-        println(Injectors.BEFORE_RETURN.find(source.get()))
-        println(Injectors.OPCODE_MATCHER.find(source.get(), Opcodes.LDC))
-    }
-
-    @Test
     fun `Test basic configuration creation`() {
         val mixinOf = TransformerConfigurations.mixinOf(`Mixin test case`::class)
         println(mixinOf)
@@ -49,6 +43,14 @@ class TestBasicMixins {
     fun `Test bytecode modification using ASM`() {
 
         val config = TransformerConfigurations.mixinOf(`Mixin test case`::class)
+            .of {
+                add { it: FieldNode ->
+                    println(it.name)
+                    println(it.value)
+//                    it.value = "Not hey"
+                    it
+                }
+            }.build()
 
         val classReader = ClassReader(TestBasicMixins::class.java.name)
 
@@ -59,16 +61,45 @@ class TestBasicMixins {
 
 
         //why am i taking this for granted, god, instrumentation is amazing
-        YakMixinsAgent.instrumentation.redefineClasses(ClassDefinition(TestBasicMixins::class.java, writer.toByteArray()))
+        YakMixinsAgent.instrumentation.redefineClasses(
+            ClassDefinition(
+                TestBasicMixins::class.java,
+                writer.toByteArray()
+            )
+        )
 //        Mixins.apply(listOf( TestBasicMixins::class.java),  config)
 
         testMethod()
+
+        println(somethingOrOther)
 //        println(testMethod())
     }
 
 
-    // FIXME: 9/5/21 There appear to be verify errors every once in a while with the on method invoke instructions, in general it appears to be iterating on a int stored as a local variable, though more testing is needed.
-    fun testMethod() : String {
+    @Test
+    fun `Test Bytecode modification with Mixins#apply`() {
+        val config = TransformerConfigurations.mixinOf(`Mixin test case`::class)
+            .of {
+                add { it: FieldNode ->
+                    println(it.name)
+                    println(it.value)
+                    it
+                }
+            }.build()
+
+        val task = Mixins.apply<TestBasicMixins>(config)
+
+        //Probably hasnt executed the task yet
+        testMethod()
+
+        //Blocking
+        task.join()
+        println("Tasked finished ------------------")
+
+        testMethod()
+    }
+
+    fun testMethod(): String {
         println("happens first")
         println("happens second")
 
@@ -101,7 +132,7 @@ class TestBasicMixins {
 
 @Mixer("something cool")
 class `Mixin test case` {
-    @Injection("testMethod()", type= InjectionType.BEFORE_END)
+    @Injection("testMethod()", type = InjectionType.OVERWRITE)
     fun `Inject this!`() {
         println("Get injected")
     }

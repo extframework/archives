@@ -6,12 +6,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-    implementation("org.reflections:reflections:0.9.12")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2") {
+        exclude(group="org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
+    }
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
 
-    api("org.ow2.asm:asm:9.1")
-    api("org.ow2.asm:asm-util:9.1")
+    api("org.ow2.asm:asm:9.2")
+    api("org.ow2.asm:asm-util:9.2")
     api(project(":api"))
     implementation(project(":base.agent"))
 

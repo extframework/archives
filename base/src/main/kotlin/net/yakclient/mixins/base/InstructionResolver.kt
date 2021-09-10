@@ -6,10 +6,18 @@ fun interface InstructionResolver {
     fun get() : InsnList
 }
 
-abstract class InstructionReader(
+fun interface InstructionReader : InstructionResolver
+
+class ProvidedInstructionReader(
+     private val insn: InsnList
+) : InstructionReader {
+    override fun get(): InsnList = insn
+}
+
+abstract class DirectInstructionReader(
     protected val parentClass: String,
     protected val methodSignature: String
-) : InstructionResolver
+) : InstructionReader
 
 abstract class InstructionAdapter(
     parent: InstructionResolver

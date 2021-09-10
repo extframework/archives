@@ -5,28 +5,26 @@ class TransformerConfig(
     val mt: MethodTransformer,
     val ft: FieldTransformer
 ) {
-    companion object {
-        fun of(block: TransformerConfigScope.() -> Unit): TransformerConfig =
-            TransformerConfigScope().also(block)
-                .let { config ->
-                    fun <T : InjectionTransformer<*>> proxyOrFirst(l: List<T>, proxy: (List<T>) -> T): T =
-                        if (l.size == 1) l.first() else proxy(l)
-
-                    TransformerConfig(
-                        proxyOrFirst(config.cts) { ProxiedClassTransformer(it) },
-                        proxyOrFirst(config.mts) { ProxiedMethodTransformer(it) },
-                        proxyOrFirst(config.fts) { ProxiedFieldTransformer(it) }
-                    )
-                }
-    }
-
     class TransformerConfigScope(
-        val cts: MutableList<ClassTransformer> = ArrayList(),
-        val mts: MutableList<MethodTransformer> = ArrayList(),
-        val fts: MutableList<FieldTransformer> = ArrayList()
+        private val cts: MutableList<ClassTransformer> = ArrayList(),
+        private val mts: MutableList<MethodTransformer> = ArrayList(),
+        private val fts: MutableList<FieldTransformer> = ArrayList()
     ) {
-        fun addCt(t: ClassTransformer) = cts.add(t)
-        fun addMt(t: MethodTransformer) = mts.add(t)
-        fun addFt(t: FieldTransformer) = fts.add(t)
+        fun add(t: ClassTransformer) = cts.add(t)
+        fun add(t: MethodTransformer) = mts.add(t)
+        fun add(t: FieldTransformer) = fts.add(t)
+
+        fun of(block: TransformerConfigScope.() -> Unit): TransformerConfigScope = apply(block)
+
+        fun build(): TransformerConfig = let { config ->
+            fun <T : InjectionTransformer<*>> proxyOrFirst(l: List<T>, proxy: (List<T>) -> T): T =
+                if (l.size == 1) l.first() else proxy(l)
+
+            TransformerConfig(
+                proxyOrFirst(config.cts) { ProxiedClassTransformer(it) },
+                proxyOrFirst(config.mts) { ProxiedMethodTransformer(it) },
+                proxyOrFirst(config.fts) { ProxiedFieldTransformer(it) }
+            )
+        }
     }
 }

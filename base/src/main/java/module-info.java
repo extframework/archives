@@ -8,8 +8,8 @@ module yakclient.mixins.base {
     requires kotlin.reflect;
     requires java.instrument;
     requires org.objectweb.asm.util;
+//    requires kotlinx.coroutines.core.jvm;
 
     exports net.yakclient.mixins.base;
-    exports net.yakclient.mixins.base.mixin;
     exports net.yakclient.mixins.base.extension;
 }

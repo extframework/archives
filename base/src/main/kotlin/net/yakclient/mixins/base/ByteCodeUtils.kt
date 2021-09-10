@@ -3,10 +3,15 @@ package net.yakclient.mixins.base
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.util.Textifier
+import org.objectweb.asm.util.TraceMethodVisitor
 import java.io.DataInputStream
 import java.io.IOException
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.lang.reflect.Method
 import java.util.function.Consumer
+
 
 object ByteCodeUtils {
     const val ASM_VERSION = Opcodes.ASM9
@@ -296,7 +301,7 @@ object ByteCodeUtils {
         val desc: String,
         val returnType: String
     ) {
-        fun matches(other: MethodSignature) : Boolean = other.name == name && other.desc == desc
+        fun matches(other: MethodSignature): Boolean = other.name == name && other.desc == desc
 
         companion object {
             const val NON_ARRAY_PATTERN = "[ZCBSIFJD]|(?:L.+;)"
@@ -309,7 +314,13 @@ object ByteCodeUtils {
                 val regex = Regex(SIGNATURE_PATTERN)
                 check(regex.matches(signature)) { "Invalid method signature: $signature" }
 
-                return regex.find(signature)!!.groupValues.let { MethodSignature(it[1], it[2], if (it.size == 4) it[3] else "UNKNOWN") }
+                return regex.find(signature)!!.groupValues.let {
+                    MethodSignature(
+                        it[1],
+                        it[2],
+                        if (it.size == 4) it[3] else "UNKNOWN"
+                    )
+                }
             }
         }
     }
@@ -333,5 +344,18 @@ object ByteCodeUtils {
         builder.append(')')
         builder.append(if (methodReturn.isPrimitive) primitiveType(methodReturn) else methodReturn.name)
         return builder.toString()
+    }
+
+    fun insnToString(insn: InsnList): List<String> {
+        val printer = Textifier()
+        val mv = TraceMethodVisitor(printer);
+
+        return insn.map {
+            it.accept(mv)
+            val sw = StringWriter()
+            printer.print(PrintWriter(sw))
+            printer.getText().clear()
+            sw.toString()
+        }
     }
 }
