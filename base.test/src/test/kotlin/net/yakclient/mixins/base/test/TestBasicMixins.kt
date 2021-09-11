@@ -94,7 +94,6 @@ class TestBasicMixins {
 
         //Blocking
         task.join()
-        println("Tasked finished ------------------")
 
         testMethod()
 //        `Inject this!`()
@@ -143,10 +142,10 @@ class TestBasicMixins {
 
 @Mixer("something cool")
 class `Mixin test case` {
-    @Injection("testMethod()", type = InjectionType.OVERWRITE)
-    fun `Inject this!`() : String {
+    @Injection("testMethod()", type = InjectionType.BEFORE_INVOKE)
+    fun `Inject this!`() {
         println("Get injected")
 
-        return "New return hahahh!"
+//        return "New return hahahh!"
     }
 }
