@@ -1,12 +1,15 @@
 module yakclient.mixins.base {
-    exports net.yakclient.mixin.base.registry;
-    exports net.yakclient.mixin.base.registry.pool;
-    exports net.yakclient.mixin.base.registry.proxy;
-
     requires transitive yakclient.mixins.api;
+    requires yakclient.mixins.base.agent;
 
     requires org.objectweb.asm;
     requires org.objectweb.asm.tree;
-    requires org.jetbrains.annotations;
     requires kotlin.stdlib;
+    requires kotlin.reflect;
+    requires java.instrument;
+    requires org.objectweb.asm.util;
+//    requires kotlinx.coroutines.core.jvm;
+
+    exports net.yakclient.mixins.base;
+    exports net.yakclient.mixins.base.extension;
 }
