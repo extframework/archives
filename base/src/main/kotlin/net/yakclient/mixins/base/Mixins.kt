@@ -3,6 +3,7 @@ package net.yakclient.mixins.base
 import net.yakclient.mixins.base.agent.YakMixinsAgent
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.util.CheckClassAdapter
 import java.lang.instrument.ClassDefinition
 import java.util.concurrent.ForkJoinPool
 
@@ -24,7 +25,7 @@ object Mixins {
         val classReader = ClassReader(`class`.name)
 
         val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-
+//        val checker = CheckClassAdapter(writer)
         val resolver = ClassResolver(writer, config)
         classReader.accept(resolver, 0)
 

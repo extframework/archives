@@ -13,12 +13,12 @@ class MixinInjectionTransformer(
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
 
-        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
+//        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
         point.apply(context, opcode).forEach { it.inject(source) }
 
-        println("----------------------")
+//        println("----------------------")
 
-        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
+//        ByteCodeUtils.insnToString(context.instructions).forEach { println(it) }
     }
 }
 

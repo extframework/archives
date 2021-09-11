@@ -90,13 +90,14 @@ class TestBasicMixins {
         val task = Mixins.apply<TestBasicMixins>(config)
 
         //Probably hasnt executed the task yet
-        testMethod()
+//        testMethod()
 
         //Blocking
         task.join()
         println("Tasked finished ------------------")
 
         testMethod()
+//        `Inject this!`()
     }
 
     fun testMethod(): String {
@@ -126,6 +127,16 @@ class TestBasicMixins {
     }
 
     fun `Inject this!`() {
+        println("Somethien else")
+
+        val integer = 5
+
+        println(integer)
+
+        if (integer == 5) println("Ok something else")
+
+        for (i in 1..5) println("hey")
+
         println("Wait, this was the original, anything more?")
     }
 }
@@ -133,7 +144,9 @@ class TestBasicMixins {
 @Mixer("something cool")
 class `Mixin test case` {
     @Injection("testMethod()", type = InjectionType.OVERWRITE)
-    fun `Inject this!`() {
+    fun `Inject this!`() : String {
         println("Get injected")
+
+        return "New return hahahh!"
     }
 }
