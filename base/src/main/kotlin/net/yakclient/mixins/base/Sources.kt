@@ -12,7 +12,7 @@ import kotlin.reflect.jvm.javaMethod
 
 object Sources {
     fun sourceOf(method: Method): InstructionResolver =
-        MethodSourceResolver(method.declaringClass.name, ByteCodeUtils.jvmName(method))
+        MethodSourceResolver(method.declaringClass.name, ByteCodeUtils.runtimeSignature(method))
 
     fun sourceOf(func: KFunction<*>) =
         sourceOf(requireNotNull(func.javaMethod) { "KFunction must have associated java method" })

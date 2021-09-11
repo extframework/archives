@@ -1,6 +1,5 @@
 package net.yakclient.mixins.base.mixin
 
-import net.yakclient.mixins.base.ByteCodeUtils
 import net.yakclient.mixins.base.InstructionResolver
 import net.yakclient.mixins.base.MethodTransformer
 import org.objectweb.asm.tree.InsnList
