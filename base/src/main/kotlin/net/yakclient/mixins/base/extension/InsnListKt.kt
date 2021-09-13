@@ -13,8 +13,7 @@ import org.objectweb.asm.tree.MethodNode
 ////    for (insn: AbstractInsnNode; ) this.insertBefore(last, )// .forEach { this.insertBefore(last, it); last = it }
 //}
 
-fun InsnList.copy(): InsnList =
-    MethodNode().also {  accept(it) }.instructions
+
 
 //fun InsnList.setAfter(old: AbstractInsnNode, list: InsnList): InsnList = apply {
 //    this.set(old, list.first)

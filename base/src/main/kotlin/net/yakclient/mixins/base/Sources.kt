@@ -10,14 +10,14 @@ import java.lang.reflect.Method
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
-object Sources {
-    fun sourceOf(method: Method): InstructionResolver =
+public object Sources {
+    public fun sourceOf(method: Method): InstructionResolver =
         MethodSourceResolver(method.declaringClass.name, ByteCodeUtils.runtimeSignature(method))
 
-    fun sourceOf(func: KFunction<*>) =
+    public fun sourceOf(func: KFunction<*>) : InstructionResolver =
         sourceOf(requireNotNull(func.javaMethod) { "KFunction must have associated java method" })
 
-    class MethodSourceResolver internal constructor(
+    public class MethodSourceResolver internal constructor(
         parent: String,
         signature: String
     ) : DirectInstructionReader(parent, signature) {

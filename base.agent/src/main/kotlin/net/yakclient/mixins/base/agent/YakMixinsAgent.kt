@@ -6,8 +6,8 @@ import java.lang.instrument.Instrumentation
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-object YakMixinsAgent {
-    lateinit var instrumentation: Instrumentation// by object : ReadWriteProperty<YakMixinsAgent, Instrumentation?> {
+public object YakMixinsAgent {
+   public lateinit var instrumentation: Instrumentation// by object : ReadWriteProperty<YakMixinsAgent, Instrumentation?> {
 //        override fun getValue(thisRef: YakMixinsAgent, property: KProperty<*>): Instrumentation? = instrumentation
 //
 //        override fun setValue(thisRef: YakMixinsAgent, property: KProperty<*>, value: Instrumentation?) =
@@ -17,7 +17,7 @@ object YakMixinsAgent {
 //    }
 }
 
-fun agentmain(args: String?, instrumentation: Instrumentation) {
+public fun agentmain(args: String?, instrumentation: Instrumentation) {
     YakMixinsAgent.instrumentation = instrumentation
 }
 

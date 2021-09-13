@@ -5,34 +5,24 @@ package net.yakclient.mixins.api
  * It is recommended to use these but overloading with a
  * raw int would also work sufficiently.
  *
- * You can use priority as shown below;
+ * You can use priority as shown below:
  *
- * <pre>
- * `= Priority.HIGHEST)
- * public void exampleMethod() { ... }
-` *
-</pre> *
- *
- * Additionally, overriding and using a raw int might look like
- * this;
- *
- * <pre>
- * * `* @Injection(priority = 15) //Arbitrary value
- * *  public void exampleMethod() { ... }
- * * `
- * * </pre>
+ * ```kotlin
+ * @Injection(priority=Priority.HIGHEST)
+ * fun `Your Method`() { /*...*/ }
+ * ```
  *
  * @see Injection
  *
  *
  * @author Durgan McBroom
  */
-interface Priority {
-    companion object {
-        const val HIGHEST = 4
-        const val HIGH = 3
-        const val MEDIUM = 2
-        const val LOW = 1
-        const val LOWEST = 0
+public interface Priority {
+    public companion object {
+        public const val HIGHEST : Int = 4
+        public const val HIGH : Int = 3
+        public const val MEDIUM : Int = 2
+        public const val LOW : Int = 1
+        public const val LOWEST : Int = 0
     }
 }

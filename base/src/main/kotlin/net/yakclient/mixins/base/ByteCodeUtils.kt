@@ -16,17 +16,17 @@ import java.util.function.Consumer
  * A common set of utilities that might be needed for doing work with JVM
  * Bytecode.
  *
- * @since 1.1-SNAPSHOT
+ * @since 1.0-SNAPSHOT
  * @author Durgan McBroom
  */
-object ByteCodeUtils {
+public object ByteCodeUtils {
     /**
      * Parses the runtime signature of the given method.
      *
      * @param method The method to parse.
      * @return the signature parsed.
      */
-    fun runtimeSignature(method: Method): String = "${method.name}${
+    public fun runtimeSignature(method: Method): String = "${method.name}${
         method.parameterTypes.joinToString(
             prefix = "(",
             postfix = ")"
@@ -41,7 +41,7 @@ object ByteCodeUtils {
      * @param cls The class to find the primitive type of.
      * @return The type char or null if it cannot be found.
      */
-    fun primitiveType(cls: Class<*>): Char? = when (cls) {
+    public fun primitiveType(cls: Class<*>): Char? = when (cls) {
         Void.TYPE -> 'V'
         Boolean::class.javaPrimitiveType -> 'Z'
         Char::class.javaPrimitiveType -> 'C'
@@ -61,7 +61,7 @@ object ByteCodeUtils {
      * @param c the char to find a primitive class of.
      * @return the primitive class or null.
      */
-    fun primitiveType(c: Char): Class<*>? = when (c) {
+    public fun primitiveType(c: Char): Class<*>? = when (c) {
         'V' -> Void.TYPE
         'Z' -> Boolean::class.javaPrimitiveType
         'C' -> Char::class.javaPrimitiveType
@@ -85,7 +85,7 @@ object ByteCodeUtils {
      * @param type The class to get the runtime name of
      * @return the name.
      */
-    fun toRuntimeName(type: Class<*>): String = when {
+    public fun toRuntimeName(type: Class<*>): String = when {
         type.isPrimitive -> primitiveType(type).toString()
         type.isArray -> type.name
         else -> "L" + type.name.replace(
@@ -101,7 +101,7 @@ object ByteCodeUtils {
      * @param c the given char.
      * @return if the char can be parsed to a primitive.
      */
-    fun isPrimitiveType(c: Char): Boolean = when (c) {
+    public fun isPrimitiveType(c: Char): Boolean = when (c) {
         'V', 'Z', 'C', 'B', 'S', 'I', 'F', 'J', 'D' -> true
         else -> false
     }
@@ -112,7 +112,7 @@ object ByteCodeUtils {
      * @param opcode The opcode to check against.
      * @return If it is a return instruction or not.
      */
-    fun isReturn(opcode: Int): Boolean = when (opcode) {
+    public fun isReturn(opcode: Int): Boolean = when (opcode) {
         Opcodes.IRETURN, Opcodes.LRETURN, Opcodes.FRETURN, Opcodes.DRETURN, Opcodes.ARETURN, Opcodes.RETURN -> true
         else -> false
     }
@@ -127,7 +127,7 @@ object ByteCodeUtils {
      *
      * @return If the method signatures are the same.
      */
-    fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first)
+    public fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first)
         .matches(MethodSignature.of(second))
 
     /**
@@ -139,10 +139,10 @@ object ByteCodeUtils {
      * @since 1.1-SNAPSHOT
      * @author Durgan McBroom
      */
-    data class MethodSignature(
+    public data class MethodSignature(
         val name: String,
         val desc: String,
-        val returnType: String
+        val returnType: String?
     ) {
         /**
          * Checks if the name and description of the other Signature match this one.
@@ -150,14 +150,15 @@ object ByteCodeUtils {
          * @param other The signature to match against.
          * @return if they match.
          */
-        fun matches(other: MethodSignature): Boolean = other.name == name && other.desc == desc
+        public fun matches(other: MethodSignature): Boolean =
+            (other.name == name && other.desc == desc) && (if (returnType == null || other.returnType == null) true else returnType == other.returnType)
 
-        companion object {
-            const val NON_ARRAY_PATTERN = "[ZCBSIFJD]|(?:L.+;)"
+        public companion object {
+            private const val NON_ARRAY_PATTERN = "[ZCBSIFJD]|(?:L.+;)"
 
-            const val ANY_VALUE_PATTERN = "$NON_ARRAY_PATTERN|(?:\\[+(?:$NON_ARRAY_PATTERN))"
+            private const val ANY_VALUE_PATTERN = "$NON_ARRAY_PATTERN|(?:\\[+(?:$NON_ARRAY_PATTERN))"
 
-            const val SIGNATURE_PATTERN = "^(.+)\\(((?:$ANY_VALUE_PATTERN)*)\\)($ANY_VALUE_PATTERN|V)?$"
+            private const val SIGNATURE_PATTERN = "^(.+)\\(((?:$ANY_VALUE_PATTERN)*)\\)($ANY_VALUE_PATTERN|V)?$"
 
             /**
              * Parses a method signature into a MethodSignature.
@@ -167,15 +168,15 @@ object ByteCodeUtils {
              *
              * @throws IllegalStateException If the given signature is invalid.
              */
-            fun of(signature: String): MethodSignature {
+            public fun of(signature: String): MethodSignature {
                 val regex = Regex(SIGNATURE_PATTERN)
                 check(regex.matches(signature)) { "Invalid method signature: $signature" }
 
-                return regex.find(signature)!!.groupValues.let {
+                return regex.find(signature)!!.groupValues.let { values ->
                     MethodSignature(
-                        it[1],
-                        it[2],
-                        if (it.size == 4) it[3] else "UNKNOWN"
+                        values[1],
+                        values[2],
+                        values[3].takeIf { it.isNotBlank() }
                     )
                 }
             }
@@ -188,7 +189,7 @@ object ByteCodeUtils {
      * @param method The method to parse the name of.
      * @return the parsed name.
      */
-    fun byteCodeSignature(method: Method): String {
+    public fun byteCodeSignature(method: Method): String {
         val methodReturn = method.returnType
         val builder = StringBuilder(method.name)
         builder.append('(')

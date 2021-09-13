@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 
 
-fun ClassNode.methodOf(name: String, vararg args: Class<*>): MethodNode? = methods.firstOrNull {
+public fun ClassNode.methodOf(name: String, vararg args: Class<*>): MethodNode? = methods.firstOrNull {
     it.name == name && args.joinToString(
         prefix = "(",
         postfix = ")",
@@ -16,5 +16,5 @@ fun ClassNode.methodOf(name: String, vararg args: Class<*>): MethodNode? = metho
     ) == it.desc
 }
 
-fun ClassNode.fieldOf(name: String): FieldNode? = fields.firstOrNull { it.name == name }
+public fun ClassNode.fieldOf(name: String): FieldNode? = fields.firstOrNull { it.name == name }
 

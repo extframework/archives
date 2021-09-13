@@ -4,8 +4,8 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.InsnList
 
-object InstructionAdapters {
-    class RemoveLastReturn(
+public object InstructionAdapters {
+   public class RemoveLastReturn(
         parent: InstructionResolver
     ) : InstructionAdapter(parent) {
         override fun get(): InsnList = super.get().also { insn ->

@@ -2,6 +2,7 @@ package net.yakclient.mixins.base
 
 import net.yakclient.mixins.api.Injection
 import net.yakclient.mixins.api.METHOD_SELF
+import net.yakclient.mixins.base.TransformerConfig.TransformerConfigScope
 import net.yakclient.mixins.base.mixin.Injectors
 import net.yakclient.mixins.base.mixin.MixinInjectionTransformer
 import kotlin.reflect.KClass
@@ -15,7 +16,7 @@ import kotlin.reflect.KClass
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-object TransformerConfigurations {
+public object TransformerConfigurations {
     /**
      * Given a class annotated with @Mixer creates a configuration scope with
      * all basic mixin transformers. This can be added to.
@@ -23,8 +24,8 @@ object TransformerConfigurations {
      * @since 1.1-SNAPSHOT
      * @author Durgan McBroom
      */
-    fun mixinOf(clazz: Class<*>): TransformerConfig.TransformerConfigScope =
-        TransformerConfig.TransformerConfigScope().of {
+    public fun mixinOf(clazz: Class<*>): TransformerConfigScope =
+        TransformerConfigScope().of {
             for (method in clazz.methods) {
                 if (method.isAnnotationPresent(Injection::class.java)) {
                     val injection = method.getAnnotation(Injection::class.java)
@@ -37,7 +38,7 @@ object TransformerConfigurations {
                     add(
                         TargetedMethodTransformer(
                             MixinInjectionTransformer(Injectors.of(type), type, source),
-                            signature
+                            ByteCodeUtils.MethodSignature.of(signature)
                         )
                     )
                 }
@@ -47,5 +48,5 @@ object TransformerConfigurations {
     /**
      * Creates a mixin configuration from a KClass
      */
-    fun mixinOf(from: KClass<*>) = mixinOf(from.java)
+    public fun mixinOf(from: KClass<*>) : TransformerConfigScope = mixinOf(from.java)
 }

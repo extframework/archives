@@ -13,7 +13,7 @@ import org.objectweb.asm.tree.MethodNode
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-abstract class TargetedTransformer<T>(
+public abstract class TargetedTransformer<T>(
    private val delegate: InjectionTransformer<T>,
 ) {
     /**
@@ -23,7 +23,7 @@ abstract class TargetedTransformer<T>(
      * @param c The context to match
      * @return The context(transformed or not)
      */
-   fun call(c: T): T =
+    public fun call(c: T): T =
         if (matches(c)) delegate(c) else c
 
     /**
@@ -32,7 +32,7 @@ abstract class TargetedTransformer<T>(
      * @param c the context to match
      * @return If the context matches.
      */
-    abstract fun matches(c: T): Boolean
+    public abstract fun matches(c: T): Boolean
 }
 
 /**
@@ -43,9 +43,9 @@ abstract class TargetedTransformer<T>(
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-class TargetedMethodTransformer(
+public class TargetedMethodTransformer(
     delegate: MethodTransformer,
-    private val signature: String,
+    private val signature: ByteCodeUtils.MethodSignature,
 ) : TargetedTransformer<MethodNode>(delegate), MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = call(context)
 
@@ -60,7 +60,7 @@ class TargetedMethodTransformer(
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-class TargetedFieldTransformer(
+public class TargetedFieldTransformer(
     delegate: FieldTransformer,
     private val name: String,
 ) : TargetedTransformer<FieldNode>(delegate), FieldTransformer {

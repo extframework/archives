@@ -1,23 +1,23 @@
 package net.yakclient.mixins.api
 
 /**
- * `Mixer` marks a class as a Mixer. This is a alternate
- * for `IMixer` but should be used preferably.
+ * `Mixer` marks a class as a Mixer. All mixer classes should
+ * be abstract.
  *
  * An example;
  *
- * <pre>
- * `public abstract class ExampleClass { ... }
-` *
-</pre> *
+ * ```
+ * @Mixer("org.example.TestCase")
+ * abstract class MixerClass { /*...*/ }
+ * ```
+ *
+ * @see Injection
  *
  * @author Durgan McBroom
  */
-const val RESOLVE_MODULE = "<RESOLVE_MODULE>"
-
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
-annotation class Mixer(
+public annotation class Mixer(
     /**
      * `Mixer#type()` provides the class that will
      * be mixed to.
@@ -25,6 +25,4 @@ annotation class Mixer(
      * @return returns the class that will be mixed into.
      */
     val value: String,
-
-    val module: String = RESOLVE_MODULE
 )

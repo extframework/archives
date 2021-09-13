@@ -7,9 +7,9 @@ import net.yakclient.mixins.base.ByteCodeUtils
 import org.objectweb.asm.tree.MethodNode
 
 
-fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
+public fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
 
-fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add, _ ->
+public fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
     fun StringBuilder.containedClass(): Class<*> =
         Class.forName(this.toString().replace('/', '.')).also { this.clear() }
@@ -44,11 +44,13 @@ fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf { add, _ ->
     }
 }
 
-fun MethodNode.sameSignature(signature: String): Boolean =
+public fun MethodNode.sameSignature(signature: String): Boolean =
     ByteCodeUtils.sameSignature(name + desc, signature)
 
-fun <T> listOf(creator: ((T) -> Unit, (T?) -> Unit) -> Unit): List<T> =
-    ArrayList<T>().apply { creator({ this.add(it) }, { if (it != null) this.add(it) }) }
+public fun MethodNode.sameSignature(signature: ByteCodeUtils.MethodSignature): Boolean =
+    ByteCodeUtils.MethodSignature.of(name + desc).matches(signature)
+
+private fun <T> listOf(builder: MutableList<T>.() -> Unit) : List<T> = ArrayList<T>().apply(builder).toList()
 
 private enum class SearchType {
     OBJECT,

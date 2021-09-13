@@ -18,9 +18,6 @@ import java.lang.instrument.ClassDefinition
 
 class TestBasicMixins {
     companion object {
-        @JvmStatic
-        private val somethingOrOther = "Hey"
-
         @BeforeAll
         @JvmStatic
         fun attachAgent() {
@@ -60,43 +57,27 @@ class TestBasicMixins {
         classReader.accept(resolver, 0)
 
 
-        //why am i taking this for granted, god, instrumentation is amazing
         YakMixinsAgent.instrumentation.redefineClasses(
             ClassDefinition(
                 TestBasicMixins::class.java,
                 writer.toByteArray()
             )
         )
-//        Mixins.apply(listOf( TestBasicMixins::class.java),  config)
 
         testMethod()
-
-        println(somethingOrOther)
-//        println(testMethod())
     }
 
 
     @Test
     fun `Test Bytecode modification with Mixins#apply`() {
-        val config = TransformerConfigurations.mixinOf(`Mixin test case`::class)
-            .of {
-                add { it: FieldNode ->
-                    println(it.name)
-                    println(it.value)
-                    it
-                }
-            }.build()
+        val config = TransformerConfigurations.mixinOf(`Mixin test case`::class).build()
 
         val task = Mixins.apply<TestBasicMixins>(config)
-
-        //Probably hasnt executed the task yet
-//        testMethod()
 
         //Blocking
         task.join()
 
         testMethod()
-//        `Inject this!`()
     }
 
     fun testMethod(): String {
@@ -104,8 +85,7 @@ class TestBasicMixins {
         println("happens second")
 
         if (System.currentTimeMillis() > 0) println("hey")
-//        println("Hey, this is a ldc!")
-//
+
         val integer = 5
 
         val o = listOf("Something", "somethign else")
@@ -119,33 +99,15 @@ class TestBasicMixins {
         for (i in 1..integer) {
             println("SOMETHING")
         }
-//
-//        if (integer == 3) return "Hmm, looks like the integer is 3"
-//
+
         return "All finished here"
-    }
-
-    fun `Inject this!`() {
-        println("Somethien else")
-
-        val integer = 5
-
-        println(integer)
-
-        if (integer == 5) println("Ok something else")
-
-        for (i in 1..5) println("hey")
-
-        println("Wait, this was the original, anything more?")
     }
 }
 
 @Mixer("something cool")
-class `Mixin test case` {
-    @Injection("testMethod()", type = InjectionType.BEFORE_INVOKE)
+abstract class `Mixin test case` {
+    @Injection("testMethod()", type = InjectionType.AFTER_BEGIN)
     fun `Inject this!`() {
         println("Get injected")
-
-//        return "New return hahahh!"
     }
 }

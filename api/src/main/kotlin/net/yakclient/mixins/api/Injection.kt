@@ -1,48 +1,45 @@
 package net.yakclient.mixins.api
 
 /**
- * `@Injection` marks a method as a Injection, who's Java
- * bytecode will be injected into the reciprocal.
+ * `@Injection` marks a method as an Injection. In a mixin this will be
+ * code that is injected into another spot.
  *
  * This annotation is meant to be very simple and easy to use.
  * In fact nothing has to be pre-defined and values will
  * default to acceptable options.
  *
- * A basic example, in this case all we have to provide is
- * the annotation;
+ * The most basic example is as follows:
+ * ```
+ * @Injection
+ * fun doSomething(int: Int, any: Any) : String { /*Injection*/ }
+ * ```
+ * This configuration will inject the body of the annotated method into
+ * the methods with the signature `doSomething(ILkotlin/Any;)Ljava/lang/String`
  *
- * <pre>
- * `...
+ * You can of course change options to something more like this:
  *
- * public void myMethod(Integer... params) { ... }
- * ...
-` *
-</pre> *
+ * ```
+ * @Injection(
+ *    to="doSomething(ILkotlin/Any;)",
+ *    type = InjectionType.AFTER_BEGIN,
+ *    priority = Priority.MEDIUM)
+ * fun asdf(int: Int, any: Any) /* Can have a void return type where the mixin does not exit the method */ { /*Injection*/ }
+ * ```
  *
- * In a more complex example we could provide as many
- * options as we would like;
- *
- * <pre>
- * `...
- * = "a_different_name", type = InjectionType.BEFORE_INVOKE, priority = Priority.LOW)
- * public void myMethod(Integer... params) { ... }
- * ...
-` *
-</pre> *
+ * This will inject to a method with the signature `doSomething(ILkotlin/Any;)`(ignoring return type) with a
+ * injection type of [AFTER_BEGIN][InjectionType.AFTER_BEGIN] and a [medium priority][Priority.MEDIUM]
  *
  * @see InjectionType
- *
  * @see Priority
- *
  *
  * @author Durgan McBroom
  */
 
-const val METHOD_SELF: String = "<SELF>"
+public const val METHOD_SELF: String = "<SELF>"
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
-annotation class Injection(
+public annotation class Injection(
     /**
      * The `Injection#to()` method defines the method that
      * will be injected into. If this value is not provided it will
@@ -66,6 +63,8 @@ annotation class Injection(
      * Specifies a injection priority that will in the end determine
      * what different injections will go first if there is a
      * collision.
+     *
+     * @see Priority
      *
      * @return the priority of this injection.
      */

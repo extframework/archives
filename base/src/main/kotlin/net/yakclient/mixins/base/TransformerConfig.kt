@@ -13,10 +13,10 @@ package net.yakclient.mixins.base
  *
  * @author Durgan McBroom
  */
-class TransformerConfig(
-    val ct: ClassTransformer,
-    val mt: MethodTransformer,
-    val ft: FieldTransformer
+public class TransformerConfig(
+    public val ct: ClassTransformer,
+    public val mt: MethodTransformer,
+    public val ft: FieldTransformer
 ) {
     /**
      * The TransformerConfig builder scope which provides utilities for creating a
@@ -30,7 +30,7 @@ class TransformerConfig(
      *
      * @author Durgan McBroom
      */
-    class TransformerConfigScope(
+    public class TransformerConfigScope(
         private val cts: MutableList<ClassTransformer> = ArrayList(),
         private val mts: MutableList<MethodTransformer> = ArrayList(),
         private val fts: MutableList<FieldTransformer> = ArrayList()
@@ -40,28 +40,28 @@ class TransformerConfig(
          *
          * @param t the transformer to add.
          */
-        fun add(t: ClassTransformer) = cts.add(t)
+        public fun add(t: ClassTransformer) : Boolean = cts.add(t)
 
         /**
          * Adds a MethodTransformer.
          *
          * @param t the transformer to add.
          */
-        fun add(t: MethodTransformer) = mts.add(t)
+        public fun add(t: MethodTransformer) : Boolean = mts.add(t)
 
         /**
          * Adds a FieldTransformer.
          *
          * @param t the Transformer to add.
          */
-        fun add(t: FieldTransformer) = fts.add(t)
+        public fun add(t: FieldTransformer) : Boolean = fts.add(t)
 
         /**
          * Applies the given expression with 'this' as the scope.
          *
          * @param block the expression to evaluate.
          */
-        fun of(block: TransformerConfigScope.() -> Unit): TransformerConfigScope = apply(block)
+        public fun of(block: TransformerConfigScope.() -> Unit): TransformerConfigScope = apply(block)
 
         /**
          * Constructs a TransformerConfig from the collected transformers. If more
@@ -69,7 +69,7 @@ class TransformerConfig(
          *
          * @return The built TransformerConfig.
          */
-        fun build(): TransformerConfig = let { config ->
+        public fun build(): TransformerConfig = let { config ->
             fun <T : InjectionTransformer<*>> proxyOrFirst(l: List<T>, proxy: (List<T>) -> T): T =
                 if (l.size == 1) l.first() else proxy(l)
 

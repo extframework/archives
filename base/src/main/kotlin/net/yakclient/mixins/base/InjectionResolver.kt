@@ -5,25 +5,13 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 
-interface InjectionResolver
+internal interface InjectionResolver
 
-class ClassResolver(
+public class ClassResolver(
     private val delegate: ClassVisitor,
 
     private val config: TransformerConfig,
 ) : ClassVisitor(Opcodes.ASM9, ClassNode()), InjectionResolver {
-//    override fun visit(
-//        version: Int,
-//        access: Int,
-//        name: String?,
-//        signature: String?,
-//        superName: String?,
-//        interfaces: Array<out String>?
-//    ) {
-//        println(version)
-//        super.visit(version, access, name, signature, superName, interfaces)
-//    }
-
     override fun visitMethod(
         access: Int,
         name: String?,
@@ -53,7 +41,7 @@ class ClassResolver(
     }
 }
 
-class MethodResolver(
+internal class MethodResolver(
     private val delegate: MethodNode,
     private val transformer: MethodTransformer
 ) : MethodVisitor(
@@ -74,7 +62,7 @@ class MethodResolver(
     }
 }
 
-class FieldResolver(
+internal class FieldResolver(
     private val delegate: ClassVisitor,
     private val transformer: FieldTransformer,
 

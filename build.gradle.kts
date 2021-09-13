@@ -1,38 +1,55 @@
 plugins {
     kotlin("jvm") version "1.5.30"
-//    kotlin("jvm") version "1.5.21"
 
-
-    id( "org.springframework.boot") version "2.4.7"
+    id("io.gitlab.arturbosch.detekt") version "1.18.1"
+    id("signing")
+    id("maven-publish")
+    id("org.jetbrains.dokka") version "1.4.32"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("org.javamodularity.moduleplugin") version "1.8.9"
 }
 
 group = "net.yakclient"
-version = "1.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+version = "1.1"
 
 
 repositories {
     mavenCentral()
 }
 
-
 dependencies {
     implementation(kotlin("stdlib"))
 
-//    implementation( "org.jetbrains.kotlin:kotlin-stdlib")
     implementation(project(":base"))
 }
 
 tasks.wrapper {
-    gradleVersion = "7.1.1"
-//    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "7.2"
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(project.findProperty("mavenUsername") as String)
+            password.set(project.findProperty("mavenPassword") as String)
+        }
+    }
 }
 
 subprojects {
-    apply( plugin= "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "signing")
 
     repositories {
         mavenCentral()
+    }
+
+    kotlin {
+        explicitApi()
     }
 
     dependencies {
@@ -40,7 +57,7 @@ subprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-        destinationDir = tasks.compileJava.get().destinationDirectory.asFile.get()
+        destinationDirectory.set(tasks.compileJava.get().destinationDirectory.asFile.get())
         kotlinOptions.jvmTarget = "11"
 
     }
@@ -48,10 +65,4 @@ subprojects {
     tasks.test {
         useJUnitPlatform()
     }
-
-    tasks.compileJava {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
-    }
-    
 }
