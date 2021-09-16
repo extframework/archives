@@ -35,6 +35,7 @@ public object TransformerConfigurations {
                     val type = injection.type
                     val signature =
                         injection.to.takeIf { it != METHOD_SELF } ?: ByteCodeUtils.byteCodeSignature(method)
+
                     add(
                         TargetedMethodTransformer(
                             MixinInjectionTransformer(Injectors.of(type), type, source),
@@ -46,7 +47,7 @@ public object TransformerConfigurations {
         }
 
     /**
-     * Creates a mixin configuration from a KClass
+     * Creates a mixin configuration from a KClass.
      */
     public fun mixinOf(from: KClass<*>) : TransformerConfigScope = mixinOf(from.java)
 }

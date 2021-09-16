@@ -6,9 +6,29 @@ import net.yakclient.mixins.base.extension.SearchType.*
 import net.yakclient.mixins.base.ByteCodeUtils
 import org.objectweb.asm.tree.MethodNode
 
-
+/**
+ * Returns a list of parameters in class form.
+ *
+ * @receiver The node to find the parameters of.
+ *
+ * @return the parameters.
+ */
 public fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
 
+/**
+ * Turns a bytecode description into a list of classes. The
+ * form of the description should be as follows:
+ * `( + <description> + )`
+ *
+ * An actual example:
+ * ```
+ * (ZC[I[ILjava/lang/Object;D)
+ * ```
+ *
+ * @param desc the description to find the parameters of.
+ *
+ * @return the list of classes.
+ */
 public fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
     fun StringBuilder.containedClass(): Class<*> =
@@ -44,9 +64,29 @@ public fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf {
     }
 }
 
+/**
+ * Determines if the given signature is the same as the receiver
+ * this is called on.
+ *
+ * @receiver the node to determine the signature of.
+ *
+ * @param signature the signature to match
+ *
+ * @return if the two signatures match
+ */
 public fun MethodNode.sameSignature(signature: String): Boolean =
     ByteCodeUtils.sameSignature(name + desc, signature)
 
+/**
+ * Determines if the given bytecode signature is the same as the receiver
+ * this is called on.
+ *
+ * @receiver the node to determine the signature of.
+ *
+ * @param signature the signature to match
+ *
+ * @return if the two signatures match
+ */
 public fun MethodNode.sameSignature(signature: ByteCodeUtils.MethodSignature): Boolean =
     ByteCodeUtils.MethodSignature.of(name + desc).matches(signature)
 

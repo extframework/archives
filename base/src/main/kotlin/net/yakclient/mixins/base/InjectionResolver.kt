@@ -7,7 +7,7 @@ import org.objectweb.asm.tree.MethodNode
 
 internal interface InjectionResolver
 
-public class ClassResolver(
+internal class ClassResolver(
     private val delegate: ClassVisitor,
 
     private val config: TransformerConfig,

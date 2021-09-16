@@ -5,8 +5,6 @@ open module yakclient.mixins.base.test.test {
     requires org.objectweb.asm.tree;
     requires jdk.unsupported;
 
-    requires net.bytebuddy.agent;
-    requires yakclient.mixins.base.agent;
     requires java.instrument;
     requires jdk.attach;
 

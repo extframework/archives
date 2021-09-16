@@ -17,10 +17,10 @@ internal class MixinInjectionTransformer(
 
 internal typealias MixinInjectionPoint = MixinInjectionContext.(opcode: Int) -> List<MixinInjector>
 
-public class MixinInjectionContext(
-    public val node: MethodNode
+internal class MixinInjectionContext(
+    val node: MethodNode
 ) {
-    public val insn : InsnList = node.instructions
+    val insn : InsnList = node.instructions
 }
 private fun MixinInjectionPoint.apply(node: MethodNode, opcode: Int) : List<MixinInjector> = this(MixinInjectionContext(node), opcode)
 
