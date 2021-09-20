@@ -5,33 +5,74 @@ plugins {
 }
 
 group = "net.yakclient"
-version = "1.1"
+version = "1.1.3"
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("net.bytebuddy:byte-buddy-agent:1.11.15")
+sourceSets {
+    create("java9") {
+        java.srcDir("src/main/java9")
+    }
+}
 
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2") {
-//        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
-//    }
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
+tasks.named<JavaCompile>("compileJava9Java") {
+    targetCompatibility = "1.9"
+    sourceCompatibility = "1.9"
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(9))
+    })
 
+    options.compilerArgs.addAll(
+        listOf(
+            "--patch-module",
+            "yakclient.mixins.base=${sourceSets.main.get().java.destinationDirectory.get().asFile.absolutePath}"
+        )
+    )
+}
 
-    api("org.ow2.asm:asm:9.2")
-    api("org.ow2.asm:asm-util:9.2")
-    api(project(":api"))
+tasks.compileJava {
+    targetCompatibility = "1.8"
+    sourceCompatibility = "1.8"
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    })
 }
 
 tasks.jar {
     archiveBaseName.set("mixins-base")
     archiveClassifier.set("")
+
+
+
+    into("META-INF/versions/9") {
+        from(sourceSets["java9"].output)
+    }
+    manifest {
+        attributes(
+            "Multi-Release" to true
+        )
+    }
 }
+
+fun DependencyHandlerScope.modularDependency(dependency: Any, configuration: String = "implementation") {
+    add(configuration, dependency)
+    add("java9${configuration.capitalize()}" /* Sucks but i cant be bothered to do something better */, dependency)
+}
+
+dependencies {
+    modularDependency("net.bytebuddy:byte-buddy-agent:1.11.15")
+
+    modularDependency("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
+    modularDependency(project(":api"), "api")
+    modularDependency("org.ow2.asm:asm:9.2", "api")
+    modularDependency("org.ow2.asm:asm-util:9.2", "api")
+}
+
+
+
 task<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
@@ -41,6 +82,7 @@ task<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
     from(tasks.dokkaJavadoc)
 }
+
 
 publishing {
     publications {

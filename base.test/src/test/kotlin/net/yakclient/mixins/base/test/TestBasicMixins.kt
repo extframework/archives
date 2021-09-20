@@ -24,6 +24,8 @@ class TestBasicMixins {
 
     @Test
     fun `Test Bytecode modification with Mixins#apply`() {
+        println( Class.forName("java.net.http.HttpRequest"))
+
         val config = TransformerConfigurations.mixinOf(`Mixin test case`::class).build()
 
         val task = Mixins.apply<TestBasicMixins>(config)

@@ -1,16 +1,9 @@
 package net.yakclient.mixins.base
 
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.util.Textifier
-import org.objectweb.asm.util.TraceMethodVisitor
-import java.io.DataInputStream
-import java.io.IOException
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.File
 import java.lang.reflect.Method
-import java.util.function.Consumer
+import java.util.stream.Collectors
 
 /**
  * A common set of utilities that might be needed for doing work with JVM
@@ -190,6 +183,7 @@ public object ByteCodeUtils {
      * @return the parsed name.
      */
     public fun byteCodeSignature(method: Method): String {
+        File.pathSeparator
         val methodReturn = method.returnType
         val builder = StringBuilder(method.name)
         builder.append('(')
