@@ -19,14 +19,8 @@ sourceSets {
 }
 
 tasks.named<JavaCompile>("compileJava9Java") {
-//    JavaLanguageVersion.of(8).
     targetCompatibility = "1.9"
-    sourceCompatibility =  "1.9"
-//    options.compilerArgs.addAll(arrayOf("--release", "1.9"))
-
-    javaCompiler.set(javaToolchains.compilerFor {
-        languageVersion.set(JavaLanguageVersion.of(9))
-    })
+    sourceCompatibility = "1.9"
 
     options.compilerArgs.addAll(
         listOf(
@@ -36,18 +30,19 @@ tasks.named<JavaCompile>("compileJava9Java") {
     )
 }
 
+tasks.compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 tasks.compileJava {
     targetCompatibility = "1.8"
     sourceCompatibility = "1.8"
-//    options.compilerArgs.addAll(arrayOf("--release", "8"))
-
-    javaCompiler.set(javaToolchains.compilerFor {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    })
 }
 
 tasks.jar {
-    archiveBaseName.set("mixins-api")
+    archiveBaseName.set("mixins-base")
     archiveClassifier.set("")
 
     into("META-INF/versions/9") {
