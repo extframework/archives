@@ -73,6 +73,7 @@ dependencies {
 task<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
+    from(sourceSets["java9"].allSource)
 }
 
 task<Jar>("javadocJar") {

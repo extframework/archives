@@ -11,6 +11,7 @@ internal class MixinInjectionTransformer(
     private val source: InstructionResolver
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
+//        context.
         point.apply(context, opcode).forEach { it.inject(source) }
     }
 }
