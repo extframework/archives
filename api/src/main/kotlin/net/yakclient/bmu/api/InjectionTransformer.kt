@@ -22,8 +22,6 @@ public fun interface InjectionTransformer<T> : (T) -> T {
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-//public fun interface ClassTransformer : InjectionTransformer<ClassNode>
-
 public typealias ClassTransformer = InjectionTransformer<ClassNode>
 /**
  * The base transformer type for all method transformations.
@@ -31,7 +29,6 @@ public typealias ClassTransformer = InjectionTransformer<ClassNode>
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-//public fun interface MethodTransformer : InjectionTransformer<MethodNode>
 public typealias MethodTransformer = InjectionTransformer<MethodNode>
 
 /**
