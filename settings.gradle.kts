@@ -1,3 +1,3 @@
-rootProject.name = "mixins"
+rootProject.name = "bmu"
 
-include(":api", ":base", "base.test")
+include(":mixin", ":api")

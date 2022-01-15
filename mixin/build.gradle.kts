@@ -24,7 +24,7 @@ tasks.named<JavaCompile>("compileJava9Java") {
     options.compilerArgs.addAll(
         listOf(
             "--patch-module",
-            "yakclient.bmu.api=${sourceSets.main.get().java.destinationDirectory.get().asFile.absolutePath}"
+            "yakclient.bmu.mixin=${sourceSets.main.get().java.destinationDirectory.get().asFile.absolutePath}"
         )
     )
 }
@@ -60,25 +60,18 @@ fun DependencyHandlerScope.modularDependency(dependency: Any, configuration: Str
 }
 
 dependencies {
-    modularDependency("net.bytebuddy:byte-buddy-agent:1.11.15")
-
-    modularDependency("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
-//    modularDependency(project(":api"), "api")
-    modularDependency("org.ow2.asm:asm:9.2", "api")
-    modularDependency("org.ow2.asm:asm-util:9.2", "api")
+    modularDependency(project(":api"), "api")
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.7.0")
     testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 }
 
 tasks.test {
     useJUnitPlatform()
-
 }
 
 task<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
-    from(sourceSets["java9"].allSource)
 }
 
 task<Jar>("javadocJar") {
@@ -86,19 +79,18 @@ task<Jar>("javadocJar") {
     from(tasks.dokkaJavadoc)
 }
 
-
 publishing {
     publications {
-        create<MavenPublication>("api-maven") {
+        create<MavenPublication>("mixin-maven") {
             from(components["java"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
 
-            artifactId = "bmu-api"
+            artifactId = "bmu-mixin"
 
             pom {
-                name.set("Bmu Api")
-                description.set("The base API module for YakClient Bytecode manipulation utils")
+                name.set("BMU mixins")
+                description.set("A mixin module for the YakClient Bytecode Manipulation Utils")
                 url.set("https://github.com/yakclient/mixins")
 
                 packaging = "jar"
@@ -127,9 +119,5 @@ publishing {
     }
 }
 signing {
-    sign(publishing.publications["api-maven"])
+    sign(publishing.publications["mixin-maven"])
 }
-
-
-
-
