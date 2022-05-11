@@ -1,7 +1,5 @@
 plugins {
-    id("maven-publish")
     id("org.jetbrains.dokka")
-    id("signing")
 }
 
 group = "net.yakclient"
@@ -11,62 +9,9 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    create("java9") {
-        java.srcDir("src/main/java9")
-    }
-}
-
-tasks.named<JavaCompile>("compileJava9Java") {
-    targetCompatibility = "1.9"
-    sourceCompatibility = "1.9"
-
-    options.compilerArgs.addAll(
-        listOf(
-            "--patch-module",
-            "yakclient.bmu.mixin=${sourceSets.main.get().java.destinationDirectory.get().asFile.absolutePath}"
-        )
-    )
-}
-
-tasks.compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-tasks.compileJava {
-    targetCompatibility = "1.8"
-    sourceCompatibility = "1.8"
-}
-
-tasks.jar {
-    archiveBaseName.set("mixins-base")
-    archiveClassifier.set("")
-
-    into("META-INF/versions/9") {
-        from(sourceSets["java9"].output)
-    }
-    manifest {
-        attributes(
-            "Multi-Release" to true
-        )
-    }
-}
-
-fun DependencyHandlerScope.modularDependency(dependency: Any, configuration: String = "implementation") {
-    add(configuration, dependency)
-    add("java9${configuration.capitalize()}" /* Sucks but i cant be bothered to do something better */, dependency)
-}
 
 dependencies {
-    modularDependency(project(":api"), "api")
-    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.7.0")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    api(project(":api"))
 }
 
 task<Jar>("sourcesJar") {
@@ -117,7 +62,4 @@ publishing {
             }
         }
     }
-}
-signing {
-    sign(publishing.publications["mixin-maven"])
 }

@@ -1,17 +1,13 @@
 plugins {
     kotlin("jvm") version "1.6.10"
 
-    id("io.gitlab.arturbosch.detekt") version "1.18.1"
     id("signing")
     id("maven-publish")
-    id("org.jetbrains.dokka") version "1.4.32"
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-
+    id("org.jetbrains.dokka") version "1.6.0"
 }
 
 group = "net.yakclient"
-version = "1.1"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -25,23 +21,34 @@ tasks.wrapper {
     gradleVersion = "7.2"
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(project.findProperty("mavenUsername") as String)
-            password.set(project.findProperty("mavenPassword") as String)
-        }
-    }
-}
-
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "maven-publish")
 
     repositories {
         mavenCentral()
+    }
+
+    publishing {
+        repositories {
+            if (!project.hasProperty("maven-user") || !project.hasProperty("maven-pass")) return@repositories
+
+            maven {
+                val repo = if (project.findProperty("isSnapshot") == "true") "snapshots" else "releases"
+
+                isAllowInsecureProtocol = true
+
+                url = uri("http://repo.yakclient.net/$repo")
+
+                credentials {
+                    username = project.findProperty("maven-user") as String
+                    password = project.findProperty("maven-pass") as String
+                }
+                authentication {
+                    create<BasicAuthentication>("basic")
+                }
+            }
+        }
     }
 
     kotlin {
@@ -50,12 +57,30 @@ subprojects {
 
     dependencies {
         implementation(kotlin("stdlib"))
+        implementation(kotlin("reflect"))
+        testImplementation(kotlin("test"))
     }
 
     tasks.compileKotlin {
         destinationDirectory.set(tasks.compileJava.get().destinationDirectory.asFile.get())
-        kotlinOptions.jvmTarget = "11"
+
+        kotlinOptions {
+            jvmTarget = "17"
+        }
     }
 
-//    tasks.compileTestKotlin
+    tasks.compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+
+    tasks.test {
+        useJUnitPlatform()
+    }
+
+    tasks.compileJava {
+        targetCompatibility = "17"
+        sourceCompatibility = "17"
+    }
 }
