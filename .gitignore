@@ -1,9 +1,7 @@
 /.idea/
 /out/
 *.iml
-**/gradle/wrapper
 **/build
-**/gradle
 .gradle
 out
 gradle.properties
