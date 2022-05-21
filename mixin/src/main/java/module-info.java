@@ -1,7 +1,7 @@
-module yakclient.bmu.mixin {
+module yakclient.archives.mixin {
     requires kotlin.stdlib;
-    requires transitive yakclient.archives.api;
+    requires transitive yakclient.archives;
 
-    exports net.yakclient.bmu.api.mixin;
+    exports net.yakclient.archives.api.mixin;
 //    exports net.yakclient.bmu.api.mixin.annotations;
 }

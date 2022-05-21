@@ -1,4 +1,4 @@
-module yakclient.archives.api {
+module yakclient.archives {
     requires transitive org.objectweb.asm;
     requires transitive org.objectweb.asm.tree;
     requires kotlin.stdlib;
@@ -8,7 +8,7 @@ module yakclient.archives.api {
     requires jdk.attach;
     requires yakclient.common.util;
 
-    exports net.yakclient.bmu.api;
-    exports net.yakclient.bmu.api.extension;
-    exports net.yakclient.bmu.api.transform;
+    exports net.yakclient.archives.api;
+    exports net.yakclient.archives.api.extension;
+    exports net.yakclient.archives.api.transform;
 }
