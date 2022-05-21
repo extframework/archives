@@ -8,7 +8,7 @@ module yakclient.archives {
     requires jdk.attach;
     requires yakclient.common.util;
 
-    exports net.yakclient.archives.api;
-    exports net.yakclient.archives.api.extension;
-    exports net.yakclient.archives.api.transform;
+    exports net.yakclient.archives;
+    exports net.yakclient.archives.extension;
+    exports net.yakclient.archives.transform;
 }
