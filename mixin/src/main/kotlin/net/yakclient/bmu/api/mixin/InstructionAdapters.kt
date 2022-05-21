@@ -1,7 +1,7 @@
 package net.yakclient.bmu.api.mixin
 
-import net.yakclient.bmu.api.InstructionAdapter
-import net.yakclient.bmu.api.InstructionResolver
+import net.yakclient.bmu.api.transform.InstructionAdapter
+import net.yakclient.bmu.api.transform.InstructionResolver
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.FieldInsnNode

@@ -1,15 +1,13 @@
 package net.yakclient.bmu.api.mixin
 
-import net.yakclient.bmu.api.*
-import net.yakclient.bmu.api.mixin.annotations.Injection
-import net.yakclient.bmu.api.mixin.annotations.METHOD_SELF
-import net.yakclient.bmu.api.mixin.annotations.Mixer
-import kotlin.reflect.KClass
+import net.yakclient.bmu.api.transform.*
 
-/**
- *
- */
 public object Mixins {
+    public data class InjectionMetaData(
+        public val resolver: InstructionResolver,
+        public val to: String,
+        public val type: InjectionType = InjectionType.AFTER_BEGIN,
+        )
     /**
      * Given a class annotated with @Mixer creates a configuration scope with
      * all basic mixin transformers. This can be added to.
@@ -17,36 +15,29 @@ public object Mixins {
      * @since 1.1-SNAPSHOT
      * @author Durgan McBroom
      */
-    public fun mixinOf(clazz: Class<*>): TransformerConfig.MutableTransformerConfiguration =
-        TransformerConfig.of {
-            val mixer = clazz.getAnnotation(Mixer::class.java)
-                ?: throw IllegalArgumentException("Given class must be annotated with @Mixer")
-            for (method in clazz.methods) {
-                if (method.isAnnotationPresent(Injection::class.java)) {
-                    val injection = method.getAnnotation(Injection::class.java)
+    public fun mixinOf(to: String, self: String, injections: List<InjectionMetaData>): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+        for (injection in injections) {
+                val source = InstructionAdapters.AlterThisReference(
+                   injection.resolver,
+                    to.replace('.', '/'),
+                    self.replace('.', '/')
+                )
 
-                    val source = InstructionAdapters.AlterThisReference(
-                        Sources.sourceOf(method),
-                        mixer.value.replace('.', '/'),
-                        clazz.name.replace('.', '/')
+                val type = injection.type
+                val signature = injection.to
+
+                transformMethod(
+                    TargetedMethodTransformer(
+                        MethodSignature.of(signature),
+                        MixinInjectionTransformer(Injectors.of(type), -1, source)
                     )
-
-                    val type = injection.type
-                    val signature =
-                        injection.to.takeIf { it != METHOD_SELF } ?: ByteCodeUtils.byteCodeSignature(method)
-
-                    transformMethod(
-                        TargetedMethodTransformer(
-                            ByteCodeUtils.MethodSignature.of(signature),
-                            MixinInjectionTransformer(Injectors.of(type), type, source)
-                        )
-                    )
-                }
+                )
             }
-        }
+    }
 
-    /**
-     * Creates a mixin configuration from a KClass.
-     */
-    public fun mixinOf(from: KClass<*>): TransformerConfig.MutableTransformerConfiguration = mixinOf(from.java)
+//    /**
+//     * Creates a mixin configuration from a KClass.
+//     */
+//    public fun mixinOf(from: KClass<*>): TransformerConfig.MutableTransformerConfiguration =
+//        mixinOf(from.java)
 }

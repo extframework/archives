@@ -1,3 +1,3 @@
-rootProject.name = "bmu"
+rootProject.name = "archives"
 
-include(":mixin", ":api")
+include(":mixin")

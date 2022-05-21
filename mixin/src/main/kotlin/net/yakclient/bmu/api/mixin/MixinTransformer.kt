@@ -1,7 +1,7 @@
 package net.yakclient.bmu.api.mixin
 
-import net.yakclient.bmu.api.InstructionResolver
-import net.yakclient.bmu.api.MethodTransformer
+import net.yakclient.bmu.api.transform.InstructionResolver
+import net.yakclient.bmu.api.transform.MethodTransformer
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
 
@@ -11,7 +11,6 @@ internal class MixinInjectionTransformer(
     private val source: InstructionResolver
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
-//        context.
         point.apply(context, opcode).forEach { it.inject(source) }
     }
 }

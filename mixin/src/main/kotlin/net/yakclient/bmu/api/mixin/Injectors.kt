@@ -1,7 +1,8 @@
 package net.yakclient.bmu.api.mixin
 
-import net.yakclient.bmu.api.ByteCodeUtils
-import net.yakclient.bmu.api.InstructionResolver
+import net.yakclient.bmu.api.transform.ByteCodeUtils
+import net.yakclient.bmu.api.transform.InstructionResolver
+import net.yakclient.bmu.api.mixin.InjectionType
 import org.objectweb.asm.tree.*
 
 /**
@@ -112,12 +113,12 @@ internal object Injectors {
      * int, correlating to the [injection type][net.yakclient.bmu.api.InjectionType].
      * If the type does not match then an opcode matcher will be assumed.
      */
-    fun of(id: Int) : MixinInjectionPoint = when (id) {
-        200 -> AFTER_BEGIN
-        201 -> BEFORE_END
-        202 -> BEFORE_RETURN
-        203 -> BEFORE_INVOKE
-        204 -> OVERWRITE
-        else -> BEFORE_OPCODE
+    fun of(id: InjectionType) : MixinInjectionPoint = when (id) {
+        InjectionType.AFTER_BEGIN -> AFTER_BEGIN
+        InjectionType.BEFORE_END -> BEFORE_END
+        InjectionType.BEFORE_RETURN -> BEFORE_RETURN
+        InjectionType.BEFORE_INVOKE -> BEFORE_INVOKE
+        InjectionType.OVERWRITE -> OVERWRITE
+// TODO Figure out if we need this --->        else -> BEFORE_OPCODE
     }
 }

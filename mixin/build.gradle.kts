@@ -2,16 +2,13 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-group = "net.yakclient"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
 
 
 dependencies {
-    api(project(":api"))
+    api(project(":"))
 }
 
 task<Jar>("sourcesJar") {
@@ -31,12 +28,12 @@ publishing {
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
 
-            artifactId = "bmu-mixin"
+            artifactId = "archives-mixin"
 
             pom {
-                name.set("BMU mixins")
-                description.set("A mixin module for the YakClient Bytecode Manipulation Utils")
-                url.set("https://github.com/yakclient/mixins")
+                name.set("Archive mixins")
+                description.set("A mixin module for the YakClient Archive library")
+                url.set("https://github.com/yakclient/archives")
 
                 packaging = "jar"
 
@@ -55,9 +52,9 @@ publishing {
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/yakclient/mixins")
-                    developerConnection.set("scm:git:ssh://github.com:yakclient/mixins.git")
-                    url.set("https://github.com/yakclient/mixins")
+                    connection.set("scm:git:git://github.com/yakclient/archives")
+                    developerConnection.set("scm:git:ssh://github.com:yakclient/archives.git")
+                    url.set("https://github.com/yakclient/archives")
                 }
             }
         }
