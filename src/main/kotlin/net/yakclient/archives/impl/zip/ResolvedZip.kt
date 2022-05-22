@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.zip
+package net.yakclient.archives.impl.zip
 
 import net.yakclient.archives.ResolvedArchive
 

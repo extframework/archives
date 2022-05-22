@@ -38,7 +38,7 @@ class TestBasicTransformations {
             Archives.zipFinder
         )
 
-        val writer = AwareClassWriter(archive, 0)
+        val writer = AwareClassWriter(listOf(archive), 0)
         assert(writer.getCommonSuperClass("java/lang/String", "java/lang/String") == "java/lang/Object")
         assert(
             writer.getCommonSuperClass(
@@ -60,7 +60,7 @@ class TestBasicTransformations {
        Archives.resolve(
             ClassReader(archive.reader["net/yakclient/archive/mapper/ObfuscationMap.class"]!!.resource.open()),
             config,
-            AwareClassWriter(archive, ClassWriter.COMPUTE_FRAMES)
+            AwareClassWriter(listOf(archive), ClassWriter.COMPUTE_FRAMES)
         )
     }
 

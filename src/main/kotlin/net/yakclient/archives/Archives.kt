@@ -1,11 +1,11 @@
 package net.yakclient.archives
 
-import net.yakclient.archives.internal.jpm.JpmFinder
-import net.yakclient.archives.internal.jpm.JpmHandle
-import net.yakclient.archives.internal.jpm.JpmResolver
-import net.yakclient.archives.internal.zip.ZipFinder
-import net.yakclient.archives.internal.zip.ZipHandle
-import net.yakclient.archives.internal.zip.ZipResolver
+import net.yakclient.archives.impl.jpm.JpmFinder
+import net.yakclient.archives.impl.jpm.JpmHandle
+import net.yakclient.archives.impl.jpm.JpmResolver
+import net.yakclient.archives.impl.zip.ZipFinder
+import net.yakclient.archives.impl.zip.ZipHandle
+import net.yakclient.archives.impl.zip.ZipResolver
 import net.yakclient.archives.transform.ClassResolver
 import net.yakclient.archives.transform.TransformerConfig
 import net.yakclient.common.util.CAST

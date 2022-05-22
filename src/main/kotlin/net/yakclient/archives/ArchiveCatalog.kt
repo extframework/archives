@@ -12,8 +12,11 @@ public object ArchiveCatalog {
 
     public fun <T : Any> loadService(service: KClass<T>): List<T> = loadService(service.java)
 
-    public fun <T : Any> loadService(service: Class<T>): List<T> =
-        ServiceLoader.load(service).toList() + archives.flatMap { it.loadService(service.name) }
+    public fun <T : Any> loadService(service: Class<T>): List<T> {
+        this::class.java.module.addUses(service)
+
+        return ServiceLoader.load(service).toList() + archives.flatMap { it.loadService(service.name) }
             .map { it.getConstructor().newInstance() }
             .map { it as T }
+    }
 }

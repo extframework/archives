@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.jpm
+package net.yakclient.archives.impl.jpm
 
 import net.yakclient.archives.ArchiveHandle
 import net.yakclient.common.util.readBytes

@@ -29,7 +29,12 @@ public interface ArchiveHandle : Closeable {
     }
 
     public interface Writer {
-        public fun put(name: String, resource: SafeResource, handle: ArchiveHandle, isDirectory: Boolean = false): Unit =
+        public fun put(
+            name: String,
+            resource: SafeResource,
+            handle: ArchiveHandle,
+            isDirectory: Boolean = false
+        ): Unit =
             put(Entry(name, resource, isDirectory, handle))
 
         public fun put(entry: Entry)
@@ -43,18 +48,16 @@ public interface ArchiveHandle : Closeable {
         public val isDirectory: Boolean,
         public val handle: ArchiveHandle,
     ) {
-        public fun transform(config: TransformerConfig): Entry {
-            val newContent by lazy {
-                Archives.resolve(
-                    ClassReader(resource.open()),
-                    config,
-                    AwareClassWriter(handle, WRITER_FLAGS)
-                )
-            }
-
+        public fun transform(config: TransformerConfig, handles: List<ArchiveHandle> = listOf()): Entry {
             return Entry(
                 name,
-                ProvidedResource(resource.uri) { newContent },
+                ProvidedResource(resource.uri) {
+                    Archives.resolve(
+                        ClassReader(resource.open()),
+                        config,
+                        AwareClassWriter(handles + handle, WRITER_FLAGS)
+                    )
+                },
                 isDirectory,
                 handle
             )

@@ -28,7 +28,7 @@ public data class MethodSignature(
 
         private const val ANY_VALUE_PATTERN = "$NON_ARRAY_PATTERN|(?:\\[+(?:$NON_ARRAY_PATTERN))"
 
-        private const val SIGNATURE_PATTERN = "^(.+)\\(((?:$ANY_VALUE_PATTERN)*)\\)($ANY_VALUE_PATTERN|V)?$"
+        private const val SIGNATURE_PATTERN = "^(.*)\\(((?:$ANY_VALUE_PATTERN)*)\\)($ANY_VALUE_PATTERN|V)?$"
 
         /**
          * Parses a method signature into a MethodSignature.

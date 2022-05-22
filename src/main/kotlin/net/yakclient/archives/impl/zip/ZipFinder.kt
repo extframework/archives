@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.zip
+package net.yakclient.archives.impl.zip
 
 import net.yakclient.archives.ArchiveFinder
 import java.nio.file.Path
@@ -6,7 +6,7 @@ import java.util.jar.JarFile
 import java.util.zip.ZipFile
 import kotlin.reflect.KClass
 
-public class ZipFinder : ArchiveFinder<ZipHandle> {
+internal class ZipFinder : ArchiveFinder<ZipHandle> {
     override val type: KClass<ZipHandle> = ZipHandle::class
 
     override fun find(path: Path): ZipHandle {

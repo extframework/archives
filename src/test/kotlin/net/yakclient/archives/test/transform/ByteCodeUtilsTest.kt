@@ -7,5 +7,6 @@ class ByteCodeUtilsTest {
     @Test
     fun `Test MethodSignature`() {
        println(MethodSignature.of("test(ZZZZ)"))
+        println(MethodSignature.of("()V"))
     }
 }

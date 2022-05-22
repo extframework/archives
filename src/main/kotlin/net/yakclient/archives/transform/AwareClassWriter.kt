@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 public class AwareClassWriter(
-    private val handle: ArchiveHandle,
+    private val handles:  List<ArchiveHandle>,
     flags: Int,
     reader: ClassReader? = null,
 ) : ClassWriter(reader, flags) {
@@ -69,7 +69,7 @@ public class AwareClassWriter(
 
     // Name expected in JVM internal format
     private fun loadType(name: String): HierarchyNode {
-        val openEntry = handle.reader["$name.class"]?.resource?.open()
+        val openEntry = handles.firstNotNullOfOrNull { it.reader["$name.class"]?.resource?.open() }
             ?: return runCatching(ClassNotFoundException::class) {
                 LoadedClassNode(Class.forName(name.replace('/', '.')))
             } ?: throw TypeNotPresentException(name, null)

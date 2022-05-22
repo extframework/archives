@@ -1,11 +1,11 @@
-package net.yakclient.archives.internal.zip
+package net.yakclient.archives.impl.zip
 
 import net.yakclient.archives.ArchiveResolver
 import net.yakclient.archives.ClassLoaderProvider
 import net.yakclient.archives.ResolvedArchive
 import kotlin.reflect.KClass
 
-public class ZipResolver : ArchiveResolver<ZipHandle> {
+internal class ZipResolver : ArchiveResolver<ZipHandle> {
     override val type: KClass<ZipHandle> = ZipHandle::class
 
     override fun resolve(
@@ -22,6 +22,4 @@ public class ZipResolver : ArchiveResolver<ZipHandle> {
 
         ResolvedZip(entry.second, packages, parents)
     }
-
-
 }

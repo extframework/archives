@@ -1,17 +1,17 @@
-package net.yakclient.archives.internal.jpm
+package net.yakclient.archives.impl.jpm
 
 import net.yakclient.archives.ResolvedArchive
 import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 
-internal class ResolvedJpm(
-    val module: Module,
+public class ResolvedJpm(
+    public val module: Module,
 ) : ResolvedArchive {
-    override val classloader: ClassLoader=module.classLoader
+    override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()
     override val packages: Set<String> = module.packages
     override val parents: List<ResolvedArchive>
-    val configuration: Configuration = module.layer.configuration()
-    val layer: ModuleLayer = module.layer
+    public val configuration: Configuration = module.layer.configuration()
+    public val layer: ModuleLayer = module.layer
     private val services: Map<String, List<Class<*>>> by lazy {
         module.descriptor.provides().associate { it.service() to it.providers().map(classloader::loadClass) }
     }
