@@ -11,7 +11,7 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
 public object Sources {
-    public fun sourceOf(method: Method): InstructionResolver {
+    public fun of(method: Method): InstructionResolver {
         val declaringClass = method.declaringClass
         val name = declaringClass.name
         val r = name.replace(
@@ -29,8 +29,8 @@ public object Sources {
         )
     }
 
-    public fun sourceOf(func: KFunction<*>): InstructionResolver =
-        sourceOf(requireNotNull(func.javaMethod) { "KFunction must have associated java method" })
+    public fun of(func: KFunction<*>): InstructionResolver =
+        of(requireNotNull(func.javaMethod) { "KFunction must have associated java method" })
 
     public class MethodSourceResolver internal constructor(
         reader: ClassReader,

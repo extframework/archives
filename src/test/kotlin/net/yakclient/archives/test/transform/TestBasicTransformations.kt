@@ -14,7 +14,7 @@ class TestBasicTransformations {
     fun `Test replace methods`() {
         val config = TransformerConfig.of {
             transformMethod("testMethod()V") {
-                it.instructions = Sources.sourceOf(::methodToInject).get()
+                it.instructions = Sources.of(::methodToInject).get()
 
                 it
             }

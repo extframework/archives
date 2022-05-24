@@ -1,5 +1,6 @@
 package net.yakclient.archives.mixin
 
+import net.yakclient.archives.extension.slice
 import net.yakclient.archives.transform.ByteCodeUtils
 import net.yakclient.archives.transform.InstructionResolver
 import net.yakclient.archives.mixin.InjectionType
@@ -17,12 +18,9 @@ internal object Injectors {
      * Finds the instruction directly before the last return statement.
      */
     private val BEFORE_END: MixinInjectionPoint = {
-        var lastReturn: AbstractInsnNode? = null
-        for (node in insn) {
-            if (ByteCodeUtils.isReturn(node.opcode)) lastReturn = node
-        }
-
-        checkNotNull(lastReturn) { "Failed to find last return in given instructions." }
+        val lastReturn = insn.fold<AbstractInsnNode, AbstractInsnNode?>(null) { acc, node ->
+            if (ByteCodeUtils.isReturn(node.opcode)) node else acc
+        } ?: throw IllegalStateException("Failed to find last return in given instructions.")
 
         listOf(BeforeInsnNodeInjector(insn, lastReturn))
     }
@@ -75,7 +73,7 @@ internal object Injectors {
          * @param toInject the instructions to adapt and inject.
          */
         override fun inject(toInject: InstructionResolver) =
-            inject(InstructionAdapters.RemoveLastReturn(toInject).get())
+            inject(FixLocals(RemoveLastReturn(toInject), sourceFollowingInjection()).get())
 
         /**
          * Abstractly injects the given insnList into the provided by construction.
@@ -83,6 +81,8 @@ internal object Injectors {
          * @param toInject the instructions to inject(already adapted).
          */
         abstract fun inject(toInject: InsnList)
+
+        abstract fun sourceFollowingInjection() : InsnList
     }
 
     /**
@@ -97,6 +97,7 @@ internal object Injectors {
         }
 
         override fun inject(toInject: InsnList) = insn.insertBefore(node, toInject)
+        override fun sourceFollowingInjection(): InsnList = insn.slice(node)
     }
 
     /**
@@ -106,6 +107,7 @@ internal object Injectors {
         insn: InsnList,
     ) : MixinAdaptedInjector(insn) {
         override fun inject(toInject: InsnList) = insn.insert(toInject)
+        override fun sourceFollowingInjection(): InsnList = insn
     }
 
     /**
@@ -113,7 +115,7 @@ internal object Injectors {
      * int, correlating to the [injection type][net.yakclient.archives.api.InjectionType].
      * If the type does not match then an opcode matcher will be assumed.
      */
-    fun of(id: InjectionType) : MixinInjectionPoint = when (id) {
+    fun of(id: InjectionType): MixinInjectionPoint = when (id) {
         InjectionType.AFTER_BEGIN -> AFTER_BEGIN
         InjectionType.BEFORE_END -> BEFORE_END
         InjectionType.BEFORE_RETURN -> BEFORE_RETURN
