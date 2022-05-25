@@ -8,6 +8,7 @@ import net.yakclient.archives.transform.Sources
 import net.yakclient.archives.transform.TransformerConfig
 import org.junit.jupiter.api.Test
 import org.objectweb.asm.ClassReader
+import kotlin.math.floor
 
 class TestBasicMixins {
     @Test
@@ -84,18 +85,13 @@ class MixedClass {
 abstract class `Mixin test case` {
     private var value = ""
 
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun print(): String {
-        val r = Math.random()
-
-        return "Something? $r"
-    }
-
     fun `Inject this!`() {
-        println(print())
+        var a = ""
+//
+        repeat( floor(Math.random() * 10).toInt()) {
+            a += "a"
+        }
 
-        println("OK BUD")
-
-        value = "changed value"
+//       println(a)
     }
 }

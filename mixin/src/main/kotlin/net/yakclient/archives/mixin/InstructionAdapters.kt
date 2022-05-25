@@ -93,8 +93,7 @@ public class FixLocals(
             .subtract(requiredInjectionLocals) // We dont care about instructions that both list require(self ref and parameters again)
             .withIndex() // Attach index for use when pairing with new locals
             .associateWith { (i, _) ->
-                overridableLocals.getOrNull(i) // First check if we can use a local that is safe to override(saves slight amounts of memory)
-                    ?: (largestLocal + (i + 1)) // If we have no more overridable locals we can "create a new one".
+                largestLocal + (i + 1) // Assign to a new local
             }.mapKeys { it.key.value } // Make the keys to the old local value
 
         // Iterate through and if it's an instruction referencing a local, change it.

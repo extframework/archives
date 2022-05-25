@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.InvokeDynamicInsnNode
 import org.objectweb.asm.tree.JumpInsnNode
+import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.LineNumberNode
 import org.objectweb.asm.tree.LookupSwitchInsnNode
@@ -190,9 +191,10 @@ public object ByteCodeUtils {
                 is TableSwitchInsnNode -> "${it.min} ${it.max} ${it.dflt.label} ${it.labels}"
                 is TypeInsnNode -> it.desc
                 is VarInsnNode -> "${it.`var`}"
+                is LabelNode -> "LABEL ${it.label}"
                 else -> ""
             }
-        }.map { "${opcodeToString(it.key.opcode)?.let { it -> "$it " } ?: ""}${it.value}" }
+        }.map { "${opcodeToString(it.key.opcode)?.let { s -> "$s " } ?: ""}${it.value}" }
     }
 
 }
