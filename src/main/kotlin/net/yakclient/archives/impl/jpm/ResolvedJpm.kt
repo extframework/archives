@@ -1,6 +1,7 @@
 package net.yakclient.archives.impl.jpm
 
 import net.yakclient.archives.ResolvedArchive
+import net.yakclient.archives.security.PrivilegeList
 import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 
@@ -9,7 +10,7 @@ public class ResolvedJpm(
 ) : ResolvedArchive {
     override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()
     override val packages: Set<String> = module.packages
-    override val parents: List<ResolvedArchive>
+    override val parents: Set<ResolvedArchive>
     public val configuration: Configuration = module.layer.configuration()
     public val layer: ModuleLayer = module.layer
     private val services: Map<String, List<Class<*>>> by lazy {
@@ -28,7 +29,7 @@ public class ResolvedJpm(
             module.descriptor.requires()
                 .filterNot {
                     it.modifiers().contains(ModuleDescriptor.Requires.Modifier.STATIC)
-                }.map {
+                }.mapTo(HashSet()) {
                     loadArchive(it.name())!!
                 }
         }
@@ -38,5 +39,5 @@ public class ResolvedJpm(
         private val nameToArchive: MutableMap<String, ResolvedArchive> = HashMap()
     }
 
-    override fun loadService(name: String): List<Class<*>> = services[name] ?: ArrayList()
+//    override fun loadService(name: String): List<Class<*>> = services[name] ?: ArrayList()
 }

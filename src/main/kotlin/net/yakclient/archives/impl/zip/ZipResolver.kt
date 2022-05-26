@@ -11,7 +11,7 @@ internal class ZipResolver : ArchiveResolver<ZipHandle> {
     override fun resolve(
         archiveRefs: List<ZipHandle>,
         clProvider: ClassLoaderProvider<ZipHandle>,
-        parents: List<ResolvedArchive>
+        parents: Set<ResolvedArchive>
     ): List<ResolvedArchive> = archiveRefs.map { it to clProvider(it) }.map { entry ->
         val packages = entry.first.reader.entries()
             .map { it.name } // Mapping to the name of the entry

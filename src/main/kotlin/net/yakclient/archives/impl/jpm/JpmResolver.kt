@@ -21,7 +21,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle> {
     override fun resolve(
         archiveRefs: List<JpmHandle>,
         clProvider: ClassLoaderProvider<JpmHandle>,
-        parents: List<ResolvedArchive>
+        parents: Set<ResolvedArchive>
     ): List<ResolvedArchive> {
         val refs = archiveRefs.map(::loadRef)
         val refsByName = refs.associateBy { it.descriptor().name() }

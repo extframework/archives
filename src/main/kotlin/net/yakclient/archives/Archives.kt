@@ -14,6 +14,7 @@ import org.objectweb.asm.ClassWriter
 
 import java.nio.file.Path
 import java.util.*
+import kotlin.collections.HashSet
 import kotlin.reflect.KClass
 
 
@@ -26,7 +27,7 @@ public object Archives {
 
     @Suppress(CAST)
     private fun <T : ArchiveHandle> resolver(clazz: KClass<T>): ArchiveResolver<T> {
-        return (ArchiveCatalog.loadService(ArchiveResolver::class)
+        return (ArchiveCataloger.loadService(ArchiveResolver::class)
             .firstOrNull { clazz == it.type } as? ArchiveResolver<T>)
             ?: throw IllegalStateException("Not able to load the ArchiveResolver, make sure all services are declared!")
     }
@@ -43,16 +44,16 @@ public object Archives {
             @Suppress(CAST)
             resolver(type) as ArchiveResolver<T>
         },
-        parents: List<ResolvedArchive> = ArrayList(),
+        parents: Set<ResolvedArchive> = hashSetOf(),
         clProvider: ClassLoaderProvider<T>,
-    ): List<ResolvedArchive> = resolver.resolve(refs, clProvider, parents).onEach(ArchiveCatalog::catalog)
+    ): List<ResolvedArchive> = resolver.resolve(refs, clProvider, parents).onEach(ArchiveCataloger::catalog)
 
     @JvmOverloads
     public fun <T : ArchiveHandle> resolve(
         ref: T,
         classloader: ClassLoader,
         resolver: ArchiveResolver<T> = @Suppress(CAST) (resolver(ref::class) as ArchiveResolver<T>),
-        parents: List<ResolvedArchive> = ArrayList(),
+        parents: Set<ResolvedArchive> = hashSetOf(),
     ): ResolvedArchive = resolve(listOf(ref), resolver, parents) { classloader }.first()
 
     public const val WRITER_FLAGS: Int = ClassWriter.COMPUTE_FRAMES
