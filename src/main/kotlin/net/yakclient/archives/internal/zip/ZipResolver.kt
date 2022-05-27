@@ -1,4 +1,4 @@
-package net.yakclient.archives.impl.zip
+package net.yakclient.archives.internal.zip
 
 import net.yakclient.archives.ArchiveResolver
 import net.yakclient.archives.ClassLoaderProvider

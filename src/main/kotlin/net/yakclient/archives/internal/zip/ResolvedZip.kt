@@ -1,9 +1,9 @@
-package net.yakclient.archives.impl.zip
+package net.yakclient.archives.internal.zip
 
 import net.yakclient.archives.ResolvedArchive
 
 
-public class ResolvedZip(
+internal class ResolvedZip(
     override val classloader: ClassLoader,
     override val packages: Set<String>,
     override val parents: Set<ResolvedArchive>

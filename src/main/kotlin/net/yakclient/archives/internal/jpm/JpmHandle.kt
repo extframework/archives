@@ -1,4 +1,4 @@
-package net.yakclient.archives.impl.jpm
+package net.yakclient.archives.internal.jpm
 
 import net.yakclient.archives.ArchiveHandle
 import net.yakclient.common.util.readBytes
@@ -12,7 +12,7 @@ import java.nio.ByteBuffer
 import java.util.*
 import java.util.stream.Stream
 
-public class JpmHandle(
+internal class JpmHandle(
     delegate: ModuleReference,
 ) : ArchiveHandle, ModuleReference(
     delegate.descriptor(),

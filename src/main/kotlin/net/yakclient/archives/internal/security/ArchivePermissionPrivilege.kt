@@ -1,11 +1,11 @@
-package net.yakclient.archives.impl.security
+package net.yakclient.archives.internal.security
 
 import net.yakclient.archives.security.ArchivePrivilege
 import net.yakclient.common.util.runCatching
 import java.security.Permission
 
-public data class ArchivePermissionPrivilege(
-    public val permission: Permission
+internal data class ArchivePermissionPrivilege(
+    val permission: Permission
 ) : ArchivePrivilege {
     override val name: String = permission.name
 

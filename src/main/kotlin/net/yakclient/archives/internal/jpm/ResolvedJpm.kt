@@ -1,24 +1,25 @@
-package net.yakclient.archives.impl.jpm
+package net.yakclient.archives.internal.jpm
 
+import net.yakclient.archives.JpmArchives.archives
+import net.yakclient.archives.JpmArchives.nameToArchive
 import net.yakclient.archives.ResolvedArchive
-import net.yakclient.archives.security.PrivilegeList
 import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 
-public class ResolvedJpm(
-    public val module: Module,
+internal class ResolvedJpm(
+    val module: Module,
 ) : ResolvedArchive {
     override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()
     override val packages: Set<String> = module.packages
     override val parents: Set<ResolvedArchive>
-    public val configuration: Configuration = module.layer.configuration()
-    public val layer: ModuleLayer = module.layer
-    private val services: Map<String, List<Class<*>>> by lazy {
-        module.descriptor.provides().associate { it.service() to it.providers().map(classloader::loadClass) }
-    }
+    val configuration: Configuration = module.layer.configuration()
+    val layer: ModuleLayer = module.layer
+//    private val services: Map<String, List<Class<*>>> by lazy {
+//        module.descriptor.provides().associate { it.service() to it.providers().map(classloader::loadClass) }
+//    }
 
     init {
-        nameToArchive[module.name] = this
+        archives[module.name] = this
 
         fun ModuleLayer.allModules(): Set<Module> = modules() + parents().flatMap { it.allModules() }
 
@@ -34,10 +35,4 @@ public class ResolvedJpm(
                 }
         }
     }
-
-    private companion object {
-        private val nameToArchive: MutableMap<String, ResolvedArchive> = HashMap()
-    }
-
-//    override fun loadService(name: String): List<Class<*>> = services[name] ?: ArrayList()
 }

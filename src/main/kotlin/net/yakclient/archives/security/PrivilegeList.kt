@@ -2,7 +2,7 @@
 
 package net.yakclient.archives.security
 
-import net.yakclient.archives.impl.security.ArchivePermissionPrivilege
+import net.yakclient.archives.internal.security.ArchivePermissionPrivilege
 import net.yakclient.common.util.UNUSED_INLINE
 import java.security.Permission
 import java.security.PermissionCollection

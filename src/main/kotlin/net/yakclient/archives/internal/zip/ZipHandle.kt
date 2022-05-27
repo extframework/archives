@@ -1,11 +1,11 @@
-package net.yakclient.archives.impl.zip
+package net.yakclient.archives.internal.zip
 
 import net.yakclient.archives.ArchiveHandle
 import net.yakclient.common.util.resource.LocalResource
 import java.net.URI
 import java.util.jar.JarFile
 
-public class ZipHandle(
+internal class ZipHandle(
     private val zip: JarFile, override val location: URI,
 ) : ArchiveHandle {
     private var closed = false

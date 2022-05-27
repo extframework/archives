@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 //    }
 //
 //    internal fun updateDescendant(archive: ResolvedArchive, descendant: ResolvedArchive) {
-//        (catalogs[archive]
+//       (catalogs[archive]
 //            ?: throw IllegalStateException("Archive: $archive must be cataloged first!"))._descendants.add(descendant)
 //    }
 //
