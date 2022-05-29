@@ -26,21 +26,21 @@ internal class JpmResolver : ArchiveResolver<JpmHandle> {
         val refs = archiveRefs.map(::loadRef)
         val refsByName = refs.associateBy { it.descriptor().name() }
 
-        for (ref in refs) assert(
+        for (ref in refs)
             ref.descriptor().requires()
                 .filterNot { it.modifiers().contains(ModuleDescriptor.Requires.Modifier.STATIC) }
-                .all { r ->
+                .forEach { r ->
                     fun Configuration.provides(name: String): Boolean =
                         modules().any { it.name() == name } || parents().any { it.provides(name) }
 
-                    parents.filterIsInstance<ResolvedJpm>().any {
+                   val hasDependencies = parents.filterIsInstance<ResolvedJpm>().any {
                         it.module.name == r.name() || it.configuration.provides(r.name())
                     } || ModuleLayer.boot().configuration().provides(r.name()) || refs.any {
                         it.descriptor().name() == r.name()
                     }
-                }) {
-            "A Dependency of ${ref.descriptor().name()} is not in the graph!"
-        }
+
+                    if (!hasDependencies) throw IllegalArgumentException("Dependency: '${r.name()}' Required by '${ref.name}' but not found in parents!")
+                }
 
         val loaders = LazyMap<String, ClassLoader> {
             clProvider(

@@ -25,6 +25,9 @@ internal class JpmHandle(
     override val location: URI = delegate.location().get()
     override val reader: ArchiveHandle.Reader = JpmReader(delegate.open())
     override val writer: ArchiveHandle.Writer = JpmWriter()
+
+    override val name: String = descriptor().name()
+
     override val modified: Boolean get() = overrides.isNotEmpty() || removes.isNotEmpty()
     override val isClosed: Boolean
         get() = closed

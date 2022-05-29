@@ -1,5 +1,6 @@
 package net.yakclient.archives.internal.jpm
 
+import net.yakclient.archives.JpmArchives
 import net.yakclient.archives.JpmArchives.archives
 import net.yakclient.archives.JpmArchives.nameToArchive
 import net.yakclient.archives.ResolvedArchive
@@ -12,11 +13,9 @@ internal class ResolvedJpm(
     override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()
     override val packages: Set<String> = module.packages
     override val parents: Set<ResolvedArchive>
+    override val name: String = module.name
     val configuration: Configuration = module.layer.configuration()
     val layer: ModuleLayer = module.layer
-//    private val services: Map<String, List<Class<*>>> by lazy {
-//        module.descriptor.provides().associate { it.service() to it.providers().map(classloader::loadClass) }
-//    }
 
     init {
         archives[module.name] = this
@@ -26,13 +25,14 @@ internal class ResolvedJpm(
         fun loadArchive(name: String): ResolvedArchive? =
             nameToArchive[name] ?: module.layer.allModules().find { it.name == name }?.let(::ResolvedJpm)
 
-        parents = run {
-            module.descriptor.requires()
-                .filterNot {
-                    it.modifiers().contains(ModuleDescriptor.Requires.Modifier.STATIC)
-                }.mapTo(HashSet()) {
-                    loadArchive(it.name())!!
-                }
-        }
+        parents = if (module.descriptor.isAutomatic)
+            module.layer.allModules().mapTo(HashSet(), JpmArchives::moduleToArchive)
+        else module.descriptor.requires()
+            .filterNot {
+                it.modifiers().contains(ModuleDescriptor.Requires.Modifier.STATIC)
+            }.mapTo(HashSet()) {
+                loadArchive(it.name())!!
+            }
+
     }
 }

@@ -14,6 +14,7 @@ internal class ZipHandle(
 
     override val reader: ArchiveHandle.Reader = ZipReader()
     override val writer: ArchiveHandle.Writer = ZipWriter()
+    override val name: String? = null
     override val modified: Boolean = overrides.isNotEmpty() || removes.isNotEmpty()
     override val isClosed: Boolean
         get() = closed

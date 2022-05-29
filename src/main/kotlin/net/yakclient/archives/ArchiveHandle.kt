@@ -13,10 +13,13 @@ public interface ArchiveHandle : Closeable {
     public val location: URI
     public val reader: Reader
     public val writer: Writer
+    public val name: String?
+
     public val modified: Boolean
     public val isClosed: Boolean
     public val isOpen: Boolean
         get() = !isClosed
+
 
     public interface Reader {
         public fun of(name: String): Entry?
