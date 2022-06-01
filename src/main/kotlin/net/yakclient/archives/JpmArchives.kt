@@ -1,6 +1,6 @@
 package net.yakclient.archives
 
-import net.yakclient.archives.internal.jpm.ResolvedJpm
+import net.yakclient.archives.jpm.ResolvedJpm
 
 public object JpmArchives {
     internal val archives: MutableMap<String, ResolvedJpm> = HashMap()

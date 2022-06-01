@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.zip
+package net.yakclient.archives.zip
 
 import net.yakclient.archives.ArchiveFinder
 import java.nio.file.Path

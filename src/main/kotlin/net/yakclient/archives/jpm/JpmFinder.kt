@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.jpm
+package net.yakclient.archives.jpm
 
 import net.yakclient.archives.ArchiveFinder
 import java.lang.module.ModuleFinder

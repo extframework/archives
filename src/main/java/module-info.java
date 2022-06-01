@@ -1,9 +1,9 @@
 import net.yakclient.archives.ArchiveFinder;
 import net.yakclient.archives.ArchiveResolver;
-import net.yakclient.archives.internal.jpm.JpmFinder;
-import net.yakclient.archives.internal.jpm.JpmResolver;
-import net.yakclient.archives.internal.zip.ZipFinder;
-import net.yakclient.archives.internal.zip.ZipResolver;
+import net.yakclient.archives.jpm.JpmFinder;
+import net.yakclient.archives.jpm.JpmResolver;
+import net.yakclient.archives.zip.ZipFinder;
+import net.yakclient.archives.zip.ZipResolver;
 
 module yakclient.archives {
     requires transitive org.objectweb.asm;
@@ -18,6 +18,8 @@ module yakclient.archives {
     exports net.yakclient.archives;
     exports net.yakclient.archives.extension;
     exports net.yakclient.archives.transform;
+    exports net.yakclient.archives.jpm;
+    exports net.yakclient.archives.zip;
 
     uses ArchiveResolver;
     uses ArchiveFinder;

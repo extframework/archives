@@ -35,7 +35,7 @@ class TestBasicTransformations {
     fun `Test aware classwriter`() {
         val archive = Archives.find(
             File(this::class.java.getResource("/resources/archive-mapper-TEST-JAR.jar")!!.toURI()).toPath(),
-            Archives.Finders.ZIP_FINDER.finder
+            Archives.Finders.ZIP_FINDER
         )
 
         val writer = AwareClassWriter(listOf(archive), 0)
@@ -52,7 +52,7 @@ class TestBasicTransformations {
     fun `Test aware class writer without modifications`() {
         val archive = Archives.find(
             File(this::class.java.getResource("/resources/archive-mapper-TEST-JAR.jar")!!.toURI()).toPath(),
-            Archives.Finders.ZIP_FINDER.finder
+            Archives.Finders.ZIP_FINDER
         )
 
         val config = TransformerConfig.of { }

@@ -1,66 +1,47 @@
 package net.yakclient.archives
 
-import net.yakclient.archives.internal.jpm.JpmFinder
-import net.yakclient.archives.internal.jpm.JpmResolver
-import net.yakclient.archives.internal.zip.ZipFinder
-import net.yakclient.archives.internal.zip.ZipResolver
+import net.yakclient.archives.jpm.JpmFinder
+import net.yakclient.archives.jpm.JpmResolutionResult
+import net.yakclient.archives.jpm.JpmResolver
 import net.yakclient.archives.transform.ClassResolver
 import net.yakclient.archives.transform.TransformerConfig
-import net.yakclient.common.util.CAST
+import net.yakclient.archives.zip.ZipFinder
+import net.yakclient.archives.zip.ZipResolutionResult
+import net.yakclient.archives.zip.ZipResolver
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
-
 import java.nio.file.Path
-import kotlin.reflect.full.isSubclassOf
-
-private typealias Finder = ArchiveFinder<ArchiveHandle>
-private typealias Resolver = ArchiveResolver<ArchiveHandle>
 
 public object Archives {
-    public enum class Resolvers(
-        delegate: ArchiveResolver<*>
-    ) : ArchiveResolver<ArchiveHandle> by delegate as ArchiveResolver<ArchiveHandle> {
-        JPM_RESOLVER(JpmResolver()),
-        ZIP_RESOLVER(ZipResolver());
-
-        private val resolver: ArchiveResolver<ArchiveHandle> = delegate as ArchiveResolver<ArchiveHandle>
-
-        override fun resolve(
-            archiveRefs: List<ArchiveHandle>,
-            clProvider: ClassLoaderProvider<ArchiveHandle>,
-            parents: Set<ResolvedArchive>
-        ): List<ResolvedArchive> {
-            check(archiveRefs.all { it::class.isSubclassOf(type) })
-
-            return resolver.resolve(archiveRefs, clProvider, parents)
-        }
+    public object Resolvers {
+        public val JPM_RESOLVER: ArchiveResolver<ArchiveHandle, JpmResolutionResult> =
+            JpmResolver() as ArchiveResolver<ArchiveHandle, JpmResolutionResult>
+        public val ZIP_RESOLVER: ArchiveResolver<ArchiveHandle, ZipResolutionResult> =
+            ZipResolver() as ArchiveResolver<ArchiveHandle, ZipResolutionResult>
     }
 
-
-    public enum class Finders(
-        public val delegate: ArchiveFinder<*>
-    ) : ArchiveFinder<ArchiveHandle> by delegate as ArchiveFinder<ArchiveHandle> {
-        JPM_FINDER(JpmFinder()),
-        ZIP_FINDER(ZipFinder());
+    public object Finders {
+        public val JPM_FINDER: ArchiveFinder<*> = JpmFinder()
+        public val ZIP_FINDER: ArchiveFinder<*> = ZipFinder()
     }
 
     public fun <T : ArchiveHandle> find(path: Path, finder: ArchiveFinder<T>): T = finder.find(path)
 
     @JvmOverloads
-    public fun <T : ArchiveHandle> resolve(
+    public fun <T : ArchiveHandle, R : ResolutionResult> resolve(
         refs: List<T>,
-        resolver: ArchiveResolver<T>,
+        resolver: ArchiveResolver<T, R>,
         parents: Set<ResolvedArchive> = hashSetOf(),
         clProvider: ClassLoaderProvider<T>,
-    ): List<ResolvedArchive> = resolver.resolve(refs, clProvider, parents)
+    ): List<R> = resolver.resolve(refs, clProvider, parents)
 
     @JvmOverloads
-    public fun <T : ArchiveHandle> resolve(
+    public fun <T : ArchiveHandle, R : ResolutionResult> resolve(
         ref: T,
         classloader: ClassLoader,
-        resolver: ArchiveResolver<T>,
+        resolver: ArchiveResolver<T, R>,
         parents: Set<ResolvedArchive> = hashSetOf(),
-    ): ResolvedArchive = resolve(listOf(ref), resolver, parents) { classloader }.first()
+    ): R = resolve(listOf(ref), resolver, parents) { classloader }.first()
 
     public const val WRITER_FLAGS: Int = ClassWriter.COMPUTE_FRAMES
 

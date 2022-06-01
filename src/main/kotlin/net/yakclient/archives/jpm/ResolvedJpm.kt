@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.jpm
+package net.yakclient.archives.jpm
 
 import net.yakclient.archives.JpmArchives
 import net.yakclient.archives.JpmArchives.archives
@@ -7,7 +7,7 @@ import net.yakclient.archives.ResolvedArchive
 import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 
-internal class ResolvedJpm(
+internal class ResolvedJpm internal constructor(
     val module: Module,
 ) : ResolvedArchive {
     override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()

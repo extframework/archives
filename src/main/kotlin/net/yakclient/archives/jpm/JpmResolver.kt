@@ -1,4 +1,4 @@
-package net.yakclient.archives.internal.jpm
+package net.yakclient.archives.jpm
 
 import net.yakclient.archives.ArchiveResolver
 import net.yakclient.archives.ClassLoaderProvider
@@ -15,14 +15,14 @@ import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 import kotlin.reflect.KClass
 
-internal class JpmResolver : ArchiveResolver<JpmHandle> {
+internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
     override val type: KClass<JpmHandle> = JpmHandle::class
 
     override fun resolve(
         archiveRefs: List<JpmHandle>,
         clProvider: ClassLoaderProvider<JpmHandle>,
-        parents: Set<ResolvedArchive>
-    ): List<ResolvedArchive> {
+        parents: Set<ResolvedArchive>,
+    ): List<JpmResolutionResult> {
         val refs = archiveRefs.map(::loadRef)
         val refsByName = refs.associateBy { it.descriptor().name() }
 
@@ -33,13 +33,13 @@ internal class JpmResolver : ArchiveResolver<JpmHandle> {
                     fun Configuration.provides(name: String): Boolean =
                         modules().any { it.name() == name } || parents().any { it.provides(name) }
 
-                   val hasDependencies = parents.filterIsInstance<ResolvedJpm>().any {
+                    val dependenciesPresent = parents.filterIsInstance<ResolvedJpm>().any {
                         it.module.name == r.name() || it.configuration.provides(r.name())
                     } || ModuleLayer.boot().configuration().provides(r.name()) || refs.any {
                         it.descriptor().name() == r.name()
                     }
 
-                    if (!hasDependencies) throw IllegalArgumentException("Dependency: '${r.name()}' Required by '${ref.name}' but not found in parents!")
+                    if (!dependenciesPresent) throw IllegalArgumentException("Dependency: '${r.name()}' Required by '${ref.name}' but not found in parents!")
                 }
 
         val loaders = LazyMap<String, ClassLoader> {
@@ -62,7 +62,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle> {
         val finder = object : ModuleFinder {
             override fun find(name: String): Optional<ModuleReference> = Optional.ofNullable(refsByName[name])
 
-            override fun findAll(): MutableSet<ModuleReference> = refsByName.values.toMutableSet()//.toMutableSet()
+            override fun findAll(): MutableSet<ModuleReference> = refsByName.values.toMutableSet()
         }
 
         val configuration = Configuration.resolveAndBind(
@@ -80,15 +80,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle> {
 
         val layer = controller.layer()
 
-        layer.modules().forEach { m ->
-            m.packages.forEach { p ->
-                ModuleLayer.boot().modules().forEach { // TODO Figure out better solution to this, most likely when we add the security system
-                    controller.addOpens(m, p, it)
-                }
-            }
-        }
-
-        return layer.modules().map { ResolvedJpm(it) }
+        return layer.modules().map(::ResolvedJpm).map { JpmResolutionResult(it, controller, it.module) }
     }
 
     private fun loadRef(ref: JpmHandle): JpmHandle = if (!ref.modified) ref else {
