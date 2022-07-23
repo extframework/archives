@@ -6,11 +6,11 @@ import java.util.jar.JarFile
 import java.util.zip.ZipFile
 import kotlin.reflect.KClass
 
-internal class ZipFinder : ArchiveFinder<ZipHandle> {
-    override val type: KClass<ZipHandle> = ZipHandle::class
+internal class ZipFinder : ArchiveFinder<ZipReference> {
+    override val type: KClass<ZipReference> = ZipReference::class
 
-    override fun find(path: Path): ZipHandle {
-        return ZipHandle(
+    override fun find(path: Path): ZipReference {
+        return ZipReference(
             JarFile(
                 path.toFile().also { assert(it.exists()) },
                 true,

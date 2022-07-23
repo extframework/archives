@@ -1,13 +1,13 @@
 package net.yakclient.archives
 
-import net.yakclient.archives.jpm.ResolvedJpm
+import net.yakclient.archives.jpm.JpmHandle
 
 public object JpmArchives {
-    internal val archives: MutableMap<String, ResolvedJpm> = HashMap()
-    public val nameToArchive: Map<String, ResolvedArchive>
+    internal val archives: MutableMap<String, JpmHandle> = HashMap()
+    public val nameToArchive: Map<String, ArchiveHandle>
         get() = archives.toMap()
 
-    public fun moduleToArchive(module: Module) : ResolvedArchive {
-        return nameToArchive[module.name] ?: ResolvedJpm(module)
+    public fun moduleToArchive(module: Module) : ArchiveHandle {
+        return nameToArchive[module.name] ?: JpmHandle(module)
     }
 }

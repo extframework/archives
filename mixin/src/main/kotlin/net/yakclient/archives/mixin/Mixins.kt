@@ -40,10 +40,4 @@ public object Mixins {
             )
         }
     }
-
-//    /**
-//     * Creates a mixin configuration from a KClass.
-//     */
-//    public fun mixinOf(from: KClass<*>): TransformerConfig.MutableTransformerConfiguration =
-//        mixinOf(from.java)
 }

@@ -1,97 +1,38 @@
 package net.yakclient.archives.jpm
 
+import net.yakclient.archives.JpmArchives
+import net.yakclient.archives.JpmArchives.archives
+import net.yakclient.archives.JpmArchives.nameToArchive
 import net.yakclient.archives.ArchiveHandle
-import net.yakclient.common.util.readBytes
-import net.yakclient.common.util.readInputStream
-import net.yakclient.common.util.resource.ProvidedResource
-import java.io.InputStream
-import java.lang.module.ModuleReader
-import java.lang.module.ModuleReference
-import java.net.URI
-import java.nio.ByteBuffer
-import java.util.*
-import java.util.stream.Stream
+import java.lang.module.Configuration
+import java.lang.module.ModuleDescriptor
 
-internal class JpmHandle(
-    delegate: ModuleReference,
-) : ArchiveHandle, ModuleReference(
-    delegate.descriptor(),
-    delegate.location().orElseGet { null }
-) {
-    private var closed: Boolean = false
-    private val overrides: MutableMap<String, ArchiveHandle.Entry> = HashMap()
-    private val removes: MutableSet<String> = HashSet()
+internal class JpmHandle internal constructor(
+    val module: Module,
+) : ArchiveHandle {
+    override val classloader: ClassLoader = module.classLoader ?: ClassLoader.getSystemClassLoader()
+    override val packages: Set<String> = module.packages
+    override val parents: Set<ArchiveHandle>
+    override val name: String = module.name
+    val configuration: Configuration = module.layer.configuration()
+    val layer: ModuleLayer = module.layer
 
-    override val location: URI = delegate.location().get()
-    override val reader: ArchiveHandle.Reader = JpmReader(delegate.open())
-    override val writer: ArchiveHandle.Writer = JpmWriter()
+    init {
+        archives[module.name] = this
 
-    override val name: String = descriptor().name()
+        fun ModuleLayer.allModules(): Set<Module> = modules() + parents().flatMap { it.allModules() }
 
-    override val modified: Boolean get() = overrides.isNotEmpty() || removes.isNotEmpty()
-    override val isClosed: Boolean
-        get() = closed
+        fun loadArchive(name: String): ArchiveHandle? =
+            nameToArchive[name] ?: module.layer.allModules().find { it.name == name }?.let(::JpmHandle)
 
-    override fun close() {
-        closed = true
-        (reader as JpmReader).close()
-    }
+        parents = if (module.descriptor.isAutomatic)
+            module.layer.allModules().mapTo(HashSet(), JpmArchives::moduleToArchive)
+        else module.descriptor.requires()
+            .filterNot {
+                it.modifiers().contains(ModuleDescriptor.Requires.Modifier.STATIC)
+            }.mapTo(HashSet()) {
+                loadArchive(it.name())!!
+            }
 
-    private fun ensureOpen() {
-        if (closed) {
-            throw IllegalStateException("Module is closed")
-        }
-    }
-
-    override fun open(): ModuleReader = reader as ModuleReader
-
-    private inner class JpmReader(
-        private val reader: ModuleReader
-    ) : ArchiveHandle.Reader, ModuleReader by reader {
-        private val cache: MutableMap<String, ArchiveHandle.Entry> = HashMap()
-
-        override fun of(name: String): ArchiveHandle.Entry? {
-            ensureOpen()
-
-            return (overrides[name]
-                ?: cache[name]
-                ?: reader.find(name).orElse(null)?.let {
-                    ArchiveHandle.Entry(
-                        name,
-                        ProvidedResource(it) { it.readBytes() },
-                        name.endsWith("/"), // This is how they do it in the java source code, wish there could be a better solution :(
-                        this@JpmHandle
-                    )
-                }?.also { cache[name] = it })
-                ?.takeUnless { removes.contains(it.name) }
-        }
-
-        override fun entries(): Sequence<ArchiveHandle.Entry> = Sequence {
-            list().iterator()
-        }.mapNotNull { of(it) }
-
-        override fun find(name: String): Optional<URI> = Optional.ofNullable(of(name)?.resource?.uri)
-
-        override fun open(name: String): Optional<InputStream> = Optional.ofNullable(of(name)?.resource?.open())
-
-        override fun read(name: String): Optional<ByteBuffer> =
-            Optional.ofNullable(of(name)?.resource?.open()?.readInputStream()?.let { ByteBuffer.wrap(it) })
-
-        override fun list(): Stream<String> {
-            ensureOpen()
-            return Stream.concat(overrides.keys.stream(), reader.list())
-        }
-    }
-
-    private inner class JpmWriter : ArchiveHandle.Writer {
-        override fun put(entry: ArchiveHandle.Entry) {
-            ensureOpen()
-            overrides[entry.name] = entry
-        }
-
-        override fun remove(name: String) {
-            ensureOpen()
-            removes.add(name)
-        }
     }
 }

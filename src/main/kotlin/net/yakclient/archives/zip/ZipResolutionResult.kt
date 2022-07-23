@@ -1,8 +1,8 @@
 package net.yakclient.archives.zip
 
 import net.yakclient.archives.ResolutionResult
-import net.yakclient.archives.ResolvedArchive
+import net.yakclient.archives.ArchiveHandle
 
 public data class ZipResolutionResult(
-    override val archive: ResolvedArchive
+    override val archive: ArchiveHandle
 ) : ResolutionResult

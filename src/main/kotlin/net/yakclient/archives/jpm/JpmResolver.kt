@@ -2,7 +2,7 @@ package net.yakclient.archives.jpm
 
 import net.yakclient.archives.ArchiveResolver
 import net.yakclient.archives.ClassLoaderProvider
-import net.yakclient.archives.ResolvedArchive
+import net.yakclient.archives.ArchiveHandle
 import net.yakclient.common.util.LazyMap
 import java.io.FileOutputStream
 import java.lang.module.Configuration
@@ -15,13 +15,13 @@ import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 import kotlin.reflect.KClass
 
-internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
-    override val type: KClass<JpmHandle> = JpmHandle::class
+internal class JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> {
+    override val type: KClass<JpmReference> = JpmReference::class
 
     override fun resolve(
-        archiveRefs: List<JpmHandle>,
-        clProvider: ClassLoaderProvider<JpmHandle>,
-        parents: Set<ResolvedArchive>,
+        archiveRefs: List<JpmReference>,
+        clProvider: ClassLoaderProvider<JpmReference>,
+        parents: Set<ArchiveHandle>,
     ): List<JpmResolutionResult> {
         val refs = archiveRefs.map(::loadRef)
         val refsByName = refs.associateBy { it.descriptor().name() }
@@ -33,7 +33,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
                     fun Configuration.provides(name: String): Boolean =
                         modules().any { it.name() == name } || parents().any { it.provides(name) }
 
-                    val dependenciesPresent = parents.filterIsInstance<ResolvedJpm>().any {
+                    val dependenciesPresent = parents.filterIsInstance<JpmHandle>().any {
                         it.module.name == r.name() || it.configuration.provides(r.name())
                     } || ModuleLayer.boot().configuration().provides(r.name()) || refs.any {
                         it.descriptor().name() == r.name()
@@ -57,7 +57,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
 
         // Mapping to a HashSet to avoid multiple configuration that are the same(they do not override equals and hashcode but using the object ID's should be good enough)
         val parentLayers =
-            parents.filterIsInstance<ResolvedJpm>().mapTo(HashSet()) { it.layer }
+            parents.filterIsInstance<JpmHandle>().mapTo(HashSet()) { it.layer }
 
         val finder = object : ModuleFinder {
             override fun find(name: String): Optional<ModuleReference> = Optional.ofNullable(refsByName[name])
@@ -80,10 +80,10 @@ internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
 
         val layer = controller.layer()
 
-        return layer.modules().map(::ResolvedJpm).map { JpmResolutionResult(it, controller, it.module) }
+        return layer.modules().map(::JpmHandle).map { JpmResolutionResult(it, controller, it.module) }
     }
 
-    private fun loadRef(ref: JpmHandle): JpmHandle = if (!ref.modified) ref else {
+    private fun loadRef(ref: JpmReference): JpmReference = if (!ref.modified) ref else {
         val desc = ref.descriptor()
         val archiveName = "${desc.name().replace('.', '-')}${
             desc.rawVersion().map { "-$it" }.orElse("")
@@ -116,7 +116,7 @@ internal class JpmResolver : ArchiveResolver<JpmHandle, JpmResolutionResult> {
 
         assert(Files.exists(jar)) { "Failed to write jar to temp directory!" }
 
-        JpmHandle(ModuleFinder.of(jar).find(ref.descriptor().name())
+        JpmReference(ModuleFinder.of(jar).find(ref.descriptor().name())
             .orElseThrow { IllegalArgumentException("Archive reference that should be present is not! Path: $jar") })
     }
 }

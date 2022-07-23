@@ -1,6 +1,6 @@
 package net.yakclient.archives.transform
 
-import net.yakclient.archives.ArchiveHandle
+import net.yakclient.archives.ArchiveReference
 import net.yakclient.common.util.runCatching
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 public class AwareClassWriter(
-    private val handles:  List<ArchiveHandle>,
+    private val handles:  List<ArchiveReference>,
     flags: Int,
     reader: ClassReader? = null,
 ) : ClassWriter(reader, flags) {
