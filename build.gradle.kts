@@ -11,10 +11,6 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(kotlin("stdlib"))
-}
-
 tasks.wrapper {
     gradleVersion = "7.2"
 }
@@ -63,6 +59,13 @@ publishing {
                         id.set("Chestly")
                         name.set("Durgan McBroom")
                     }
+                }
+
+                withXml {
+                    val repositoriesNode = asNode().appendNode("repositories")
+                    val yakclientRepositoryNode = repositoriesNode.appendNode("repository")
+                    yakclientRepositoryNode.appendNode("id", "yakclient")
+                    yakclientRepositoryNode.appendNode("url", "http://maven.yakclient.net/snapshots")
                 }
 
                 licenses {
