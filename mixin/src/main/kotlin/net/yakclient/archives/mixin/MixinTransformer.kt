@@ -7,23 +7,23 @@ import org.objectweb.asm.tree.MethodNode
 
 internal class MixinInjectionTransformer(
     private val point: MixinInjectionPoint,
-    private val opcode: Int = -1,
     private val source: InstructionResolver
 ) : MethodTransformer {
     override fun invoke(context: MethodNode): MethodNode = context.apply {
-        point.apply(context, opcode).forEach { it.inject(source) }
+        point.apply(context).forEach { it.inject(source) }
     }
 }
 
-internal typealias MixinInjectionPoint = MixinInjectionContext.(opcode: Int) -> List<MixinInjector>
+//internal typealias MixinInjectionPoint = MixinInjectionContext.() -> List<MixinInjector>
 
-internal class MixinInjectionContext(
-    val node: MethodNode
+public data class MixinInjectionContext(
+    public val node: MethodNode
 ) {
-    val insn : InsnList = node.instructions
+    public val insn : InsnList = node.instructions
 }
-private fun MixinInjectionPoint.apply(node: MethodNode, opcode: Int) : List<MixinInjector> = this(MixinInjectionContext(node), opcode)
 
-internal fun interface MixinInjector {
-    fun inject(toInject: InstructionResolver)
+private fun MixinInjectionPoint.apply(node: MethodNode) : List<MixinInjector> = apply(MixinInjectionContext(node))
+
+public fun interface MixinInjector {
+    public fun inject(toInject: InstructionResolver)
 }

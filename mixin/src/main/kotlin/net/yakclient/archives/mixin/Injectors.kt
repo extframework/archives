@@ -13,49 +13,51 @@ import org.objectweb.asm.tree.*
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-internal object Injectors {
+public object Injectors {
     /**
      * Finds the instruction directly before the last return statement.
      */
-    private val BEFORE_END: MixinInjectionPoint = {
-        val lastReturn = insn.fold<AbstractInsnNode, AbstractInsnNode?>(null) { acc, node ->
+    public val BEFORE_END: MixinInjectionPoint = MixinInjectionPoint { context ->
+        val lastReturn = context.insn.fold<AbstractInsnNode, AbstractInsnNode?>(null) { acc, node ->
             if (ByteCodeUtils.isReturn(node.opcode)) node else acc
         } ?: throw IllegalStateException("Failed to find last return in given instructions.")
 
-        listOf(BeforeInsnNodeInjector(insn, lastReturn))
+        listOf(BeforeInsnNodeInjector(context.insn, lastReturn))
     }
 
     /**
      * Finds the beginning of the provided instruction list.
      */
-    private val AFTER_BEGIN: MixinInjectionPoint = { listOf(BeginningInjector(insn)) }
+    public val AFTER_BEGIN: MixinInjectionPoint = MixinInjectionPoint { listOf(BeginningInjector(it.insn)) }
 
     /**
      * Finds all instructions before every single method invocation.
      */
-    private val BEFORE_INVOKE: MixinInjectionPoint =
-        { insn.filterIsInstance<MethodInsnNode>().map { BeforeInsnNodeInjector(insn, it) } }
+    public val BEFORE_INVOKE: MixinInjectionPoint =
+        MixinInjectionPoint { context ->
+            context.insn.filterIsInstance<MethodInsnNode>().map { BeforeInsnNodeInjector(context.insn, it) }
+        }
 
     /**
      * Finds all instructions before every return statement.
      */
-    private val BEFORE_RETURN: MixinInjectionPoint = {
-        insn.filter { ByteCodeUtils.isReturn(it.opcode) }.map { BeforeInsnNodeInjector(insn, it) }
+    public val BEFORE_RETURN: MixinInjectionPoint = MixinInjectionPoint { context ->
+        context.insn.filter { ByteCodeUtils.isReturn(it.opcode) }.map { BeforeInsnNodeInjector(context.insn, it) }
     }
 
     /**
      * Finds all instructions before the given opcode.
      */
-    private val BEFORE_OPCODE: MixinInjectionPoint = { opcode ->
-        insn.filter { it.opcode == opcode }.map { BeforeInsnNodeInjector(insn, it) }
+    public fun BEFORE_OPCODE(opcode: Int): MixinInjectionPoint = MixinInjectionPoint { context ->
+        context.insn.filter { it.opcode == opcode }.map { BeforeInsnNodeInjector(context.insn, it) }
     }
 
     /**
      * Provides an injector to overwrite all instructions and replace them
      * with the provided.
      */
-    private val OVERWRITE: MixinInjectionPoint = {
-        listOf(MixinInjector { toInject -> node.instructions = toInject.get() })
+    public val OVERWRITE: MixinInjectionPoint = MixinInjectionPoint { context ->
+        listOf(MixinInjector { toInject -> context.node.instructions = toInject.get() })
     }
 
     /**
@@ -64,7 +66,7 @@ internal object Injectors {
      *
      * @constructor Creates an adapted injector that will inject into the given insn.
      */
-    private abstract class MixinAdaptedInjector(
+    public abstract class MixinAdaptedInjector(
         protected val insn: InsnList
     ) : MixinInjector {
         /**
@@ -72,7 +74,7 @@ internal object Injectors {
          *
          * @param toInject the instructions to adapt and inject.
          */
-        override fun inject(toInject: InstructionResolver) =
+        override fun inject(toInject: InstructionResolver): Unit =
             inject(FixLocals(RemoveLastReturn(toInject), sourceFollowingInjection()).get())
 
         /**
@@ -80,15 +82,15 @@ internal object Injectors {
          *
          * @param toInject the instructions to inject(already adapted).
          */
-        abstract fun inject(toInject: InsnList)
+        public abstract fun inject(toInject: InsnList)
 
-        abstract fun sourceFollowingInjection() : InsnList
+        public abstract fun sourceFollowingInjection(): InsnList
     }
 
     /**
      * Injects into the provided list before the given node.
      */
-    private class BeforeInsnNodeInjector(
+    public class BeforeInsnNodeInjector(
         insn: InsnList,
         private val node: AbstractInsnNode,
     ) : MixinAdaptedInjector(insn) {
@@ -96,17 +98,17 @@ internal object Injectors {
             require(insn.contains(node)) { "Given InsnList does not contain the node provided to inject before." }
         }
 
-        override fun inject(toInject: InsnList) = insn.insertBefore(node, toInject)
+        override fun inject(toInject: InsnList): Unit = insn.insertBefore(node, toInject)
         override fun sourceFollowingInjection(): InsnList = insn.slice(node)
     }
 
     /**
      * Injects into the beginning of the given list.
      */
-    private class BeginningInjector(
+    public class BeginningInjector(
         insn: InsnList,
     ) : MixinAdaptedInjector(insn) {
-        override fun inject(toInject: InsnList) = insn.insert(toInject)
+        override fun inject(toInject: InsnList): Unit = insn.insert(toInject)
         override fun sourceFollowingInjection(): InsnList = insn
     }
 
@@ -115,12 +117,12 @@ internal object Injectors {
      * int, correlating to the [injection type][net.yakclient.archives.api.InjectionType].
      * If the type does not match then an opcode matcher will be assumed.
      */
-    fun of(id: InjectionType): MixinInjectionPoint = when (id) {
-        InjectionType.AFTER_BEGIN -> AFTER_BEGIN
-        InjectionType.BEFORE_END -> BEFORE_END
-        InjectionType.BEFORE_RETURN -> BEFORE_RETURN
-        InjectionType.BEFORE_INVOKE -> BEFORE_INVOKE
-        InjectionType.OVERWRITE -> OVERWRITE
-// TODO Figure out if we need this --->        else -> BEFORE_OPCODE
-    }
+//    fun of(id: InjectionType): MixinInjectionPoint = when (id) {
+//        InjectionType.AFTER_BEGIN -> AFTER_BEGIN
+//        InjectionType.BEFORE_END -> BEFORE_END
+//        InjectionType.BEFORE_RETURN -> BEFORE_RETURN
+//        InjectionType.BEFORE_INVOKE -> BEFORE_INVOKE
+//        InjectionType.OVERWRITE -> OVERWRITE
+//// TODO Figure out if we need this --->        else -> BEFORE_OPCODE
+//    }
 }

@@ -9,7 +9,7 @@ public object Mixins {
     public data class InjectionMetaData(
         public val resolver: InstructionResolver,
         public val to: String,
-        public val type: InjectionType = InjectionType.AFTER_BEGIN,
+        public val type: MixinInjectionPoint,
     )
 
     /**
@@ -36,7 +36,7 @@ public object Mixins {
 
             transformMethod(
                 signature,
-                MixinInjectionTransformer(Injectors.of(type), -1, source)
+                MixinInjectionTransformer(type, source)
             )
         }
     }
