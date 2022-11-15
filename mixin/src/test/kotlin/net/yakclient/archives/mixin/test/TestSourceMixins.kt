@@ -1,34 +1,32 @@
 package net.yakclient.archives.mixin.test
 
-import net.yakclient.archives.Archives
-import net.yakclient.archives.mixin.InjectionType
-import net.yakclient.archives.mixin.Mixins
+import net.yakclient.archives.mixin.*
 import net.yakclient.archives.transform.ByteCodeUtils
 import net.yakclient.archives.transform.Sources
 import net.yakclient.archives.transform.TransformerConfig
 import org.junit.jupiter.api.Test
-import org.objectweb.asm.ClassReader
 import kotlin.math.floor
 
-class TestBasicMixins {
+class TestSourceMixins {
     @Test
     fun `Test Source accumulation`() {
         println(Sources.of(MixedClass::testMethod))
     }
 
-    private fun getConfig(): TransformerConfig {
-        return Mixins.mixinOf(
+    private fun getConfig(): TransformerConfig = SourceInjection.apply(
+        SourceInjectionData(
             MixedClass::class.java.name,
             `Mixin test case`::class.java.name,
             listOf(
-                Mixins.InjectionMetaData(
+                SourceInjectionData.From(
                     Sources.of(`Mixin test case`::`Inject this!`),
                     ByteCodeUtils.runtimeSignature(MixedClass::testMethod),
-                    InjectionType.AFTER_BEGIN
+                    SourceInjectors.AFTER_BEGIN
                 )
             )
         )
-    }
+    )
+
 
     @Test
     fun `Test basic configuration creation`() {
@@ -41,19 +39,14 @@ class TestBasicMixins {
     fun `Test Bytecode modification with Mixins#resolve`() {
         val config = getConfig()
 
-        val bytes = Archives.resolve(ClassReader(MixedClass::class.java.name), config)
+        val c = MixedClass::class.java.transform(config)
 
-        val loader = object : ClassLoader() {
-            fun defineClass(name: String, bytes: ByteArray) = super.defineClass(name, bytes, 0, bytes.size)
-        }
-
-        val c = loader.defineClass(MixedClass::class.java.name, bytes)
-        val instance = c.getConstructor().newInstance()
+        val instance = c.noArgInstance()
         println(c.getMethod("testMethod", Int::class.java).invoke(instance, 1))
     }
 }
 
-class MixedClass {
+private class MixedClass {
     private var value = "string of something"
 
     fun testMethod(first: Int): String {
@@ -82,16 +75,17 @@ class MixedClass {
     }
 }
 
-abstract class `Mixin test case` {
+private abstract class `Mixin test case` {
     private var value = ""
 
     fun `Inject this!`() {
         var a = ""
-//
-        repeat( floor(Math.random() * 10).toInt()) {
+        println("Injected")
+
+        repeat(floor(Math.random() * 10).toInt()) {
             a += "a"
         }
 
-//       println(a)
+        println(a)
     }
 }

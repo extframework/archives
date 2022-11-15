@@ -79,6 +79,14 @@ public open class TransformerConfig(
         @JvmStatic
         public fun of(block: MutableTransformerConfiguration.() -> Unit): MutableTransformerConfiguration =
             MutableTransformerConfiguration().apply(block)
+
+        public operator fun TransformerConfig.plus(other: TransformerConfig) : MutableTransformerConfiguration {
+            return MutableTransformerConfiguration(
+                mutableListOf(this.ct, other.ct),
+                mutableListOf(this.mt, other.mt),
+                mutableListOf(this.ft, other.ft)
+            )
+        }
     }
 }
 

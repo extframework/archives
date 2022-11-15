@@ -1,43 +1,17 @@
 package net.yakclient.archives.mixin
 
-import net.yakclient.archives.transform.InstructionResolver
-import net.yakclient.archives.transform.MethodSignature
-import net.yakclient.archives.transform.TargetedMethodTransformer
-import net.yakclient.archives.transform.TransformerConfig
+import java.io.InputStream
 
 public object Mixins {
-    public data class InjectionMetaData(
-        public val resolver: InstructionResolver,
-        public val to: String,
-        public val type: MixinInjectionPoint,
-    )
+    public interface ClassDataProvider {
+        public val classname: String
 
-    /**
-     * Given a class annotated with @Mixer creates a configuration scope with
-     * all basic mixin transformers. This can be added to.
-     *
-     * @since 1.1-SNAPSHOT
-     * @author Durgan McBroom
-     */
-    public fun mixinOf(
-        to: String,
-        self: String,
-        injections: List<InjectionMetaData>
-    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
-        for (injection in injections) {
-            val source = AlterThisReference(
-                injection.resolver,
-                to.replace('.', '/'),
-                self.replace('.', '/')
-            )
+        public fun getClass() : InputStream
+    }
 
-            val type = injection.type
-            val signature = injection.to
+    public fun ClassDataProvider(clazz: Class<*>) : ClassDataProvider = object : ClassDataProvider {
+        override val classname: String = clazz.name
 
-            transformMethod(
-                signature,
-                MixinInjectionTransformer(type, source)
-            )
-        }
+        override fun getClass(): InputStream = checkNotNull(clazz.classLoader.getResourceAsStream(classname.replace('.', '/') + ".class"))
     }
 }
