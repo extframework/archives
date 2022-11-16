@@ -5,22 +5,23 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.FieldNode
 
 public object FieldInjection : MixinInjection<FieldInjectionData> {
-    override fun apply(data: FieldInjectionData): TransformerConfig.MutableTransformerConfiguration =
-        TransformerConfig.of {
-            transformClass {
-                it.apply {
-                    val node = FieldNode(
-                        data.access,
-                        data.name,
-                        data.type,
-                        data.signature,
-                        data.initialValue
-                    )
+    override fun apply(
+        data: FieldInjectionData
+    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+        transformClass {
+            it.apply {
+                val node = FieldNode(
+                    data.access,
+                    data.name,
+                    data.type,
+                    data.signature,
+                    data.initialValue
+                )
 
-                    it.fields.add(node)
-                }
+                it.fields.add(node)
             }
         }
+    }
 }
 
 public data class FieldInjectionData(

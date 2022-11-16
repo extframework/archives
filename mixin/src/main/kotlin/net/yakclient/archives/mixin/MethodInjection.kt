@@ -6,32 +6,33 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodNode
 
 public object MethodInjection : MixinInjection<MethodInjectionData> {
-    override fun apply(data: MethodInjectionData): TransformerConfig.MutableTransformerConfiguration =
-        TransformerConfig.of {
-            transformClass {
-                it.apply {
-                    val node = MethodNode(
-                        data.access,
-                        data.name,
-                        data.desc,
-                        data.signature,
-                        data.exceptions.toTypedArray()
-                    )
+    override fun apply(
+        data: MethodInjectionData
+    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+        transformClass {
+            it.apply {
+                val node = MethodNode(
+                    data.access,
+                    data.name,
+                    data.desc,
+                    data.signature,
+                    data.exceptions.toTypedArray()
+                )
 
-                    val source = AlterThisReference(
-                        data.insnResolver,
-                        data.classTo.replace('.', '/'),
-                        data.classSelf.replace('.', '/')
-                    )
+                val source = AlterThisReference(
+                    data.insnResolver,
+                    data.classTo.replace('.', '/'),
+                    data.classSelf.replace('.', '/')
+                )
 
-                    node.instructions = source.get()
+                node.instructions = source.get()
 
-                    it.methods.add(
-                        node
-                    )
-                }
+                it.methods.add(
+                    node
+                )
             }
         }
+    }
 }
 
 public data class MethodInjectionData(

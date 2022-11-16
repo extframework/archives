@@ -11,37 +11,34 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 public object SourceInjection : MixinInjection<SourceInjectionData> {
-    override fun apply(data: SourceInjectionData): TransformerConfig.MutableTransformerConfiguration =
-        TransformerConfig.of {
-            for (injection in data.methodsFrom) {
-                val source = AlterThisReference(
-                    injection.insnResolver,
-                    data.classTo.replace('.', '/'),
-                    data.classSelf.replace('.', '/')
-                )
+    override fun apply(
+        data: SourceInjectionData
+    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+        val source = AlterThisReference(
+            data.insnResolver,
+            data.classTo.replace('.', '/'),
+            data.classSelf.replace('.', '/')
+        )
 
-                val point = injection.methodAt
-                val signature = injection.methodTo
+        val point = data.methodAt
+        val signature = data.methodTo
 
-                transformMethod(
-                    signature,
-                    SourceInjectionTransformer(point, source)
-                )
-            }
-        }
+        transformMethod(
+            signature,
+            SourceInjectionTransformer(point, source)
+        )
+    }
 }
 
 public data class SourceInjectionData(
     val classTo: String,
     val classSelf: String,
-    val methodsFrom: List<From>
-) : MixinInjection.InjectionData {
-    public data class From(
-        public val insnResolver: InstructionResolver,
-        public val methodTo: String,
-        public val methodAt: SourceInjectionPoint,
-    )
-}
+
+    public val insnResolver: InstructionResolver,
+    public val methodTo: String,
+    public val methodAt: SourceInjectionPoint,
+) : MixinInjection.InjectionData
+
 
 internal class SourceInjectionTransformer(
     private val point: SourceInjectionPoint,
@@ -55,17 +52,18 @@ internal class SourceInjectionTransformer(
 public data class SourceInjectionContext(
     val node: MethodNode
 ) {
-    val insn : InsnList = node.instructions
+    val insn: InsnList = node.instructions
 }
 
-private fun SourceInjectionPoint.apply(node: MethodNode) : List<MixinInjector> = apply(SourceInjectionContext(node))
+private fun SourceInjectionPoint.apply(node: MethodNode): List<MethodSourceInjector> =
+    apply(SourceInjectionContext(node))
 
-public fun interface MixinInjector {
+public fun interface MethodSourceInjector {
     public fun inject(toInject: InstructionResolver)
 }
 
-public fun interface SourceInjectionPoint  {
-    public fun apply(context: SourceInjectionContext) : List<MixinInjector>
+public fun interface SourceInjectionPoint {
+    public fun apply(context: SourceInjectionContext): List<MethodSourceInjector>
 }
 
 /**
@@ -119,7 +117,7 @@ public object SourceInjectors {
      * with the provided.
      */
     public val OVERWRITE: SourceInjectionPoint = SourceInjectionPoint { context ->
-        listOf(MixinInjector { toInject -> context.node.instructions = toInject.get() })
+        listOf(MethodSourceInjector { toInject -> context.node.instructions = toInject.get() })
     }
 }
 
@@ -131,7 +129,7 @@ public object SourceInjectors {
  */
 public abstract class MixinAdaptedInjector(
     protected val insn: InsnList
-) : MixinInjector {
+) : MethodSourceInjector {
     /**
      * Injects after adding a resolver to remove the last return statement.
      *
