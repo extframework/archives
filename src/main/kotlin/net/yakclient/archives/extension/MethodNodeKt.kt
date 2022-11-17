@@ -30,10 +30,13 @@ public fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.
  *
  * @return the list of classes.
  */
-public fun compiledDescriptionOf(desc: String): List<Class<*>> = listOf {
+public fun compiledDescriptionOf(
+    desc: String,
+    classloader: (String) -> Class<*> = { Class.forName(it) }
+): List<Class<*>> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
     fun StringBuilder.containedClass(): Class<*> =
-        Class.forName(this.toString().replace('/', '.')).also { this.clear() }
+        classloader(this.toString().replace('/', '.')).also { this.clear() }
 
     val builder = StringBuilder()
     var type = NONE
@@ -91,7 +94,7 @@ public fun MethodNode.sameSignature(signature: String): Boolean =
 public fun MethodNode.sameSignature(signature: MethodSignature): Boolean =
     MethodSignature.of(name + desc).matches(signature)
 
-private fun <T> listOf(builder: MutableList<T>.() -> Unit) : List<T> = ArrayList<T>().apply(builder).toList()
+private fun <T> listOf(builder: MutableList<T>.() -> Unit): List<T> = ArrayList<T>().apply(builder).toList()
 
 private enum class SearchType {
     OBJECT,
