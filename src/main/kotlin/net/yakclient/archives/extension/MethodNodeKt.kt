@@ -14,7 +14,7 @@ import org.objectweb.asm.tree.MethodNode
  *
  * @return the parameters.
  */
-public fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.desc)
+public fun MethodNode.parameters(): List<Class<*>> = parameterClasses(this.desc)
 
 /**
  * Turns a bytecode description into a list of classes. The
@@ -30,13 +30,13 @@ public fun MethodNode.parameters(): List<Class<*>> = compiledDescriptionOf(this.
  *
  * @return the list of classes.
  */
-public fun compiledDescriptionOf(
+public fun parameterClasses(
     desc: String,
     classloader: (String) -> Class<*> = { Class.forName(it) }
-): List<Class<*>> = listOf {
+): List<Class<*>> = parameters(desc).map(classloader)
+
+public fun parameters(desc: String) : List<String>  = listOf{
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
-    fun StringBuilder.containedClass(): Class<*> =
-        classloader(this.toString().replace('/', '.')).also { this.clear() }
 
     val builder = StringBuilder()
     var type = NONE
@@ -52,16 +52,16 @@ public fun compiledDescriptionOf(
         } else if (c == ';' && type.or(OBJECT, ARRAY_OBJECT)) {
             if (type == ARRAY_OBJECT) builder.append(c)
             type = NONE
-            add(builder.containedClass())
+            add(builder.toString().replace('/', '.'))
         } else {
             val primitiveType = ByteCodeUtils.isPrimitiveType(c)
             if (primitiveType && type == ARRAY_NOT_DETERMINED) {
                 type = NONE
                 builder.append(c)
-                add(builder.containedClass())
+                add(builder.toString().replace('/', '.'))
             } else if (primitiveType && type == NONE) add(
                 checkNotNull(
-                    ByteCodeUtils.primitiveType(c)
+                    ByteCodeUtils.primitiveType(c)?.name
                 ) { "Failed primitive type" })
             else builder.append(c)
         }
