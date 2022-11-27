@@ -175,7 +175,6 @@ public object ByteCodeUtils {
 
     // Turn a InsnList into a list of strings
     public fun textifyInsn(insn: InsnList): List<String> {
-
         return insn.associateWith {
             when (it) {
                 is FieldInsnNode -> "${it.owner} ${it.name} ${it.desc}"

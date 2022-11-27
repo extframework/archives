@@ -1,6 +1,6 @@
 package net.yakclient.archives.transform
 
-import net.yakclient.archives.ArchiveReference
+import net.yakclient.archives.ArchiveTree
 import net.yakclient.common.util.runCatching
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 public class AwareClassWriter(
-    private val handles:  List<ArchiveReference>,
+    private val handles:  List<ArchiveTree>,
     flags: Int,
     reader: ClassReader? = null,
 ) : ClassWriter(reader, flags) {
@@ -69,14 +69,12 @@ public class AwareClassWriter(
 
     // Name expected in JVM internal format
     private fun loadType(name: String): HierarchyNode {
-        val openEntry = handles.firstNotNullOfOrNull { it.reader["$name.class"]?.resource?.open() }
+        val openEntry = handles.firstNotNullOfOrNull { it.getResource("$name.class") }
             ?: return runCatching(ClassNotFoundException::class) {
                 LoadedClassNode(Class.forName(name.replace('/', '.')))
             } ?: throw TypeNotPresentException(name, null)
 
         val node = ClassNode()
-
-
         ClassReader(openEntry).accept(node, 0)
         return UnloadedClassNode(node)
     }

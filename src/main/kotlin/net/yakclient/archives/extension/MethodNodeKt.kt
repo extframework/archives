@@ -33,10 +33,19 @@ public fun MethodNode.parameters(): List<Class<*>> = parameterClasses(this.desc)
 public fun parameterClasses(
     desc: String,
     classloader: (String) -> Class<*> = { Class.forName(it) }
-): List<Class<*>> = parameters(desc).map(classloader)
+): List<Class<*>> = parameters(desc)
+    .map {
+//        fun unwrapPrimitive() : Class<*>? {
+//
+//        }
+        (ByteCodeUtils.primitiveType(it.first())) ?: classloader(it)
+    }
 
 public fun parameters(desc: String) : List<String>  = listOf{
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
+
+    fun StringBuilder.containedClass(): String =
+        this.toString().replace('/', '.').also { this.clear() }
 
     val builder = StringBuilder()
     var type = NONE
@@ -52,17 +61,14 @@ public fun parameters(desc: String) : List<String>  = listOf{
         } else if (c == ';' && type.or(OBJECT, ARRAY_OBJECT)) {
             if (type == ARRAY_OBJECT) builder.append(c)
             type = NONE
-            add(builder.toString().replace('/', '.'))
+            add(builder.containedClass())
         } else {
-            val primitiveType = ByteCodeUtils.isPrimitiveType(c)
-            if (primitiveType && type == ARRAY_NOT_DETERMINED) {
+            val isPrimitive = ByteCodeUtils.isPrimitiveType(c)
+            if (isPrimitive && type == ARRAY_NOT_DETERMINED) {
                 type = NONE
                 builder.append(c)
-                add(builder.toString().replace('/', '.'))
-            } else if (primitiveType && type == NONE) add(
-                checkNotNull(
-                    ByteCodeUtils.primitiveType(c)?.name
-                ) { "Failed primitive type" })
+                add(builder.containedClass())
+            } else if (isPrimitive && type == NONE) add(c.toString())
             else builder.append(c)
         }
     }

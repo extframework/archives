@@ -7,9 +7,10 @@ import net.yakclient.common.util.resource.ProvidedResource
 import net.yakclient.common.util.resource.SafeResource
 import org.objectweb.asm.ClassReader
 import java.io.Closeable
+import java.io.InputStream
 import java.net.URI
 
-public interface ArchiveReference : Closeable {
+public interface ArchiveReference : Closeable, ArchiveTree {
     public val location: URI
     public val reader: Reader
     public val writer: Writer
@@ -20,6 +21,9 @@ public interface ArchiveReference : Closeable {
     public val isOpen: Boolean
         get() = !isClosed
 
+    override fun getResource(name: String): InputStream? {
+        return reader[name]?.resource?.open()
+    }
 
     public interface Reader {
         public fun of(name: String): Entry?
@@ -51,7 +55,7 @@ public interface ArchiveReference : Closeable {
         public val isDirectory: Boolean,
         public val handle: ArchiveReference,
     ) {
-        public fun transform(config: TransformerConfig, handles: List<ArchiveReference> = listOf()): Entry {
+        public fun transform(config: TransformerConfig, handles: List<ArchiveTree> = listOf()): Entry {
             return Entry(
                 name,
                 ProvidedResource(resource.uri) {

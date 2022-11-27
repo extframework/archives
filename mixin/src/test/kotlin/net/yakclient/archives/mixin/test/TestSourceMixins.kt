@@ -5,6 +5,7 @@ import net.yakclient.archives.transform.ByteCodeUtils
 import net.yakclient.archives.transform.Sources
 import net.yakclient.archives.transform.TransformerConfig
 import org.junit.jupiter.api.Test
+import java.lang.reflect.Method
 import kotlin.math.floor
 
 class TestSourceMixins {
@@ -17,13 +18,9 @@ class TestSourceMixins {
         SourceInjectionData(
             MixedClass::class.java.name,
             `Mixin test case`::class.java.name,
-            listOf(
-                SourceInjectionData.From(
-                    Sources.of(`Mixin test case`::`Inject this!`),
-                    ByteCodeUtils.runtimeSignature(MixedClass::testMethod),
-                    SourceInjectors.AFTER_BEGIN
-                )
-            )
+            Sources.of(`Mixin test case`::`Inject this!`),
+            ByteCodeUtils.runtimeSignature(MixedClass::testMethod),
+            SourceInjectors.AFTER_BEGIN
         )
     )
 
@@ -42,7 +39,7 @@ class TestSourceMixins {
         val c = MixedClass::class.java.transform(config)
 
         val instance = c.noArgInstance()
-        println(c.getMethod("testMethod", Int::class.java).invoke(instance, 1))
+        println(c.getMethod("testMethod", Int::class.java).also(Method::trySetAccessible).invoke(instance, 1))
     }
 }
 

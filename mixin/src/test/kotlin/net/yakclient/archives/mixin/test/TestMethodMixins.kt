@@ -61,13 +61,9 @@ class TestMethodMixins {
             SourceInjectionData(
                 MixTo::class.java.name,
                 MethodSource::class.java.name,
-                listOf(
-                    SourceInjectionData.From(
-                        Sources.of(MethodSource::mixThis),
-                        "thisMethodIsAlreadyHere()V",
-                        SourceInjectors.AFTER_BEGIN
-                    )
-                )
+                Sources.of(MethodSource::mixThis),
+                "thisMethodIsAlreadyHere()V",
+                SourceInjectors.AFTER_BEGIN
             )
         )
 

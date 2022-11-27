@@ -16,4 +16,4 @@ fun Class<*>.transform(config: TransformerConfig): Class<*> {
     return c
 }
 
-fun Class<*>.noArgInstance(): Any = this.getConstructor().newInstance()
+fun Class<*>.noArgInstance(): Any = this.getConstructor().apply {trySetAccessible()}.newInstance()
