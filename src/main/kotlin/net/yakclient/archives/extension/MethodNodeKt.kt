@@ -32,20 +32,18 @@ public fun MethodNode.parameters(): List<Class<*>> = parameterClasses(this.desc)
  */
 public fun parameterClasses(
     desc: String,
-    classloader: (String) -> Class<*> = { Class.forName(it) }
-): List<Class<*>> = parameters(desc)
-    .map {
-//        fun unwrapPrimitive() : Class<*>? {
-//
-//        }
-        (ByteCodeUtils.primitiveType(it.first())) ?: classloader(it)
+    classloader: (String) -> Class<*> = {
+        it.firstOrNull()?.let(ByteCodeUtils::primitiveType) ?: Class.forName(it)
     }
+): List<Class<*>> = parameters(desc)
+    .map {it.replace('/', '.')}
+    .map(classloader)
 
 public fun parameters(desc: String) : List<String>  = listOf{
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
 
     fun StringBuilder.containedClass(): String =
-        this.toString().replace('/', '.').also { this.clear() }
+        this.toString().also { this.clear() }
 
     val builder = StringBuilder()
     var type = NONE
