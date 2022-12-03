@@ -9,7 +9,6 @@ internal interface InjectionResolver
 
 internal class ClassResolver(
     private val delegate: ClassVisitor,
-
     private val config: TransformerConfig,
 ) : ClassVisitor(Opcodes.ASM9, ClassNode()), InjectionResolver {
     override fun visitMethod(
@@ -59,6 +58,12 @@ internal class MethodResolver(
         val parent = mv as MethodNode
         transformer(parent)
         parent.accept(delegate)
+
+        delegate.access = parent.access
+        delegate.name = parent.name
+        delegate.desc = parent.desc
+        delegate.signature = parent.signature
+        delegate.exceptions = parent.exceptions
     }
 }
 
