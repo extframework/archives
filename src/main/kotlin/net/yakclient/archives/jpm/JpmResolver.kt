@@ -91,7 +91,8 @@ internal class JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> 
             desc.rawVersion().map { "-$it" }.orElse("")
         }"
 
-        val jar = Files.createTempFile(archiveName, "jar")
+        // Why do I have to use the '.'?????
+        val jar = Files.createTempFile(archiveName, ".jar")
 
         JarOutputStream(FileOutputStream(jar.toFile())).use { target ->
             ref.reader.entries().forEach { e ->
