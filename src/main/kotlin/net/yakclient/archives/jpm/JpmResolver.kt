@@ -9,6 +9,7 @@ import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 import java.lang.module.ModuleFinder
 import java.lang.module.ModuleReference
+import java.lang.module.ResolvedModule
 import java.nio.file.Files
 import java.util.*
 import java.util.jar.JarEntry
@@ -56,8 +57,9 @@ internal class JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> 
         }
 
         // Mapping to a HashSet to avoid multiple configuration that are the same(they do not override equals and hashcode but using the object ID's should be good enough)
-        val parentLayers =
-            parents.filterIsInstance<JpmHandle>().mapTo(HashSet()) { it.layer }
+        val parentLayers = parents
+            .filterIsInstance<JpmHandle>()
+            .mapTo(HashSet()) { it.layer }
 
         val finder = object : ModuleFinder {
             override fun find(name: String): Optional<ModuleReference> = Optional.ofNullable(refsByName[name])
