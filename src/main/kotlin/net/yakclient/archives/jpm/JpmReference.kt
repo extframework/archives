@@ -10,6 +10,7 @@ import java.lang.module.ModuleReference
 import java.net.URI
 import java.nio.ByteBuffer
 import java.util.*
+import java.util.function.Predicate
 import java.util.stream.Stream
 
 internal class JpmReference(
@@ -66,9 +67,8 @@ internal class JpmReference(
                 ?.takeUnless { removes.contains(it.name) }
         }
 
-        override fun entries(): Sequence<ArchiveReference.Entry> = Sequence {
-            list().iterator()
-        }.mapNotNull { of(it) }
+        override fun entries(): Sequence<ArchiveReference.Entry> =
+            Sequence(list()::iterator).mapNotNull(::of)
 
         override fun find(name: String): Optional<URI> = Optional.ofNullable(of(name)?.resource?.uri)
 
@@ -79,7 +79,13 @@ internal class JpmReference(
 
         override fun list(): Stream<String> {
             ensureOpen()
-            return Stream.concat(overrides.keys.stream(), reader.list())
+
+            return Stream.concat(overrides.keys.stream(), reader.list()).filter(
+                object : Predicate<String> {
+                    private val processed = mutableSetOf<String>()
+                    override fun test(t: String): Boolean = processed.add(t)
+                }
+            )
         }
     }
 
