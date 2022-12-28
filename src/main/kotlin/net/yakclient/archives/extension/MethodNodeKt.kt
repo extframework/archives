@@ -32,14 +32,20 @@ public fun MethodNode.parameters(): List<Class<*>> = parameterClasses(this.desc)
  */
 public fun parameterClasses(
     desc: String,
-    classloader: (String) -> Class<*> = {
-        it.firstOrNull()?.let(ByteCodeUtils::primitiveType) ?: Class.forName(it)
+    classloader: (String) -> Class<*>
+    = {
+        Class.forName(it)
+        // it.firstOrNull()?.let(ByteCodeUtils::primitiveType) ?:
     }
 ): List<Class<*>> = parameters(desc)
-    .map {it.replace('/', '.')}
-    .map(classloader)
+    .map {
+        if (it.startsWith("L") && it.endsWith(";")) classloader(it.removePrefix("L").removeSuffix(";").replace('/', '.'))
+        else if (it.startsWith("[")) classloader(it.replace('/', '.'))
+        else if (ByteCodeUtils.isPrimitiveType(it.first())) ByteCodeUtils.primitiveType(it.first())!!
+        else throw IllegalArgumentException("Unknown parameter type: '$it' in parameters '$desc'")
+    }
 
-public fun parameters(desc: String) : List<String>  = listOf{
+public fun parameters(desc: String): List<String> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
 
     fun StringBuilder.containedClass(): String =
@@ -49,25 +55,21 @@ public fun parameters(desc: String) : List<String>  = listOf{
     var type = NONE
 
     for (c in desc.trim('(', ')')) {
+        builder.append(c)
         if (c == 'L' && type == NONE) type = OBJECT
         else if (c == 'L' && type == ARRAY_NOT_DETERMINED) {
             type = ARRAY_OBJECT
-            builder.append(c)
         } else if (c == '[' && type.or(NONE, ARRAY_NOT_DETERMINED)) {
             type = ARRAY_NOT_DETERMINED
-            builder.append(c)
         } else if (c == ';' && type.or(OBJECT, ARRAY_OBJECT)) {
-            if (type == ARRAY_OBJECT) builder.append(c)
             type = NONE
             add(builder.containedClass())
         } else {
             val isPrimitive = ByteCodeUtils.isPrimitiveType(c)
             if (isPrimitive && type == ARRAY_NOT_DETERMINED) {
                 type = NONE
-                builder.append(c)
                 add(builder.containedClass())
             } else if (isPrimitive && type == NONE) add(c.toString())
-            else builder.append(c)
         }
     }
 }
