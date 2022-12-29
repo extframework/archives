@@ -48,8 +48,8 @@ public fun parameterClasses(
 public fun parameters(desc: String): List<String> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
 
-    fun StringBuilder.containedClass(): String =
-        this.toString().also { this.clear() }
+    fun StringBuilder.addType() =
+        this.toString().also { add(it); this.clear() }
 
     val builder = StringBuilder()
     var type = NONE
@@ -63,13 +63,13 @@ public fun parameters(desc: String): List<String> = listOf {
             type = ARRAY_NOT_DETERMINED
         } else if (c == ';' && type.or(OBJECT, ARRAY_OBJECT)) {
             type = NONE
-            add(builder.containedClass())
+            builder.addType()
         } else {
             val isPrimitive = ByteCodeUtils.isPrimitiveType(c)
             if (isPrimitive && type == ARRAY_NOT_DETERMINED) {
                 type = NONE
-                add(builder.containedClass())
-            } else if (isPrimitive && type == NONE) add(c.toString())
+                builder.addType()
+            } else if (isPrimitive && type == NONE) builder.addType()
         }
     }
 }
