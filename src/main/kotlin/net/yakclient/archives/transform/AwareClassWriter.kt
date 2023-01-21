@@ -7,7 +7,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
-public class AwareClassWriter(
+public open class AwareClassWriter(
     private val handles:  List<ArchiveTree>,
     flags: Int,
     reader: ClassReader? = null,
@@ -34,14 +34,14 @@ public class AwareClassWriter(
         return superType.name
     }
 
-    private interface HierarchyNode {
-        val superNode: HierarchyNode?
-        val interfaceNodes: List<HierarchyNode>
+    protected interface HierarchyNode {
+        public val superNode: HierarchyNode?
+        public val interfaceNodes: List<HierarchyNode>
 
-        val name: String
-        val isInterface: Boolean
+        public val name: String
+        public val isInterface: Boolean
 
-        fun isChildOf(name: String): Boolean =
+        public fun isChildOf(name: String): Boolean =
             ((superNode?.let { listOf(it) } ?: listOf()) + interfaceNodes).any {
                 it.name == name || it.isChildOf(
                     name
@@ -49,7 +49,7 @@ public class AwareClassWriter(
             }
     }
 
-    private inner class LoadedClassNode(
+    protected inner class LoadedClassNode(
         type: Class<*>,
     ) : HierarchyNode {
         override val superNode: HierarchyNode? = type.superclass?.let(::LoadedClassNode)
@@ -58,17 +58,17 @@ public class AwareClassWriter(
         override val isInterface: Boolean = type.isInterface
     }
 
-    private inner class UnloadedClassNode(
+    protected inner class UnloadedClassNode(
         node: ClassNode,
     ) : HierarchyNode {
         override val superNode: HierarchyNode? = node.superName?.let(::loadType)
         override val interfaceNodes: List<HierarchyNode> = node.interfaces.map(::loadType)
-        override val name = node.name!!
+        override val name: String = node.name!!
         override val isInterface: Boolean = node.access and Opcodes.ACC_INTERFACE != 0
     }
 
     // Name expected in JVM internal format
-    private fun loadType(name: String): HierarchyNode {
+    protected open fun loadType(name: String): HierarchyNode {
         val openEntry = handles.firstNotNullOfOrNull { it.getResource("$name.class") }
             ?: return runCatching(ClassNotFoundException::class) {
                 LoadedClassNode(Class.forName(name.replace('/', '.')))

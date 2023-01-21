@@ -114,7 +114,6 @@ internal class JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> 
 
                 target.closeEntry()
             }
-
         }
 
         assert(Files.exists(jar)) { "Failed to write jar to temp directory!" }
