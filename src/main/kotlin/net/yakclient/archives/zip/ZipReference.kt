@@ -34,22 +34,23 @@ internal class ZipReference(
         override fun of(name: String): ArchiveReference.Entry? {
             ensureOpen()
 
-            val entry = zip.getJarEntry(name) ?: return null
-
-            val uri = URI.create("jar:${location}!/${entry.realName}")
-
-            return overrides[name] ?: ArchiveReference.Entry(
-                entry.name,
-                LocalResource(uri),
-                entry.isDirectory,
-                this@ZipReference
-            ).takeUnless { removes.contains(name) }
+            return overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
+                ArchiveReference.Entry(
+                    entry.name,
+                    LocalResource(URI.create("jar:${location}!/${entry.realName}")),
+                    entry.isDirectory,
+                    this@ZipReference
+                )
+            }.takeUnless { removes.contains(name) }
         }
 
-        override fun entries(): Sequence<ArchiveReference.Entry> = zip.entries().asSequence().mapNotNull {
-            of(it.name)
-        }.onEach {
-            ensureOpen()
+        override fun entries(): Sequence<ArchiveReference.Entry> {
+            val alreadyRead = HashSet<String>()
+
+            return (overrides.keys.asSequence() + zip.entries().asSequence().map { it.name })
+                .filter {
+                    !alreadyRead.contains(it)
+                }.mapNotNull(::of).onEach { ensureOpen() }
         }
     }
 
