@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
 public open class AwareClassWriter(
-    private val handles:  List<ArchiveTree>,
+    protected val handles: List<ArchiveTree>,
     flags: Int,
     reader: ClassReader? = null,
 ) : ClassWriter(reader, flags) {
