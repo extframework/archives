@@ -13,7 +13,7 @@ import org.objectweb.asm.tree.MethodNode
 public object SourceInjection : MixinInjection<SourceInjectionData> {
     override fun apply(
         data: SourceInjectionData
-    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+    ): TransformerConfig.Mutable = TransformerConfig.of {
         val source = AlterThisReference(
             data.insnResolver,
             data.classTo.replace('.', '/'),
@@ -44,7 +44,7 @@ internal class SourceInjectionTransformer(
     private val point: SourceInjectionPoint,
     private val source: InstructionResolver
 ) : MethodTransformer {
-    override fun invoke(context: MethodNode): MethodNode = context.apply {
+    override fun invoke(context: MethodNode)  {
         point.apply(context).forEach { it.inject(source) }
     }
 }

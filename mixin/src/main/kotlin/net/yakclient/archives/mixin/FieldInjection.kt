@@ -7,7 +7,7 @@ import org.objectweb.asm.tree.FieldNode
 public object FieldInjection : MixinInjection<FieldInjectionData> {
     override fun apply(
         data: FieldInjectionData
-    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+    ): TransformerConfig.Mutable = TransformerConfig.of {
         transformClass {
             it.apply {
                 val node = FieldNode(

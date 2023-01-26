@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.MethodNode
 public object MethodInjection : MixinInjection<MethodInjectionData> {
     override fun apply(
         data: MethodInjectionData
-    ): TransformerConfig.MutableTransformerConfiguration = TransformerConfig.of {
+    ): TransformerConfig.Mutable = TransformerConfig.of {
         transformClass {
             it.apply {
                 val node = MethodNode(

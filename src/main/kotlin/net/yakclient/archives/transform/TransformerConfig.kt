@@ -1,5 +1,8 @@
 package net.yakclient.archives.transform
 
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodNode
+
 /**
  * The base config for transforming classes. Will always contain only 1 ClassTransformer,
  * MethodTransformer, and FieldTransformer. This class is mostly used to configure
@@ -30,11 +33,15 @@ public open class TransformerConfig(
      *
      * @author Durgan McBroom
      */
-    public class MutableTransformerConfiguration(
+    public class Mutable(
         private val cts: MutableList<ClassTransformer> = ArrayList(),
         private val mts: MutableList<MethodTransformer> = ArrayList(),
         private val fts: MutableList<FieldTransformer> = ArrayList()
-    ) : TransformerConfig(ProxiedTransformer(cts), ProxiedTransformer(mts), ProxiedTransformer(fts)) {
+    ) : TransformerConfig(ClassTransformer { node ->
+        cts.forEach { it(node) }
+    }, MethodTransformer { context -> mts.forEach { it(context) } }, FieldTransformer { node ->
+        fts.forEach { it(node) }
+    }) {
         /**
          * Adds a ClassTransformer.
          *
@@ -77,11 +84,11 @@ public open class TransformerConfig(
          * @return the created configuration
          */
         @JvmStatic
-        public fun of(block: MutableTransformerConfiguration.() -> Unit): MutableTransformerConfiguration =
-            MutableTransformerConfiguration().apply(block)
+        public fun of(block: Mutable.() -> Unit): Mutable =
+            Mutable().apply(block)
 
-        public operator fun TransformerConfig.plus(other: TransformerConfig) : MutableTransformerConfiguration {
-            return MutableTransformerConfiguration(
+        public operator fun TransformerConfig.plus(other: TransformerConfig): Mutable {
+            return Mutable(
                 mutableListOf(this.ct, other.ct),
                 mutableListOf(this.mt, other.mt),
                 mutableListOf(this.ft, other.ft)

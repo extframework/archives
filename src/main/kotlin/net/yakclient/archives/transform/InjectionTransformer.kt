@@ -12,9 +12,11 @@ import org.objectweb.asm.tree.MethodNode
  * @since 1.1-SNAPSHOT
  * @author Durgan McBroom
  */
-public fun interface InjectionTransformer<T> : (T) -> T {
-    override fun invoke(context: T): T
+public fun interface InjectionTransformer<T> : (T) -> Unit {
+    override fun invoke(context: T)
 }
+
+
 
 /**
  * The base transformer type for all class transformations.

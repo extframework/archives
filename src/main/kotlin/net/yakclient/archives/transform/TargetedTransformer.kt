@@ -24,7 +24,9 @@ public abstract class TargetedTransformer<T>(
      * @param c The context to match
      * @return The context(transformed or not)
      */
-    override fun invoke(context: T): T = if (matches(context)) delegate(context) else context
+    override fun invoke(context: T) {
+        if (matches(context)) delegate(context)
+    }
 
     /**
      * Determines if the given context matches.

@@ -3,13 +3,13 @@ package net.yakclient.archives
 import net.yakclient.archives.jpm.JpmFinder
 import net.yakclient.archives.jpm.JpmResolutionResult
 import net.yakclient.archives.jpm.JpmResolver
-import net.yakclient.archives.transform.ClassResolver
 import net.yakclient.archives.transform.TransformerConfig
 import net.yakclient.archives.zip.ZipFinder
 import net.yakclient.archives.zip.ZipResolutionResult
 import net.yakclient.archives.zip.ZipResolver
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.tree.ClassNode
 import java.nio.file.Path
 
 public object Archives {
@@ -51,9 +51,14 @@ public object Archives {
         config: TransformerConfig,
         writer: ClassWriter = ClassWriter(WRITER_FLAGS)
     ): ByteArray {
-        val resolver = ClassResolver(writer, config)
-        reader.accept(resolver, 0)
+        val node = ClassNode()
+        reader.accept(node, 0)
 
+        config.ct(node)
+        node.methods.forEach(config.mt)
+        node.fields.forEach(config.ft)
+
+        node.accept(writer)
         return writer.toByteArray()
     }
 }
