@@ -71,4 +71,31 @@ class TestZipArchives {
 
         check(zip.reader.entries().sumOf { 1L } == 1L)
     }
+
+    @Test
+    fun `Remove from zip archive`() {
+        val setupEmptyJar = setupEmptyJar()
+        val zip = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
+
+        check(zip.reader.entries().sumOf { 1L } == 0L)
+
+        zip.writer.put(
+            ArchiveReference.Entry(
+                "test",
+                object : SafeResource {
+                    override val uri: URI = setupEmptyJar.toUri()
+
+                    override fun open(): InputStream {
+                        return ByteArrayInputStream(byteArrayOf())
+                    }
+                },
+                false,
+                zip
+            )
+        )
+
+        zip.writer.remove("test")
+
+        check(zip.reader.entries().sumOf { 1L } == 0L)
+    }
 }

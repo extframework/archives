@@ -34,14 +34,14 @@ internal class ZipReference(
         override fun of(name: String): ArchiveReference.Entry? {
             ensureOpen()
 
-            return overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
+            return (overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
                 ArchiveReference.Entry(
                     entry.name,
                     LocalResource(URI.create("jar:${location}!/${entry.realName}")),
                     entry.isDirectory,
                     this@ZipReference
                 )
-            }.takeUnless { removes.contains(name) }
+            }).takeUnless { removes.contains(name) }
         }
 
         override fun entries(): Sequence<ArchiveReference.Entry> {
