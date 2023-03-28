@@ -96,24 +96,24 @@ allprojects {
         mavenCentral()
         maven {
             isAllowInsecureProtocol = true
-            url = uri("http://repo.yakclient.net/snapshots")
+            url = uri("http://maven.yakclient.net/snapshots")
         }
     }
 
     publishing {
         repositories {
-            if (!project.hasProperty("maven-user") || !project.hasProperty("maven-pass")) return@repositories
+            if (!project.hasProperty("maven-user") || !project.hasProperty("maven-secret")) return@repositories
 
             maven {
-                val repo = if (project.findProperty("isSnapshot") == "true") "snapshots" else "releases"
+                val repo = if (version.endsWith("-SNAPSHOT") == "true") "snapshots" else "releases"
 
                 isAllowInsecureProtocol = true
 
-                url = uri("http://repo.yakclient.net/$repo")
+                url = uri("http://maven.yakclient.net/$repo")
 
                 credentials {
                     username = project.findProperty("maven-user") as String
-                    password = project.findProperty("maven-pass") as String
+                    password = project.findProperty("maven-secret") as String
                 }
                 authentication {
                     create<BasicAuthentication>("basic")
