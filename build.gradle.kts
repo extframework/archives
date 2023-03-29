@@ -105,7 +105,7 @@ allprojects {
             if (!project.hasProperty("maven-user") || !project.hasProperty("maven-secret")) return@repositories
 
             maven {
-                val repo = if (version.endsWith("-SNAPSHOT") == "true") "snapshots" else "releases"
+                val repo = if ((version as String).endsWith("-SNAPSHOT") == "true") "snapshots" else "releases"
 
                 isAllowInsecureProtocol = true
 
