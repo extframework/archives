@@ -1,8 +1,5 @@
 package net.yakclient.archives.transform
 
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.MethodNode
-
 /**
  * The base config for transforming classes. Will always contain only 1 ClassTransformer,
  * MethodTransformer, and FieldTransformer. This class is mostly used to configure

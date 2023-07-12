@@ -7,12 +7,16 @@ import org.junit.jupiter.api.Test
 class TestMethodNodeExtensions {
     @Test
     fun `test description to parameter classes`() {
-        println(parameterClasses("(BZCSBIFJLnet/yakclient/archives/test/extension/TestMethodNodeExtensions;[B[[Z[Lnet/yakclient/archives/test/extension/TestMethodNodeExtensions;BB)") )
+        println(parameterClasses("(BZCSBIFJLnet/yakclient/archives/test/extension/TestMethodNodeExtensions;[B[[Z[Lnet/yakclient/archives/test/extension/TestMethodNodeExtensions;BB)"))
     }
 
     @Test
     fun `test description to parameters`() {
-        println(parameters("(Lnet/yakclient/components/yak/test/extension/RealClass;ILkotlin/jvm/internal/DefaultConstructorMarker;)"))
+        println(parameters("(BZCSBIFJLnet/yakclient/archives/test/extension/TestMethodNodeExtensions;[B[[Z[Lnet/yakclient/archives/test/extension/TestMethodNodeExtensions;BB)"))
     }
 
+    @Test
+    fun `Test signature with generics to parameters`() {
+        println(parameters("(Lexample/List<LSomeClass;>;[Lexample/Map<LOk;Lexample/another/CLASS;>;II)"))
+    }
 }

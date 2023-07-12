@@ -6,6 +6,7 @@ import net.yakclient.archives.extension.SearchType.*
 import net.yakclient.archives.transform.ByteCodeUtils
 import net.yakclient.archives.transform.MethodSignature
 import org.objectweb.asm.tree.MethodNode
+import java.util.Stack
 
 /**
  * Returns a list of parameters in class form.
@@ -39,39 +40,68 @@ public fun parameterClasses(
     }
 ): List<Class<*>> = parameters(desc)
     .map {
-        if (it.startsWith("L") && it.endsWith(";")) classloader(it.removePrefix("L").removeSuffix(";").replace('/', '.'))
+        if (it.startsWith("L") && it.endsWith(";")) classloader(
+            it.removePrefix("L").removeSuffix(";").replace('/', '.')
+        )
         else if (it.startsWith("[")) classloader(it.replace('/', '.'))
         else if (ByteCodeUtils.isPrimitiveType(it.first())) ByteCodeUtils.primitiveType(it.first())!!
         else throw IllegalArgumentException("Unknown parameter type: '$it' in parameters '$desc'")
     }
 
-public fun parameters(desc: String): List<String> = listOf {
+/**
+ * Complies with javas method SIGNATURE specification. This is a superset of the Java method
+ * Descriptor so this method will work with method descriptors awell.
+ */
+public fun parameters(signature: String): List<String> = listOf {
     fun <E : Enum<E>> E.or(vararg type: Enum<E>): Boolean = type.any { equals(it) }
 
     fun StringBuilder.addType() =
         this.toString().also { add(it); this.clear() }
 
     val builder = StringBuilder()
-    var type = NONE
+    val type = Stack<SearchType>()
+    type.push(NONE)
 
-    for (c in desc.trim('(', ')')) {
+    for (c in signature.trim('(', ')')) {
         builder.append(c)
-        if (c == 'L' && type == NONE) type = OBJECT
-        else if (c == 'L' && type == ARRAY_NOT_DETERMINED) {
-            type = ARRAY_OBJECT
-        } else if (c == '[' && type.or(NONE, ARRAY_NOT_DETERMINED)) {
-            type = ARRAY_NOT_DETERMINED
-        } else if (c == ';' && type.or(OBJECT, ARRAY_OBJECT)) {
-            type = NONE
-            builder.addType()
+        val peek = type.peek()
+        if (c == 'L' && peek.or(NONE, GENERIC)) type.push(OBJECT)
+        else if (c == 'L' && peek == ARRAY_NOT_DETERMINED) {
+            type.pop()
+            type.push(OBJECT)
+        } else if (c == '[' && peek.or(NONE, ARRAY_NOT_DETERMINED)) {
+            if (peek == NONE)
+            type.push(ARRAY_NOT_DETERMINED)
+        } else if (c == '<' && peek == OBJECT) {
+            type.push(GENERIC)
+        } else if (c == '>' && peek == GENERIC) {
+            type.pop()
+        } else if (c == ';' && peek == OBJECT) {
+            type.pop()
+            if (type.peek() == NONE)
+                builder.addType()
         } else {
             val isPrimitive = ByteCodeUtils.isPrimitiveType(c)
-            if (isPrimitive && type == ARRAY_NOT_DETERMINED) {
-                type = NONE
+            if (isPrimitive && peek == ARRAY_NOT_DETERMINED) {
+                type.pop()
                 builder.addType()
-            } else if (isPrimitive && type == NONE) builder.addType()
+            } else if (isPrimitive && peek == NONE) builder.addType()
         }
     }
+}
+
+
+//private data class ParameterType(
+//    val type: SearchType,
+//    val innerType:
+//)
+
+private enum class SearchType {
+    OBJECT,
+    ARRAY_OBJECT,
+    ARRAY_NOT_DETERMINED,
+    GENERIC,
+    NONE
 }
 
 /**
@@ -102,9 +132,3 @@ public fun MethodNode.sameSignature(signature: MethodSignature): Boolean =
 
 private fun <T> listOf(builder: MutableList<T>.() -> Unit): List<T> = ArrayList<T>().apply(builder).toList()
 
-private enum class SearchType {
-    OBJECT,
-    ARRAY_OBJECT,
-    ARRAY_NOT_DETERMINED,
-    NONE
-}
