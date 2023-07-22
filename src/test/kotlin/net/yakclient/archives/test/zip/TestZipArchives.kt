@@ -16,9 +16,18 @@ import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 class TestZipArchives {
-    private fun setupEmptyJar() : Path {
+    private fun setupJar(
+        vararg entries: Pair<String, String>
+    ) : Path {
         val createTempFile = Files.createTempFile(UUID.randomUUID().toString(), ".jar")
         JarOutputStream(FileOutputStream(createTempFile.toFile())).use { target ->
+            for (entry in entries) {
+                target.putNextEntry(JarEntry(entry.first))
+
+                target.write(entry.second.toByteArray())
+
+                target.closeEntry()
+            }
 //            val entry = JarEntry()
 //
 //            target.putNextEntry(entry)
@@ -49,7 +58,7 @@ class TestZipArchives {
 
     @Test
     fun `Create zip archive`() {
-        val setupEmptyJar = setupEmptyJar()
+        val setupEmptyJar = setupJar()
         val zip = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
 
         check(zip.reader.entries().sumOf { 1L } == 0L)
@@ -74,7 +83,7 @@ class TestZipArchives {
 
     @Test
     fun `Remove from zip archive`() {
-        val setupEmptyJar = setupEmptyJar()
+        val setupEmptyJar = setupJar()
         val zip = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
 
         check(zip.reader.entries().sumOf { 1L } == 0L)
@@ -97,5 +106,41 @@ class TestZipArchives {
         zip.writer.remove("test")
 
         check(zip.reader.entries().sumOf { 1L } == 0L)
+    }
+
+    @Test
+    fun `Test no duplicates`() {
+        val setupEmptyJar = setupJar(
+            "c" to "Go watch",
+            "a" to "A jazz musician",
+            "b" to "Named: ",
+            "e" to "Patrick Bartley"
+        )
+        val archive = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
+
+        val nanResource = object: SafeResource {
+            override val uri: URI
+                get() = throw UnsupportedOperationException("")
+
+            override fun open(): InputStream {
+                throw UnsupportedOperationException("")
+            }
+        }
+
+        fun ZipReference.put(name: String) {
+            writer.put(ArchiveReference.Entry(
+                name, nanResource, false, archive
+            ))
+        }
+
+        archive.put("c")
+        archive.put("a")
+        archive.put("d")
+
+        val read = HashSet<String>()
+
+        archive.reader.entries().forEach {
+            assert(read.add(it.name)) {"Duplicates found!"}
+        }
     }
 }

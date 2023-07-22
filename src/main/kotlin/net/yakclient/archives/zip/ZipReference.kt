@@ -48,9 +48,7 @@ internal class ZipReference(
             val alreadyRead = HashSet<String>()
 
             return (overrides.keys.asSequence() + zip.entries().asSequence().map { it.name })
-                .filter {
-                    !alreadyRead.contains(it)
-                }.mapNotNull(::of).onEach { ensureOpen() }
+                .filter(alreadyRead::add).mapNotNull(::of).onEach { ensureOpen() }
         }
     }
 
