@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "2.0.0-Beta1"
 
     id("signing")
     id("maven-publish")
-    id("org.jetbrains.dokka") version "1.6.0"
+    id("org.jetbrains.dokka") version "1.9.10"
 }
 
 
@@ -12,7 +12,7 @@ repositories {
 }
 
 tasks.wrapper {
-    gradleVersion = "7.2"
+    gradleVersion = "8.5"
 }
 
 configurations.all {
@@ -20,12 +20,12 @@ configurations.all {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.30")
+    implementation(kotlin("reflect"))
     implementation("net.yakclient:common-util:1.0-SNAPSHOT") {
         isChanging = true
     }
-    api("org.ow2.asm:asm:9.3")
-    api("org.ow2.asm:asm-util:9.3")
+    api("org.ow2.asm:asm:9.6")
+    api("org.ow2.asm:asm-util:9.6")
 }
 
 task<Jar>("sourcesJar") {
@@ -155,4 +155,3 @@ allprojects {
         sourceCompatibility = "17"
     }
 }
-
