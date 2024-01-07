@@ -44,8 +44,9 @@ internal class SourceInjectionTransformer(
     private val point: SourceInjectionPoint,
     private val source: InstructionResolver
 ) : MethodTransformer {
-    override fun invoke(context: MethodNode)  {
+    override fun invoke(context: MethodNode): MethodNode  {
         point.apply(context).forEach { it.inject(source) }
+        return context
     }
 }
 

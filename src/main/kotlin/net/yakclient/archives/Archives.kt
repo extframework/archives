@@ -49,14 +49,19 @@ public object Archives {
     public fun resolve(
         reader: ClassReader,
         config: TransformerConfig,
-        writer: ClassWriter = ClassWriter(WRITER_FLAGS)
+        writer: ClassWriter = ClassWriter(WRITER_FLAGS),
+        readerFlags: Int = 0
     ): ByteArray {
-        val node = ClassNode()
-        reader.accept(node, 0)
+        var node = ClassNode()
+        reader.accept(node, readerFlags)
 
-        config.ct(node)
-        node.methods.forEach(config.mt)
-        node.fields.forEach(config.ft)
+        node = config.ct(node)
+        node.methods = node.methods.map {
+            config.mt.invoke(it)
+        }
+        node.fields = node.fields.map {
+            config.ft.invoke(it)
+        }
 
         node.accept(writer)
         return writer.toByteArray()

@@ -35,9 +35,9 @@ public open class TransformerConfig(
         private val mts: MutableList<MethodTransformer> = ArrayList(),
         private val fts: MutableList<FieldTransformer> = ArrayList()
     ) : TransformerConfig(ClassTransformer { node ->
-        cts.forEach { it(node) }
-    }, MethodTransformer { context -> mts.forEach { it(context) } }, FieldTransformer { node ->
-        fts.forEach { it(node) }
+        cts.fold(node) { acc, it -> it(acc) }
+    }, MethodTransformer { node -> mts.fold(node) { acc, it -> it(acc) } }, FieldTransformer { node ->
+        fts.fold(node) { acc, it -> it(acc) }
     }) {
         /**
          * Adds a ClassTransformer.
