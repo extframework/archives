@@ -1,15 +1,15 @@
 package net.yakclient.archives.jpm
 
+import com.durganmcbroom.resources.openStream
+import net.yakclient.archives.ArchiveHandle
 import net.yakclient.archives.ArchiveResolver
 import net.yakclient.archives.ClassLoaderProvider
-import net.yakclient.archives.ArchiveHandle
 import net.yakclient.common.util.LazyMap
 import java.io.FileOutputStream
 import java.lang.module.Configuration
 import java.lang.module.ModuleDescriptor
 import java.lang.module.ModuleFinder
 import java.lang.module.ModuleReference
-import java.lang.module.ResolvedModule
 import java.nio.file.Files
 import java.util.*
 import java.util.jar.JarEntry
@@ -100,7 +100,8 @@ internal class JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> 
 
                 target.putNextEntry(entry)
 
-                val eIn = e.resource.open()
+                // TODO integrate the jobs framework
+                val eIn = e.resource.openStream()
 
                 //Stolen from https://stackoverflow.com/questions/1281229/how-to-use-jaroutputstream-to-create-a-jar-file
                 val buffer = ByteArray(1024)

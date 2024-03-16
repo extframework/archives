@@ -1,13 +1,14 @@
 package net.yakclient.archives.test.zip
 
+import com.durganmcbroom.resources.Resource
+import com.durganmcbroom.resources.ResourceStream
+import com.durganmcbroom.resources.asResourceStream
 import net.yakclient.archives.ArchiveReference
 import net.yakclient.archives.zip.ZipReference
-import net.yakclient.common.util.resource.SafeResource
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.net.URI
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -66,11 +67,11 @@ class TestZipArchives {
         zip.writer.put(
             ArchiveReference.Entry(
                 "test",
-                object : SafeResource {
-                    override val uri: URI = setupEmptyJar.toUri()
+                object : Resource {
+                    override val location: String = setupEmptyJar.toString()
 
-                    override fun open(): InputStream {
-                        return ByteArrayInputStream(byteArrayOf())
+                    override fun open(): ResourceStream {
+                        return ByteArrayInputStream(byteArrayOf()).asResourceStream()
                     }
                 },
                 false,
@@ -91,11 +92,10 @@ class TestZipArchives {
         zip.writer.put(
             ArchiveReference.Entry(
                 "test",
-                object : SafeResource {
-                    override val uri: URI = setupEmptyJar.toUri()
-
-                    override fun open(): InputStream {
-                        return ByteArrayInputStream(byteArrayOf())
+                object : Resource {
+                    override val location: String = setupEmptyJar.toString()
+                    override fun open(): ResourceStream {
+                        return ByteArrayInputStream(byteArrayOf()).asResourceStream()
                     }
                 },
                 false,
@@ -118,11 +118,11 @@ class TestZipArchives {
         )
         val archive = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
 
-        val nanResource = object: SafeResource {
-            override val uri: URI
+        val nanResource = object: Resource {
+            override val location: String
                 get() = throw UnsupportedOperationException("")
 
-            override fun open(): InputStream {
+            override fun open(): ResourceStream {
                 throw UnsupportedOperationException("")
             }
         }
@@ -142,5 +142,20 @@ class TestZipArchives {
         archive.reader.entries().forEach {
             assert(read.add(it.name)) {"Duplicates found!"}
         }
+    }
+
+    @Test
+    fun `Entry returns correct location`() {
+        val setupEmptyJar = setupJar(
+            "c" to "Go watch",
+            "a" to "A jazz musician",
+            "b" to "Named: ",
+            "e" to "Patrick Bartley"
+        )
+        val archive = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
+
+        check(String(URL(archive.reader["c"]!!.resource.location).openStream().readAllBytes()) == "Go watch")
+        check(String(URL(archive.reader["e"]!!.resource.location).openStream().readAllBytes()) == "Patrick Bartley")
+
     }
 }

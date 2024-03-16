@@ -2,7 +2,7 @@
 
 package net.yakclient.archives.extension
 
-import net.yakclient.archives.transform.ByteCodeUtils
+import org.objectweb.asm.commons.Method
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
@@ -13,18 +13,17 @@ import org.objectweb.asm.tree.MethodNode
  *
  * @receiver the `ClassNode` to find the method of.
  *
- * @param name the name of the method to find.
- * @param args the parameters to match for.
+ * @param method the method object ot check against
  *
  * @return the found method node or null
  */
-public fun ClassNode.methodOf(name: String, vararg args: Class<*>): MethodNode? = methods.find {
-    it.name == name && args.joinToString(
-        prefix = "(",
-        postfix = ")",
-        transform = ByteCodeUtils::toRuntimeName
-    ) == it.desc
+public fun ClassNode.methodOf(method: Method): MethodNode? = methods.find {
+    val itMethod = it.toMethod()
+    itMethod.name == method.name && itMethod.argumentTypes.contentEquals(method.argumentTypes)
+            && itMethod.returnType == method.returnType
 }
+
+public fun ClassNode.hasMethod(method: Method): Boolean = methodOf(method) != null
 
 /**
  * Returns the given FieldNode matching the provided name. If not found then

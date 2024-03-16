@@ -1,6 +1,7 @@
 package net.yakclient.archives.transform
 
 import net.yakclient.archives.extension.sameSignature
+import org.objectweb.asm.commons.Method
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
@@ -53,10 +54,10 @@ public class TargetedClassTransformer(
  * @author Durgan McBroom
  */
 public class TargetedMethodTransformer(
-    private val signature: MethodSignature,
+    private val method: Method,
     delegate: MethodTransformer,
 ) : TargetedTransformer<MethodNode>(delegate) {
-    override fun matches(c: MethodNode): Boolean = c.sameSignature(signature)
+    override fun matches(c: MethodNode): Boolean = c.sameSignature(method)
 }
 
 /**

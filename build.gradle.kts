@@ -21,11 +21,10 @@ configurations.all {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("net.yakclient:common-util:1.0-SNAPSHOT") {
-        isChanging = true
-    }
+    api("net.yakclient:common-util:1.1-SNAPSHOT")
     api("org.ow2.asm:asm:9.6")
     api("org.ow2.asm:asm-util:9.6")
+    api("org.ow2.asm:asm-commons:9.6")
 }
 
 task<Jar>("sourcesJar") {
@@ -90,7 +89,7 @@ allprojects {
     apply(plugin = "maven-publish")
 
     group = "net.yakclient"
-    version = "1.1-SNAPSHOT"
+    version = "1.2-SNAPSHOT"
 
     repositories {
         mavenCentral()

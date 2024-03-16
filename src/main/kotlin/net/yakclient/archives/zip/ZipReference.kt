@@ -1,7 +1,8 @@
 package net.yakclient.archives.zip
 
+import com.durganmcbroom.resources.LocalResource
+import com.durganmcbroom.resources.streamToResource
 import net.yakclient.archives.ArchiveReference
-import net.yakclient.common.util.resource.LocalResource
 import java.net.URI
 import java.util.jar.JarFile
 
@@ -37,7 +38,9 @@ internal class ZipReference(
             return (overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
                 ArchiveReference.Entry(
                     entry.name,
-                    LocalResource(URI.create("jar:${location}!/${entry.realName}")),
+                    streamToResource("jar:${location}!/${entry.realName}") {
+                        zip.getInputStream(entry)
+                    },
                     entry.isDirectory,
                     this@ZipReference
                 )

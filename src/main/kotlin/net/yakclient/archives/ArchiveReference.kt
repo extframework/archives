@@ -1,11 +1,12 @@
 package net.yakclient.archives
 
+import com.durganmcbroom.resources.Resource
+import com.durganmcbroom.resources.openStream
 import net.yakclient.archives.Archives.WRITER_FLAGS
 import net.yakclient.archives.transform.AwareClassWriter
 import net.yakclient.archives.transform.TransformerConfig
-import net.yakclient.common.util.resource.ProvidedResource
-import net.yakclient.common.util.resource.SafeResource
 import org.objectweb.asm.ClassReader
+import java.io.ByteArrayInputStream
 import java.io.Closeable
 import java.io.InputStream
 import java.net.URI
@@ -22,7 +23,7 @@ public interface ArchiveReference : Closeable, ArchiveTree {
         get() = !isClosed
 
     override fun getResource(name: String): InputStream? {
-        return reader[name]?.resource?.open()
+        return  reader[name]?.resource?.openStream()
     }
 
     public interface Reader {
@@ -38,7 +39,7 @@ public interface ArchiveReference : Closeable, ArchiveTree {
     public interface Writer {
         public fun put(
             name: String,
-            resource: SafeResource,
+            resource: Resource,
             handle: ArchiveReference,
             isDirectory: Boolean = false
         ): Unit =
@@ -51,18 +52,20 @@ public interface ArchiveReference : Closeable, ArchiveTree {
 
     public data class Entry public constructor(
         public val name: String,
-        public val resource: SafeResource,
+        public val resource: Resource,
         public val isDirectory: Boolean,
         public val handle: ArchiveReference,
     ) {
         public fun transform(config: TransformerConfig, handles: List<ArchiveTree> = listOf()): Entry {
             return Entry(
                 name,
-                ProvidedResource(resource.uri) {
-                    Archives.resolve(
-                        ClassReader(resource.open()),
-                        config,
-                        AwareClassWriter(handles + handle, WRITER_FLAGS)
+                Resource(resource.location) {
+                    ByteArrayInputStream(
+                        Archives.resolve(
+                            ClassReader(resource.openStream()),
+                            config,
+                            AwareClassWriter(handles + handle, WRITER_FLAGS)
+                        )
                     )
                 },
                 isDirectory,

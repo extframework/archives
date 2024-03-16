@@ -1,9 +1,9 @@
 package net.yakclient.archives.jpm
 
+import com.durganmcbroom.resources.openStream
+import com.durganmcbroom.resources.streamToResource
 import net.yakclient.archives.ArchiveReference
-import net.yakclient.common.util.readBytes
 import net.yakclient.common.util.readInputStream
-import net.yakclient.common.util.resource.ProvidedResource
 import java.io.InputStream
 import java.lang.module.ModuleReader
 import java.lang.module.ModuleReference
@@ -59,7 +59,7 @@ internal class JpmReference(
                 ?: reader.find(name).orElse(null)?.let {
                     ArchiveReference.Entry(
                         name,
-                        ProvidedResource(it) { it.readBytes() },
+                        streamToResource(it.toString()) { it.toURL().openStream() },
                         name.endsWith("/"), // This is how they do it in the java source code, wish there could be a better solution :(
                         this@JpmReference
                     )
@@ -70,12 +70,15 @@ internal class JpmReference(
         override fun entries(): Sequence<ArchiveReference.Entry> =
             Sequence(list()::iterator).mapNotNull(::of)
 
-        override fun find(name: String): Optional<URI> = Optional.ofNullable(of(name)?.resource?.uri)
+        override fun find(name: String): Optional<URI> =
+            Optional.ofNullable(of(name)?.resource?.location?.let(URI::create))
 
-        override fun open(name: String): Optional<InputStream> = Optional.ofNullable(of(name)?.resource?.open())
+        override fun open(name: String): Optional<InputStream> =
+            Optional.ofNullable(of(name)?.resource?.openStream())
 
         override fun read(name: String): Optional<ByteBuffer> =
-            Optional.ofNullable(of(name)?.resource?.open()?.readInputStream()?.let { ByteBuffer.wrap(it) })
+            Optional.ofNullable(
+                of(name)?.resource?.openStream()?.readInputStream()?.let { ByteBuffer.wrap(it) })
 
         override fun list(): Stream<String> {
             ensureOpen()

@@ -1,5 +1,8 @@
 package net.yakclient.archives.transform
 
+import net.yakclient.archives.extension.Method
+import org.objectweb.asm.commons.Method
+
 /**
  * The base config for transforming classes. Will always contain only 1 ClassTransformer,
  * MethodTransformer, and FieldTransformer. This class is mostly used to configure
@@ -63,10 +66,10 @@ public open class TransformerConfig(
         public fun transformClass(name: String, t: ClassTransformer): Boolean =
             cts.add(TargetedClassTransformer(name, t))
 
-        public fun transformMethod(name: String, t: MethodTransformer): Boolean =
-            mts.add(TargetedMethodTransformer(MethodSignature.of(name), t))
+        public fun transformMethod(method: String, t: MethodTransformer): Boolean =
+            mts.add(TargetedMethodTransformer(Method(method), t))
 
-        public fun transformMethod(signature: MethodSignature, t: MethodTransformer): Boolean =
+        public fun transformMethod(signature: Method, t: MethodTransformer): Boolean =
             mts.add(TargetedMethodTransformer(signature, t))
 
         public fun transformField(name: String, t: FieldTransformer): Boolean =

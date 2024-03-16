@@ -1,5 +1,7 @@
 package net.yakclient.archives.transform
 
+import net.yakclient.archives.extension.Method
+import net.yakclient.archives.extension.overloads
 import net.yakclient.common.util.equalsAny
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.FieldInsnNode
@@ -118,16 +120,16 @@ public object ByteCodeUtils {
     }
 
 
-    /**
-     * Determines if the given char can be parsed to a primitive type.
-     *
-     * @param c the given char.
-     * @return if the char can be parsed to a primitive.
-     */
-    public fun isPrimitiveType(c: Char): Boolean = when (c) {
-        'V', 'Z', 'C', 'B', 'S', 'I', 'F', 'J', 'D' -> true
-        else -> false
-    }
+//    /**
+//     * Determines if the given char can be parsed to a primitive type.
+//     *
+//     * @param c the given char.
+//     * @return if the char can be parsed to a primitive.
+//     */
+//    public fun isPrimitiveType(c: Char): Boolean = when (c) {
+//        'V', 'Z', 'C', 'B', 'S', 'I', 'F', 'J', 'D' -> true
+//        else -> false
+//    }
 
     /**
      * Determines if the given opcode is a return instruction.
@@ -160,11 +162,9 @@ public object ByteCodeUtils {
      *
      * @return If the method signatures are the same.
      */
-    public fun sameSignature(first: String, second: String): Boolean = MethodSignature.of(first)
-        .matches(MethodSignature.of(second))
-
-    public fun signatureOf(signature: String): MethodSignature = MethodSignature.of(signature)
-
+    public fun overloads(first: String, second: String): Boolean =
+        Method(first).overloads(Method(second))
+//
     public fun opcodeToString(opcode: Int): String? {
         return Printer.OPCODES.getOrNull(opcode)
     }

@@ -1,5 +1,6 @@
 package net.yakclient.archives.test.transform
 
+import com.durganmcbroom.resources.openStream
 import net.yakclient.archives.Archives
 import net.yakclient.archives.transform.AwareClassWriter
 import net.yakclient.archives.transform.Sources
@@ -57,11 +58,12 @@ class TestBasicTransformations {
 
         val config = TransformerConfig.of { }
 
-       Archives.resolve(
-            ClassReader(archive.reader["net/yakclient/archive/mapper/ObfuscationMap.class"]!!.resource.open()),
+        Archives.resolve(
+            ClassReader(archive.reader["net/yakclient/archive/mapper/ObfuscationMap.class"]!!.resource.openStream()),
             config,
             AwareClassWriter(listOf(archive), ClassWriter.COMPUTE_FRAMES)
         )
+
     }
 
     fun methodToInject() {
