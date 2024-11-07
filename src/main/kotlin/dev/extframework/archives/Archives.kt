@@ -1,8 +1,5 @@
 package dev.extframework.archives
 
-import dev.extframework.archives.jpm.JpmFinder
-import dev.extframework.archives.jpm.JpmResolutionResult
-import dev.extframework.archives.jpm.JpmResolver
 import dev.extframework.archives.transform.TransformerConfig
 import dev.extframework.archives.zip.ZipFinder
 import dev.extframework.archives.zip.ZipResolutionResult
@@ -14,14 +11,11 @@ import java.nio.file.Path
 
 public object Archives {
     public object Resolvers {
-        public val JPM_RESOLVER: ArchiveResolver<ArchiveReference, JpmResolutionResult> =
-            JpmResolver() as ArchiveResolver<ArchiveReference, JpmResolutionResult>
         public val ZIP_RESOLVER: ArchiveResolver<ArchiveReference, ZipResolutionResult> =
             ZipResolver() as ArchiveResolver<ArchiveReference, ZipResolutionResult>
     }
 
     public object Finders {
-        public val JPM_FINDER: ArchiveFinder<*> = JpmFinder()
         public val ZIP_FINDER: ArchiveFinder<*> = ZipFinder()
     }
 
