@@ -15,7 +15,6 @@ internal class ZipFinder : ArchiveFinder<ZipReference> {
                 path.toFile().also { assert(it.exists()) },
                 true,
                 ZipFile.OPEN_READ,
-                JarFile.runtimeVersion()
             ), path.toUri()
         )
     }

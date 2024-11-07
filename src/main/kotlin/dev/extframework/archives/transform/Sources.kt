@@ -24,7 +24,7 @@ public object Sources {
         return MethodSourceResolver(
             ClassReader(
                 declaringClass.classLoader.getResourceAsStream(r)
-                    ?: throw IllegalStateException("Failed to load content of class: '$name'. Looking in classloader: '${declaringClass.classLoader.name}' for resource '$r.")
+                    ?: throw IllegalStateException("Failed to load content of class: '$name'. Looking in classloader: '${declaringClass.classLoader}' for resource '$r.")
             ), ByteCodeUtils.runtimeSignature(method)
         )
     }

@@ -35,7 +35,7 @@ class TestBasicTransformations {
     @Test
     fun `Test aware classwriter`() {
         val archive = Archives.find(
-            File(this::class.java.getResource("/archive-mapper-TEST-JAR.jar")!!.toURI()).toPath(),
+            File(this::class.java.getResource("/test.jar")!!.toURI()).toPath(),
             Archives.Finders.ZIP_FINDER
         )
 
@@ -43,23 +43,23 @@ class TestBasicTransformations {
         assert(writer.getCommonSuperClass("java/lang/String", "java/lang/String") == "java/lang/Object")
         assert(
             writer.getCommonSuperClass(
-                "dev/extframework/archive/mapper/parsers/DefaultParserProvider",
-                "dev/extframework/archive/mapper/ParserProvider"
-            ) == "dev/extframework/archive/mapper/ParserProvider"
+                "dev/extframework/ClassB",
+                "dev/extframework/ClassC"
+            ) == "dev/extframework/ClassA"
         )
     }
 
     @Test
     fun `Test aware class writer without modifications`() {
         val archive = Archives.find(
-            File(this::class.java.getResource("/archive-mapper-TEST-JAR.jar")!!.toURI()).toPath(),
+            File(this::class.java.getResource("/test.jar")!!.toURI()).toPath(),
             Archives.Finders.ZIP_FINDER
         )
 
         val config = TransformerConfig.of { }
 
         Archives.resolve(
-            ClassReader(archive.reader["dev/extframework/archive/mapper/ObfuscationMap.class"]!!.resource.openStream()),
+            ClassReader(archive.reader["dev/extframework/TestClass1.class"]!!.resource.openStream()),
             config,
             AwareClassWriter(listOf(archive), ClassWriter.COMPUTE_FRAMES)
         )

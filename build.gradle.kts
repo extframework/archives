@@ -79,4 +79,7 @@ allprojects {
         implementation(kotlin("reflect"))
         testImplementation(kotlin("test"))
     }
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }

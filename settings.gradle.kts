@@ -10,3 +10,4 @@ pluginManagement {
 rootProject.name = "archives"
 
 include(":mixin")
+include("test-jar")

@@ -154,8 +154,8 @@ class TestZipArchives {
         )
         val archive = ZipReference(JarFile(setupEmptyJar.toFile()), setupEmptyJar.toUri())
 
-        check(String(URL(archive.reader["c"]!!.resource.location).openStream().readAllBytes()) == "Go watch")
-        check(String(URL(archive.reader["e"]!!.resource.location).openStream().readAllBytes()) == "Patrick Bartley")
+        check(String(URL(archive.reader["c"]!!.resource.location).openStream().readBytes()) == "Go watch")
+        check(String(URL(archive.reader["e"]!!.resource.location).openStream().readBytes()) == "Patrick Bartley")
 
     }
 }
