@@ -6,7 +6,7 @@ import java.util.jar.JarFile
 import java.util.zip.ZipFile
 import kotlin.reflect.KClass
 
-internal class ZipFinder : ArchiveFinder<ZipReference> {
+public object ZipFinder : ArchiveFinder<ZipReference> {
     override val type: KClass<ZipReference> = ZipReference::class
 
     override fun find(path: Path): ZipReference {

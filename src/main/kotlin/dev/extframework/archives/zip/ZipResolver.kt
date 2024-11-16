@@ -5,7 +5,7 @@ import dev.extframework.archives.ClassLoaderProvider
 import dev.extframework.archives.ArchiveHandle
 import kotlin.reflect.KClass
 
-internal class ZipResolver : ArchiveResolver<ZipReference, ZipResolutionResult> {
+public object ZipResolver : ArchiveResolver<ZipReference, ZipResolutionResult> {
     override val type: KClass<ZipReference> = ZipReference::class
 
     override fun resolve(

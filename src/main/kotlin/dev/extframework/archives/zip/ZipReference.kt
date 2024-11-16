@@ -5,7 +5,7 @@ import dev.extframework.archives.ArchiveReference
 import java.net.URI
 import java.util.jar.JarFile
 
-internal class ZipReference(
+public class ZipReference(
     private val zip: JarFile, override val location: URI,
 ) : ArchiveReference {
     private var closed = false

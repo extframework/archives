@@ -11,12 +11,14 @@ import java.nio.file.Path
 
 public object Archives {
     public object Resolvers {
+        @Deprecated(message = "Replace with ZipResolver call directly")
         public val ZIP_RESOLVER: ArchiveResolver<ArchiveReference, ZipResolutionResult> =
-            ZipResolver() as ArchiveResolver<ArchiveReference, ZipResolutionResult>
+            ZipResolver as ArchiveResolver<ArchiveReference, ZipResolutionResult>
     }
 
     public object Finders {
-        public val ZIP_FINDER: ArchiveFinder<*> = ZipFinder()
+        @Deprecated(message = "Replace with ZipFinder call directly")
+        public val ZIP_FINDER: ArchiveFinder<*> = ZipFinder
     }
 
     public fun <T : ArchiveReference> find(path: Path, finder: ArchiveFinder<T>): T = finder.find(path)
@@ -40,7 +42,7 @@ public object Archives {
     public const val WRITER_FLAGS: Int = ClassWriter.COMPUTE_FRAMES
 
     @JvmOverloads
-    public fun resolve(
+    public fun applyConfig(
         reader: ClassReader,
         config: TransformerConfig,
         writer: ClassWriter = ClassWriter(WRITER_FLAGS),
