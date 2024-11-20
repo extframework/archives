@@ -37,7 +37,7 @@ public class ZipReference(
             return (overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
                 ArchiveReference.Entry(
                     entry.name,
-                    streamToResource("jar:${location}!/${entry.name}") {
+                    streamToResource("jar:${location}!/${entry.realName}") {
                         zip.getInputStream(entry)
                     },
                     entry.isDirectory,

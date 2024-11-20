@@ -14,7 +14,8 @@ public object ZipFinder : ArchiveFinder<ZipReference> {
             JarFile(
                 path.toFile().also { assert(it.exists()) },
                 true,
-                ZipFile.OPEN_READ
+                ZipFile.OPEN_READ,
+                Runtime.version()
             ), path.toUri()
         )
     }

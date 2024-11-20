@@ -41,7 +41,18 @@ public object Archives {
 
     public const val WRITER_FLAGS: Int = ClassWriter.COMPUTE_FRAMES
 
+    @Deprecated("This is deprecated, please use applyConfig instead.", replaceWith = ReplaceWith("applyConfig"))
     @JvmOverloads
+    public fun resolve(
+        reader: ClassReader,
+        config: TransformerConfig,
+        writer: ClassWriter = ClassWriter(WRITER_FLAGS),
+        readerFlags: Int = 0
+    ): ByteArray {
+        return applyConfig(reader, config, writer, readerFlags)
+    }
+
+
     public fun applyConfig(
         reader: ClassReader,
         config: TransformerConfig,

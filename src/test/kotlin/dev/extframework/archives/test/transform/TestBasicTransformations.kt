@@ -21,7 +21,7 @@ class TestBasicTransformations {
             }
         }
 
-        val new = Archives.applyConfig(ClassReader(ClassToTransform::class.java.name), config)
+        val new = Archives.resolve(ClassReader(ClassToTransform::class.java.name), config)
 
         val loader = object : ClassLoader() {
             fun defineClass(name: String, bytes: ByteArray) = super.defineClass(name, bytes, 0, bytes.size)
@@ -58,7 +58,7 @@ class TestBasicTransformations {
 
         val config = TransformerConfig.of { }
 
-        Archives.applyConfig(
+        Archives.resolve(
             ClassReader(archive.reader["dev/extframework/TestClass1.class"]!!.resource.openStream()),
             config,
             AwareClassWriter(listOf(archive), ClassWriter.COMPUTE_FRAMES)

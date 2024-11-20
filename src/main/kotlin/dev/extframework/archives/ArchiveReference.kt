@@ -61,7 +61,7 @@ public interface ArchiveReference : Closeable, ArchiveTree {
                 name,
                 Resource(resource.location) {
                     ByteArrayInputStream(
-                        Archives.applyConfig(
+                        Archives.resolve(
                             ClassReader(resource.openStream()),
                             config,
                             AwareClassWriter(handles + handle, WRITER_FLAGS)

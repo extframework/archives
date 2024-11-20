@@ -5,7 +5,7 @@ import dev.extframework.archives.transform.TransformerConfig
 import org.objectweb.asm.ClassReader
 
 fun Class<*>.transform(config: TransformerConfig): Class<*> {
-    val bytes = Archives.applyConfig(ClassReader(name), config)
+    val bytes = Archives.resolve(ClassReader(name), config)
 
     val loader = object : ClassLoader() {
         fun defineClass(name: String, bytes: ByteArray) = super.defineClass(name, bytes, 0, bytes.size)

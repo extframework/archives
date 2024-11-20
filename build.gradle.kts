@@ -5,8 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.21"
 
-    id("dev.extframework.common") version "1.0.28"
-    id("me.champeau.mrjar") version "0.1.1"
+    id("dev.extframework.common") version "1.0.36"
 }
 
 tasks.wrapper {
@@ -17,11 +16,16 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
 
-multiRelease {
-    targetVersions(8, 11)
+sourceSets {
+    create("java11")
+    create("java11Test") {
+        compileClasspath += sourceSets["main"].output + configurations["testCompileClasspath"]
+        runtimeClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
+    }
+    create("mr")
 }
 
-tasks.named<Test>("java11Test") {
+task<Test>("java11Test") {
     description = "Runs tests in the java11Test source set"
     group = "verification"
 
@@ -32,6 +36,11 @@ tasks.named<Test>("java11Test") {
     useJUnitPlatform()
 }
 
+task<Jar>("java11Jar") {
+    from(sourceSets.named("java11").get().output)
+    archiveClassifier = "jdk11"
+}
+
 dependencies {
     implementation(kotlin("reflect"))
     api("org.ow2.asm:asm:9.6")
@@ -39,14 +48,18 @@ dependencies {
     api("org.ow2.asm:asm-commons:9.6")
 
     commonUtil(configurationName = "java11Implementation")
+    commonUtil(configurationName = "mrImplementation")
     commonUtil(configurationName = "api")
 
+    "mrImplementation"(sourceSets.main.get().output)
+
+    "java11Implementation"(sourceSets.main.get().output)
+    "java11TestImplementation"("org.junit.jupiter:junit-jupiter-api:5.11.3")
     "java11TestImplementation"(kotlin("test"))
     "java11TestImplementation"(sourceSets.main.get().output)
     "java11TestImplementation"(sourceSets.named("java11").get().output)
+    "java11TestRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
-
-
 
 common {
     publishing {
@@ -54,6 +67,7 @@ common {
             withJava()
             withSources()
             withDokka()
+            artifact(tasks.named("java11Jar")).classifier = "jdk11"
 
             artifactId = "archives"
 
@@ -73,16 +87,13 @@ common {
     }
 }
 
-tasks.compileKotlin {
-    kotlinJavaToolchain.toolchain.use(javaToolchains.launcherFor {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    })
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.compileJava {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+tasks.jar {
+    from(sourceSets["mr"].output) {
+        into("META-INF/versions/11")
+    }
+    manifest {
+        attributes("Multi-Release" to "true")
+    }
 }
 
 tasks.named<KotlinCompile>("compileJava11Kotlin") {
@@ -98,14 +109,23 @@ tasks.named<JavaCompile>("compileJava11Java") {
     targetCompatibility = "11"
 }
 
-tasks.named<JavaCompile>("compileJava11TestJava") {
+
+tasks.named<KotlinCompile>("compileMrKotlin") {
+    kotlinJavaToolchain.toolchain.use(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    })
+    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.freeCompilerArgs += "-Xexplicit-api=strict"
+}
+
+tasks.named<JavaCompile>("compileMrJava") {
     sourceCompatibility = "11"
     targetCompatibility = "11"
 }
 
-java {
-    testing {
-    }
+tasks.named<JavaCompile>("compileJava11TestJava") {
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
 }
 
 tasks.test {
