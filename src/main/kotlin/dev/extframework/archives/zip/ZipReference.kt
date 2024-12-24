@@ -1,12 +1,12 @@
 package dev.extframework.archives.zip
 
-import com.durganmcbroom.resources.streamToResource
 import dev.extframework.archives.ArchiveReference
 import java.net.URI
 import java.util.jar.JarFile
 
 public class ZipReference(
-    public val zip: JarFile, override val location: URI,
+    public val zip: JarFile,
+    override val location: URI,
 ) : ArchiveReference {
     private var closed = false
     private val overrides: MutableMap<String, ArchiveReference.Entry> = HashMap()
@@ -37,12 +37,11 @@ public class ZipReference(
             return (overrides[name] ?: zip.getJarEntry(name)?.let { entry ->
                 ArchiveReference.Entry(
                     entry.name,
-                    streamToResource("jar:${location}!/${entry.name}") {
-                        zip.getInputStream(entry)
-                    },
                     entry.isDirectory,
                     this@ZipReference
-                )
+                ) {
+                    zip.getInputStream(entry)
+                }
             }).takeUnless { removes.contains(name) }
         }
 

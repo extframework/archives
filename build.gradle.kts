@@ -1,4 +1,5 @@
 import dev.extframework.gradle.common.commonUtil
+import dev.extframework.gradle.common.dm.resourceApi
 import dev.extframework.gradle.common.extFramework
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -50,6 +51,7 @@ dependencies {
     commonUtil(configurationName = "java11Implementation")
     commonUtil(configurationName = "mrImplementation")
     commonUtil(configurationName = "api")
+    resourceApi(version = "1.2-SNAPSHOT")
 
     "mrImplementation"(sourceSets.main.get().output)
 
@@ -137,11 +139,12 @@ allprojects {
     apply(plugin = "dev.extframework.common")
 
     group = "dev.extframework"
-    version = "1.4-SNAPSHOT"
+    version = "1.5-SNAPSHOT"
 
     repositories {
         mavenCentral()
         extFramework()
+        mavenLocal()
     }
 
     common {

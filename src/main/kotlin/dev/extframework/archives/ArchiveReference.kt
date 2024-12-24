@@ -1,7 +1,5 @@
 package dev.extframework.archives
 
-import com.durganmcbroom.resources.Resource
-import com.durganmcbroom.resources.openStream
 import dev.extframework.archives.Archives.WRITER_FLAGS
 import dev.extframework.archives.transform.AwareClassWriter
 import dev.extframework.archives.transform.TransformerConfig
@@ -23,7 +21,7 @@ public interface ArchiveReference : Closeable, ArchiveTree {
         get() = !isClosed
 
     override fun getResource(name: String): InputStream? {
-        return  reader[name]?.resource?.openStream()
+        return reader[name]?.open()
     }
 
     public interface Reader {
@@ -39,11 +37,11 @@ public interface ArchiveReference : Closeable, ArchiveTree {
     public interface Writer {
         public fun put(
             name: String,
-            resource: Resource,
             handle: ArchiveReference,
-            isDirectory: Boolean = false
+            isDirectory: Boolean = false,
+            stream: () -> InputStream
         ): Unit =
-            put(Entry(name, resource, isDirectory, handle))
+            put(Entry(name, isDirectory, handle, stream))
 
         public fun put(entry: Entry)
 
@@ -52,25 +50,29 @@ public interface ArchiveReference : Closeable, ArchiveTree {
 
     public data class Entry public constructor(
         public val name: String,
-        public val resource: Resource,
         public val isDirectory: Boolean,
         public val handle: ArchiveReference,
+        private val resource: () -> InputStream,
     ) {
+        @Deprecated("Dont use this, do it manually.")
         public fun transform(config: TransformerConfig, handles: List<ArchiveTree> = listOf()): Entry {
             return Entry(
                 name,
-                Resource(resource.location) {
-                    ByteArrayInputStream(
-                        Archives.resolve(
-                            ClassReader(resource.openStream()),
-                            config,
-                            AwareClassWriter(handles + handle, WRITER_FLAGS)
-                        )
-                    )
-                },
                 isDirectory,
                 handle
-            )
+            ) {
+                ByteArrayInputStream(
+                    Archives.applyConfig(
+                        ClassReader(open()),
+                        config,
+                        AwareClassWriter(handles + handle, WRITER_FLAGS)
+                    )
+                )
+            }
+        }
+
+        public fun open(): InputStream {
+            return resource()
         }
 
         override fun equals(other: Any?): Boolean {

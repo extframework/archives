@@ -1,16 +1,20 @@
 package dev.extframework.archives.module
+
 import com.durganmcbroom.resources.openStream
 import com.durganmcbroom.resources.streamToResource
 import dev.extframework.archives.ArchiveReference
 import dev.extframework.common.util.readInputStream
+import java.io.File
 import java.io.InputStream
 import java.lang.module.ModuleReader
 import java.lang.module.ModuleReference
 import java.net.URI
 import java.nio.ByteBuffer
+import java.nio.file.Paths
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
+import kotlin.io.path.Path
 
 public class JpmReference(
     delegate: ModuleReference,
@@ -28,15 +32,18 @@ public class JpmReference(
     override val modified: Boolean get() = overrides.isNotEmpty() || removes.isNotEmpty()
     override val isClosed: Boolean
         get() = closed
+
     override fun close() {
         closed = true
         (reader as JpmReader).close()
     }
+
     private fun ensureOpen() {
         if (closed) {
             throw IllegalStateException("Module is closed")
         }
     }
+
     override fun open(): ModuleReader = reader as ModuleReader
     private inner class JpmReader(
         private val reader: ModuleReader
@@ -49,22 +56,28 @@ public class JpmReference(
                 ?: reader.find(name).orElse(null)?.let {
                     ArchiveReference.Entry(
                         name,
-                        streamToResource(it.toString()) { it.toURL().openStream() },
                         name.endsWith("/"), // This is how they do it in the java source code, wish there could be a better solution :(
                         this@JpmReference
-                    )
+                    ) {
+                        it.toURL().openStream()
+                    }
                 }?.also { cache[name] = it })
                 ?.takeUnless { removes.contains(it.name) }
         }
+
         override fun entries(): Sequence<ArchiveReference.Entry> =
             Sequence(list()::iterator).mapNotNull(::of)
+
         override fun find(name: String): Optional<URI> =
-            Optional.ofNullable(of(name)?.resource?.location?.let(URI::create))
+            Optional.ofNullable(of(name)?.name?.let { URI.create("jar:${Paths.get(location)}!${File.separatorChar}$it") })
+
         override fun open(name: String): Optional<InputStream> =
-            Optional.ofNullable(of(name)?.resource?.openStream())
+            Optional.ofNullable(of(name)?.open())
+
         override fun read(name: String): Optional<ByteBuffer> =
             Optional.ofNullable(
-                of(name)?.resource?.openStream()?.readInputStream()?.let { ByteBuffer.wrap(it) })
+                of(name)?.open()?.readInputStream()?.let { ByteBuffer.wrap(it) })
+
         override fun list(): Stream<String> {
             ensureOpen()
             return Stream.concat(overrides.keys.stream(), reader.list()).filter(
@@ -75,11 +88,13 @@ public class JpmReference(
             )
         }
     }
+
     private inner class JpmWriter : ArchiveReference.Writer {
         override fun put(entry: ArchiveReference.Entry) {
             ensureOpen()
             overrides[entry.name] = entry
         }
+
         override fun remove(name: String) {
             ensureOpen()
             removes.add(name)

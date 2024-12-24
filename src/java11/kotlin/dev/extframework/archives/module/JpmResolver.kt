@@ -1,6 +1,5 @@
 package dev.extframework.archives.module
 
-import com.durganmcbroom.resources.openStream
 import dev.extframework.archives.ArchiveHandle
 import dev.extframework.archives.ArchiveResolver
 import dev.extframework.archives.ClassLoaderProvider
@@ -86,7 +85,7 @@ public object JpmResolver : ArchiveResolver<JpmReference, JpmResolutionResult> {
                 val entry = JarEntry(e.name)
                 target.putNextEntry(entry)
                 // TODO integrate the jobs framework
-                val eIn = e.resource.openStream()
+                val eIn = e.open()
                 // Borrowed from https://stackoverflow.com/questions/1281229/how-to-use-jaroutputstream-to-create-a-jar-file
                 val buffer = ByteArray(1024)
                 while (true) {
