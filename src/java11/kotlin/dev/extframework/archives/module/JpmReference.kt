@@ -1,7 +1,5 @@
 package dev.extframework.archives.module
 
-import com.durganmcbroom.resources.openStream
-import com.durganmcbroom.resources.streamToResource
 import dev.extframework.archives.ArchiveReference
 import dev.extframework.common.util.readInputStream
 import java.io.File
@@ -10,11 +8,9 @@ import java.lang.module.ModuleReader
 import java.lang.module.ModuleReference
 import java.net.URI
 import java.nio.ByteBuffer
-import java.nio.file.Paths
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
-import kotlin.io.path.Path
 
 public class JpmReference(
     delegate: ModuleReference,
@@ -69,7 +65,7 @@ public class JpmReference(
             Sequence(list()::iterator).mapNotNull(::of)
 
         override fun find(name: String): Optional<URI> =
-            Optional.ofNullable(of(name)?.name?.let { URI.create("jar:${Paths.get(location)}!${File.separatorChar}$it") })
+            Optional.ofNullable(of(name)?.name?.let { URI.create("jar:${location}!${File.separatorChar}$it") })
 
         override fun open(name: String): Optional<InputStream> =
             Optional.ofNullable(of(name)?.open())

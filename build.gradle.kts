@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.21"
 
-    id("dev.extframework.common") version "1.0.36"
+    id("dev.extframework.common") version "1.0.43"
 }
 
 tasks.wrapper {
@@ -51,7 +51,7 @@ dependencies {
     commonUtil(configurationName = "java11Implementation")
     commonUtil(configurationName = "mrImplementation")
     commonUtil(configurationName = "api")
-    resourceApi(version = "1.2-SNAPSHOT")
+//    resourceApi()
 
     "mrImplementation"(sourceSets.main.get().output)
 
